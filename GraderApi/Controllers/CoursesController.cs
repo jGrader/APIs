@@ -16,9 +16,9 @@ namespace GraderApi.Controllers
 {
     public class CoursesController : ApiController
     {
-        private readonly ICourseRepository _repository;
+        private readonly CourseRepository _repository;
 
-        public CoursesController(ICourseRepository repository)
+        public CoursesController(CourseRepository repository)
         {
             _repository = repository;
         }
