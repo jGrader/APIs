@@ -20,8 +20,8 @@
             result.Add("ShortName", cm.ShortName);
             result.Add("CourseNumber", cm.CourseNumber);
             result.Add("Semester", cm.Semester);
-            result.Add("StartTime", cm.StartTime);
-            result.Add("EndTime", cm.EndTime);
+            result.Add("StartDate", cm.StartDate);
+            result.Add("EndDate", cm.EndDate);
             result.Add("OwnerId", cm.OwnerId);
 
             return result;

@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Linq.Expressions;
 using System.Runtime.Remoting.Messaging;
 using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Models;
@@ -53,7 +54,35 @@ namespace GraderDataAccessLayer.Repositories
             return searchResult;
         }
 
+        public IEnumerable<CourseModel> GetByYear(int year)
+        {
+            var searchResult = _db.Course.Where(c => c.Year == year);
+            return searchResult;
+        }
 
+        public IEnumerable<CourseModel> GetByStartDate(DateTime startDate)
+        {
+            var searchResult = _db.Course.Where(c => c.StartDate == startDate);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetByEndDate(DateTime endDate)
+        {
+            var searchResult = _db.Course.Where(c => c.EndDate == endDate);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetByOwnerId(int ownerId)
+        {
+            var searchResult = _db.Course.Where(c => c.OwnerId == ownerId);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetByLambda(Expression<Func<CourseModel, bool>> e)
+        {
+            var searchResult = _db.Course.Where(e);
+            return searchResult;
+        }
 
         public async Task<bool> Add(CourseModel item)
         {
