@@ -16,18 +16,18 @@ namespace GraderDataAccessLayer.Repositories
     {
         private DatabaseContext _db = new DatabaseContext();
 
-        public IEnumerable<Course> GetAll()
+        public IEnumerable<CourseModel> GetAll()
         {
             //return await Task.Run(() => _db.Course.Where(c => c.Id > 0));
             return _db.Course;
         }
 
-        public Course Get(int id)
+        public CourseModel Get(int id)
         {
             throw new NotImplementedException();
         }
 
-        public bool Add(Course item)
+        public bool Add(CourseModel item)
         {
             throw new NotImplementedException();
         }
@@ -37,7 +37,7 @@ namespace GraderDataAccessLayer.Repositories
             throw new NotImplementedException();
         }
 
-        public bool Update(Course item)
+        public bool Update(CourseModel item)
         {
             throw new NotImplementedException();
         }
