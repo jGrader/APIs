@@ -4,7 +4,7 @@
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    class ExtensionModel
+    public class ExtensionModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

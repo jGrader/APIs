@@ -4,7 +4,7 @@
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    class GradeModel
+    public class GradeModel
     {
         //Scalar Properties
         [Key]

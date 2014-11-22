@@ -59,6 +59,7 @@
     <Compile Include="Models\ExtensionModel.cs" />
     <Compile Include="Models\GradeComponentModel.cs" />
     <Compile Include="Models\GradeModel.cs" />
+    <Compile Include="Models\SSHKeyModel.cs" />
     <Compile Include="Models\SubmissionModel.cs" />
     <Compile Include="Models\TaskModel.cs" />
     <Compile Include="Models\TeamMemberModel.cs" />
