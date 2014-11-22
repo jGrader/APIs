@@ -1,5 +1,7 @@
 ﻿
+using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Runtime.Remoting.Messaging;
 using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Models;
@@ -29,17 +31,63 @@ namespace GraderDataAccessLayer.Repositories
 
         public bool Add(CourseModel item)
         {
-            throw new NotImplementedException();
+            if (item == null)
+            {
+                throw new ArgumentNullException("item");
+            }
+
+            try
+            {
+                _db.Course.Add(item);
+                _db.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return false;
+            }
         }
 
         public bool Remove(int id)
         {
-            throw new NotImplementedException();
+            var item = _db.Course.FirstOrDefault(c => c.Id == id);
+            if (item == null)
+            {
+                throw new ArgumentNullException("id");
+            }
+
+            try
+            {
+                _db.Course.Remove(item);
+                _db.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return false;
+            }
         }
 
         public bool Update(CourseModel item)
         {
-            throw new NotImplementedException();
+            var dbItem = _db.Course.FirstOrDefault(c => c.Id == item.Id);
+            if (dbItem == null)
+            {
+                throw new ArgumentNullException("item");
+            }
+
+            try
+            {
+                _db.Course.Remove(dbItem);
+                _db.Course.Add(item);
+                _db.SaveChangesAsync();
+
+                return true;
+            }
+            catch (DBConcurrencyException)
+            {
+                return false;
+            }
         }
 
         private void Dispose(bool disposing)
