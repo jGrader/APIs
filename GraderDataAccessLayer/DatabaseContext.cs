@@ -21,7 +21,7 @@ namespace GraderDataAccessLayer
         public DbSet<ExtensionModel> Extension { get; set; }
         public DbSet<GradeComponentModel> GradeComponent { get; set; }
         public DbSet<GradeModel> Grade { get; set; }
-        public DbSet<SSHKeyModel> SSHKey { get; set; }
+        public DbSet<SshKeyModel> SSHKey { get; set; }
         public DbSet<SubmissionModel> Submission { get; set; }
         public DbSet<TaskModel> Task { get; set; }
         public DbSet<TeamMemberModel> TeamMember { get; set; }
