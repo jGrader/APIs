@@ -15,6 +15,18 @@ namespace GraderDataAccessLayer
         }
 
         public DbSet<CourseModel> Course { get; set; }
+        public DbSet<AdminModel> Admin { get; set; }
+        public DbSet<CourseUserModel> CourseUser { get; set; }
+        public DbSet<EntityModel> Entity { get; set; }
+        public DbSet<ExtensionModel> Extension { get; set; }
+        public DbSet<GradeComponentModel> GradeComponent { get; set; }
+        public DbSet<GradeModel> Grade { get; set; }
+        public DbSet<SSHKeyModel> SSHKey { get; set; }
+        public DbSet<SubmissionModel> Submission { get; set; }
+        public DbSet<TaskModel> Task { get; set; }
+        public DbSet<TeamMemberModel> TeamMember { get; set; }
+        public DbSet<TeamModel> Team { get; set; }
+        public DbSet<UserModel> User { get; set; }
         public DbSet<SessionIdModel> SessionId { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

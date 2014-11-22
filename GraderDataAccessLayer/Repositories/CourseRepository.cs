@@ -1,15 +1,18 @@
-﻿namespace GraderDataAccessLayer.Repositories
+﻿
+using System.Data;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Runtime.Remoting.Messaging;
+using GraderDataAccessLayer.Interfaces;
+using GraderDataAccessLayer.Models;
+
+namespace GraderDataAccessLayer.Repositories
 {
     using System;
-    using System.Linq;
-    using System.Threading.Tasks;
     using System.Collections.Generic;
-    
-    using System.Data;
-    using System.Data.Entity.Core;
-    using System.Data.Entity.Infrastructure;
-    using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Interfaces;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
 
     public class CourseRepository : ICourseRepository
     {
@@ -17,19 +20,40 @@
 
         public IEnumerable<CourseModel> GetAll()
         {
-            return _db.Course;
+            return _db.Course.Where(c => c.Id > 0);
         }
 
         public CourseModel Get(int id)
         {
-            var item = _db.Course.FirstOrDefault(c => c.Id == id);
-            if (item == null)
-            {
-                throw new ObjectNotFoundException();
-            }
-
-            return item;
+            var searchResult = _db.Course.Where(c => c.Id == id);
+            return searchResult.FirstOrDefault();
         }
+
+        public IEnumerable<CourseModel> GetByName(string name)
+        {
+            var searchResult = _db.Course.Where(c => c.Name == name);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetByShortName(string shortName)
+        {
+            var searchResult = _db.Course.Where(c => c.ShortName == shortName);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetByCourseNumber(string courseNumber)
+        {
+            var searchResult = _db.Course.Where(c => c.CourseNumber == courseNumber);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetBySemester(int semester)
+        {
+            var searchResult = _db.Course.Where(c => c.Semester == semester);
+            return searchResult;
+        }
+
+
 
         public async Task<bool> Add(CourseModel item)
         {
