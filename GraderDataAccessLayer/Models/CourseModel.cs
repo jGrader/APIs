@@ -4,7 +4,7 @@
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    public class Course
+    public class CourseModel
     {
         //Scalar Properties
         [Key]
@@ -32,10 +32,9 @@
 
         //Navigation properties
         public int OwnerId { get; set; }
-
-        /*
+        [Required]
         [ForeignKey("OwnerId")]
-        public virtual gawga Owner { get; set; }
-        */
+        public virtual UserModel Id { get; set; }
+        
     }
 }
