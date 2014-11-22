@@ -9,7 +9,7 @@ namespace GraderDataAccessLayer.Repositories
 {
     class GradeComponentRepository : IGradeComponentRepository
     {
-        private readonly DatabaseContext _db = new DatabaseContext();
+        private DatabaseContext _db = new DatabaseContext();
 
         private void Dispose(bool disposing)
         {
