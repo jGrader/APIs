@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using GraderApi.Models;
+using GraderDataAccessLayer;
 
 namespace GraderApi
 {
@@ -23,7 +24,7 @@ namespace GraderApi
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             //
-            Database.SetInitializer(new CourseInitializer());
+            Database.SetInitializer(new DatabaseInitializer());
         }
     }
 }

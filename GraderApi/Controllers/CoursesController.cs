@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 using System.Net;
 using System.Web.Http;
@@ -6,6 +8,8 @@ using System.Web.Http.Description;
 
 using GraderApi.Models;
 using System.Threading.Tasks;
+using GraderDataAccessLayer.Models;
+using GraderDataAccessLayer.Repositories;
 
 
 namespace GraderApi.Controllers
@@ -20,9 +24,10 @@ namespace GraderApi.Controllers
         }
 
         // GET: api/Courses
-        public async Task<IQueryable<Course>> GetCourses()
+        public IEnumerable<Course> GetCourses()
         {
-            return await _repository.GetAll();
+            var result =  _repository.GetAll();
+            return result.Result;
         }
 
         // GET: api/Courses/5
