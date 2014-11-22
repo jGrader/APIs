@@ -24,6 +24,6 @@
         public int CourseId { get; set; }
         [Required]
         [ForeignKey("CourseId")]
-        public virtual Course Id { get; set; }
+        public virtual CourseModel Id { get; set; }
     }
 }
