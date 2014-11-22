@@ -11,9 +11,8 @@
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        //Navigation properties
+        //Navigation property
         public int CourseId { get; set; }
-
         [Required]
         [ForeignKey("CourseId")]
         public virtual Course Id { get; set; }
