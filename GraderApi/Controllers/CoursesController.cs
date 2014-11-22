@@ -8,6 +8,7 @@ using System.Web.Http.Description;
 
 using GraderApi.Models;
 using System.Threading.Tasks;
+using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Models;
 using GraderDataAccessLayer.Repositories;
 

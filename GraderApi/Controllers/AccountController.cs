@@ -23,7 +23,6 @@ namespace GraderApi.Controllers
     [RoutePrefix("api/Account")]
     public class AccountController : ApiController
     {
-
         private const string LocalLoginProvider = "Local";
         private ApplicationUserManager _userManager;
 
@@ -329,7 +328,7 @@ namespace GraderApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
+            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email, Permissions = "" };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
 

@@ -1,5 +1,6 @@
 using System.Configuration;
 using GraderApi.Models;
+using GraderDataAccessLayer.Interfaces;
 using Microsoft.Practices.Unity;
 using System.Web.Http;
 using Unity.WebApi;
