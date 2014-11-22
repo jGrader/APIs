@@ -114,7 +114,7 @@
             return result;
         }
 
-        public static JObject ToJson(this SSHKeyModel skm)
+        public static JObject ToJson(this SshKeyModel skm)
         {
             var result = new JObject();
 
