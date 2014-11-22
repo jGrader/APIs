@@ -25,7 +25,7 @@
         public int Semester { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime StarTime { get; set; }
+        public DateTime StartTime { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime EndTime { get; set; }
