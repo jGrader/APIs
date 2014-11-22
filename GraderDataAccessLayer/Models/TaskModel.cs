@@ -18,12 +18,12 @@
         public int GradeComponentId { get; set; }
         [Required]
         [ForeignKey("GradeComponentId")]
-        public virtual GradeComponentModel Id { get; set; }
+        public virtual GradeComponentModel GradeComponent { get; set; }
 
         //Navigation property
         public int CourseId { get; set; }
         [Required]
         [ForeignKey("CourseId")]
-        public virtual CourseModel Id { get; set; }
+        public virtual CourseModel Course { get; set; }
     }
 }
