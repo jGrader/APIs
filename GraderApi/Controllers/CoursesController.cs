@@ -34,7 +34,7 @@ namespace GraderApi.Controllers
         }
 
         // GET: api/Courses/5
-        public Course GetCourse(int id)
+        public CourseModel GetCourse(int id)
         {
             var course = _repository.Get(id);
             return course;
@@ -42,7 +42,7 @@ namespace GraderApi.Controllers
 
         // PUT: api/Courses/5
         [ResponseType(typeof(void))]
-        public IHttpActionResult PutCourse(int id, Course course)
+        public IHttpActionResult PutCourse(int id, CourseModel course)
         {
             if (!ModelState.IsValid)
             {
@@ -59,8 +59,8 @@ namespace GraderApi.Controllers
         }
 
         // POST: api/Courses
-        [ResponseType(typeof(Course))]
-        public async Task<IHttpActionResult> PostCourse(Course course)
+        [ResponseType(typeof(CourseModel))]
+        public async Task<IHttpActionResult> PostCourse(CourseModel course)
         {
             if (!ModelState.IsValid)
             {
@@ -78,7 +78,7 @@ namespace GraderApi.Controllers
         }
 
         // DELETE: api/Courses/5
-        [ResponseType(typeof(Course))]
+        [ResponseType(typeof(CourseModel))]
         public async Task<IHttpActionResult> DeleteCourse(int id)
         {
             var result = _repository.Remove(id);
