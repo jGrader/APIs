@@ -14,7 +14,7 @@
         public int UserId { get; set; }
         [Required]
         [ForeignKey("UserId")]
-        //public virtual UserModel Id { get; set; }
+        public virtual UserModel Id { get; set; }
 
         //Navigation property
         public int EntityId { get; set; }
