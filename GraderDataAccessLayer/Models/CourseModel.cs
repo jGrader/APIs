@@ -1,13 +1,8 @@
-﻿
-namespace GraderDataAccessLayer.Models
+﻿namespace GraderDataAccessLayer.Models
 {
     using System;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data;
-    using System.Data.Entity.Infrastructure;
-    using System.Linq;
-    using System.Threading.Tasks;
 
     public class Course
     {

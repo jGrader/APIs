@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using GraderDataAccessLayer.Models;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
-using GraderDataAccessLayer.Models;
+
 
 namespace GraderDataAccessLayer
 {

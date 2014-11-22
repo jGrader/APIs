@@ -1,6 +1,7 @@
 ﻿
 using System.Data.Entity;
 using System.Runtime.Remoting.Messaging;
+using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Models;
 
 namespace GraderDataAccessLayer.Repositories
