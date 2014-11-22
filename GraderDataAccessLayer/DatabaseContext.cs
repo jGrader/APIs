@@ -15,6 +15,7 @@ namespace GraderDataAccessLayer
         }
 
         public DbSet<CourseModel> Course { get; set; }
+        public DbSet<SessionIdModel> SessionId { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

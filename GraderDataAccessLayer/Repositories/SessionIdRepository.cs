@@ -4,12 +4,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GraderDataAccessLayer.Interfaces;
+using GraderDataAccessLayer.Models;
 
 namespace GraderDataAccessLayer.Repositories
 {
-    public class GradeComponentRepository : IGradeComponentRepository
+    public class SessionIdRepository : ISessionIdRepository
     {
-        private DatabaseContext _db = new DatabaseContext();
+        DatabaseContext _db = new DatabaseContext();
+
+        public SessionIdModel Get(int userId)
+        {
+            var result = _db.SessionId.FirstOrDefault(s => s.UserId == userId);
+            if (result == null)
+                return null;
+
+            return result;
+        }
+
+        public Task<bool> IsAuthorized(int userId)
+        {
+            throw new NotImplementedException();
+        }
 
         private void Dispose(bool disposing)
         {
@@ -23,6 +38,7 @@ namespace GraderDataAccessLayer.Repositories
             }
 
             _db.Dispose();
+            _db = null;
         }
 
         public void Dispose()
