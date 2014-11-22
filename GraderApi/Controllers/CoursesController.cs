@@ -33,7 +33,7 @@ namespace GraderApi.Controllers
         }
 
         // GET: api/Courses/5
-        public HttpResponseMessage GetCourse(int id)
+        public Course GetCourse(int id)
         {
             var course = _repository.Get(id);
             if (course == null)
