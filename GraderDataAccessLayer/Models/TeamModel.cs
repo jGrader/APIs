@@ -4,9 +4,8 @@
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    class GradeComponentModel
+    class TeamModel
     {
-        //Scalar Properties
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -16,12 +15,5 @@
         [Required]
         [ForeignKey("CourseId")]
         public virtual CourseModel Id { get; set; }
-
-        [Required]
-        [DataType(DataType.Text)]
-        public string Name { get; set; }
-
-        [Required]
-        public int Percentage { get; set; }
     }
 }

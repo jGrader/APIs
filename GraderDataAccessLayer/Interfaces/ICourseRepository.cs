@@ -8,10 +8,10 @@ namespace GraderDataAccessLayer.Interfaces
 
     public interface ICourseRepository : IDisposable
     {
-        Task<IEnumerable<Course>> GetAll();
-        Task<Course> Get(int id);
-        Task<bool> Add(Course item);
-        Task<bool> Remove(int id);
-        Task<bool> Update(Course item);
+        IEnumerable<Course> GetAll();
+        Course Get(int id);
+        bool Add(Course item);
+        bool Remove(int id);
+        bool Update(Course item);
     }
 }

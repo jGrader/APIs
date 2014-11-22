@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
 
@@ -17,36 +18,31 @@ namespace GraderApi.Controllers
 {
     public class CoursesController : ApiController
     {
-        private readonly ICourseRepository _repository;
+        private readonly CourseRepository _repository;
 
-        public CoursesController(ICourseRepository repository)
+        public CoursesController(CourseRepository repository)
         {
             _repository = repository;
         }
 
         // GET: api/Courses
-        public IEnumerable<Course> GetCourses()
+        public HttpResponseMessage GetCourses()
         {
-            var result =  _repository.GetAll();
-            return result.Result;
+            var courses =  _repository.GetAll();
+            var result = Request.CreateResponse(HttpStatusCode.Accepted, courses);
+            return result;
         }
 
         // GET: api/Courses/5
-        [ResponseType(typeof(Course))]
-        public async Task<IHttpActionResult> GetCourse(int id)
+        public Course GetCourse(int id)
         {
-            var course = await _repository.Get(id);
-            if (course == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(course);
+            var course = _repository.Get(id);
+            return course;
         }
 
         // PUT: api/Courses/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutCourse(int id, Course course)
+        public IHttpActionResult PutCourse(int id, Course course)
         {
             if (!ModelState.IsValid)
             {
@@ -58,7 +54,7 @@ namespace GraderApi.Controllers
                 return BadRequest();
             }
 
-            var result = await _repository.Update(course);
+            var result = _repository.Update(course);
             return StatusCode(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
         }
 
@@ -71,7 +67,7 @@ namespace GraderApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = await _repository.Add(course);
+            var result = _repository.Add(course);
 
             if (!result)
             {
@@ -85,7 +81,7 @@ namespace GraderApi.Controllers
         [ResponseType(typeof(Course))]
         public async Task<IHttpActionResult> DeleteCourse(int id)
         {
-            var result = await _repository.Remove(id);
+            var result = _repository.Remove(id);
 
             return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
         }
