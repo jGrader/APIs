@@ -1,21 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using System.Web.Http.Description;
-
-using GraderApi.Models;
-using System.Threading.Tasks;
-using GraderDataAccessLayer.Interfaces;
-using GraderDataAccessLayer.Models;
-using GraderDataAccessLayer.Repositories;
-
-
-namespace GraderApi.Controllers
+﻿namespace GraderApi.Controllers
 {
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using System.Net;
+    using System.Net.Http;
+    using System.Web.Http;
+    using System.Web.Http.Description;
+
+    using GraderApi.Models;
+    using System.Threading.Tasks;
+    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer.Models;
+    using GraderDataAccessLayer.Repositories;
+
+    using Grader.JsonSerializer;
+
     public class CoursesController : ApiController
     {
         private readonly CourseRepository _repository;
@@ -29,7 +30,7 @@ namespace GraderApi.Controllers
         public HttpResponseMessage GetCourses()
         {
             var courses =  _repository.GetAll();
-            return Request.CreateResponse(HttpStatusCode.Accepted, courses);
+            return Request.CreateResponse(HttpStatusCode.Accepted, courses.ToJson());
         }
 
         // GET: api/Courses/5

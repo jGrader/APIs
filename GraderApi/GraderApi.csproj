@@ -285,6 +285,14 @@
       <Project>{f8a2941c-65ac-41d7-af65-8a4443209898}</Project>
       <Name>GraderDataAccessLayer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\JsonSerializer\JsonSerializer.csproj">
+      <Project>{fd18aff1-e18c-48e1-8952-f7c343d1c5c5}</Project>
+      <Name>JsonSerializer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Services.cs\Services.cs.csproj">
+      <Project>{eb402009-5a3b-418a-b52b-ef579349fd56}</Project>
+      <Name>Services.cs</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
