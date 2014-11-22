@@ -4,7 +4,7 @@
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    class TeamModel
+    public class TeamModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

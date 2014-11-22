@@ -11,7 +11,7 @@
         canCreateEntities = 2
     }
 
-    class CourseUserModel
+    public class CourseUserModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

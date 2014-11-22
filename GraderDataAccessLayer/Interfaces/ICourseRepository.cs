@@ -8,10 +8,10 @@ namespace GraderDataAccessLayer.Interfaces
 
     public interface ICourseRepository : IDisposable
     {
-        IEnumerable<Course> GetAll();
-        Course Get(int id);
-        bool Add(Course item);
+        IEnumerable<CourseModel> GetAll();
+        CourseModel Get(int id);
+        bool Add(CourseModel item);
         bool Remove(int id);
-        bool Update(Course item);
+        bool Update(CourseModel item);
     }
 }

@@ -4,7 +4,7 @@
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    class SubmissionModel
+    public class SubmissionModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

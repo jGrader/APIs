@@ -4,7 +4,7 @@
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    class TaskModel
+    public class TaskModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

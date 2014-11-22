@@ -4,7 +4,7 @@
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    class EntityModel
+    public class EntityModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -19,7 +19,7 @@
         public int TaskId { get; set; }
         [Required]
         [ForeignKey("TaskId")]
-        public virtual TaskModel Id { get; set; }
+        public virtual TaskModel Task { get; set; }
 
         [Required]
         [DataType(DataType.DateTime)]

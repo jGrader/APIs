@@ -14,7 +14,7 @@ namespace GraderDataAccessLayer
         {
         }
 
-        public DbSet<Course> Course { get; set; }
+        public DbSet<CourseModel> Course { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -26,10 +26,10 @@ namespace GraderDataAccessLayer
     {
         protected override void Seed(DatabaseContext context)
         {
-            var courses = new List<Course>
+            var courses = new List<CourseModel>
             {
-                new Course { Name = "General Procrastination", CourseNumber = "52001", StarTime = new DateTime(2014, 10, 22), EndTime = new DateTime(2014, 11, 23), Semester = 1, ShortName = "GenPro" },
-                new Course { Name = "General Useless Studies", CourseNumber = "71501", StarTime = new DateTime(2014, 1, 2), EndTime = new DateTime(2015, 5, 23), Semester = 2, ShortName = "GenULS" }
+                new CourseModel { Name = "General Procrastination", CourseNumber = "52001", StarTime = new DateTime(2014, 10, 22), EndTime = new DateTime(2014, 11, 23), Semester = 1, ShortName = "GenPro" },
+                new CourseModel { Name = "General Useless Studies", CourseNumber = "71501", StarTime = new DateTime(2014, 1, 2), EndTime = new DateTime(2015, 5, 23), Semester = 2, ShortName = "GenULS" }
             };
             courses.ForEach(c => context.Course.Add(c));
             context.SaveChanges();
