@@ -3,11 +3,6 @@
     using System;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data;
-    using System.Data.Entity.Infrastructure;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using GraderDataAccessLayer.Models;
 
     class GradeComponentModel
     {
@@ -22,6 +17,12 @@
         [Required]
         [ForeignKey("CourseId")]
         public virtual Course Id { get; set; }
-        
+
+        [Required]
+        [DataType(DataType.Text)]
+        public string Name { get; set; }
+
+        [Required]
+        public int Percentage { get; set; }
     }
 }
