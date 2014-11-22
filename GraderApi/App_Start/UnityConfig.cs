@@ -1,9 +1,10 @@
 using System.Configuration;
 using GraderApi.Models;
+using GraderDataAccessLayer.Repositories;
 using Microsoft.Practices.Unity;
 using System.Web.Http;
 using Unity.WebApi;
-using GraderDataAccessLayer.Repositories;
+using GraderDataAccessLayer.Interfaces;
 
 namespace GraderApi
 {
