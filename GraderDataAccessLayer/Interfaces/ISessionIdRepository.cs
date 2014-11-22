@@ -10,6 +10,6 @@
     public interface ISessionIdRepository : IDisposable
     {
         SessionIdModel Get(int userId);
-        Task<bool> IsAuthorized(int userId);
+        bool IsAuthorized(int? userId);
     }
 }

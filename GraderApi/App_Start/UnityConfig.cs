@@ -1,10 +1,9 @@
-using System.Configuration;
-using GraderApi.Models;
-using GraderDataAccessLayer.Repositories;
-using Microsoft.Practices.Unity;
-using System.Web.Http;
 using Unity.WebApi;
+using System.Web.Http;
+using Microsoft.Practices.Unity;
 using GraderDataAccessLayer.Interfaces;
+using GraderDataAccessLayer.Repositories;
+
 
 namespace GraderApi
 {
@@ -14,9 +13,13 @@ namespace GraderApi
         {
 			var container = new UnityContainer();
             container.RegisterType<ICourseRepository, CourseRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<ISessionIdRepository, SessionIdRepository>(new ContainerControlledLifetimeManager());
 
             var courseRepository = new CourseRepository();
             container.RegisterInstance<ICourseRepository>(courseRepository);
+
+            var sessionIdRepository = new SessionIdRepository();
+            container.RegisterInstance<ISessionIdRepository>(sessionIdRepository);
 
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }

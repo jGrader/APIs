@@ -24,17 +24,19 @@
 
         public int Semester { get; set; }
 
-        [DataType(DataType.Date)]
-        public DateTime StartTime { get; set; }
+        public int Year { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime EndTime { get; set; }
+        public DateTime StartDate { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime EndDate { get; set; }
 
         //Navigation properties
         public int OwnerId { get; set; }
-        [Required]
+/*
         [ForeignKey("OwnerId")]
         public virtual UserModel Owner { get; set; }
-        
+  */      
     }
 }

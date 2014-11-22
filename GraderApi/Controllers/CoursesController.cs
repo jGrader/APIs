@@ -1,15 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
 
-using GraderApi.Models;
 using System.Threading.Tasks;
-using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Models;
 using GraderDataAccessLayer.Repositories;
 
@@ -33,7 +27,7 @@ namespace GraderApi.Controllers
         }
 
         // GET: api/Courses/5
-        public Course GetCourse(int id)
+        public HttpResponseMessage GetCourse(int id)
         {
             var course = _repository.Get(id);
             if (course == null)
@@ -45,7 +39,7 @@ namespace GraderApi.Controllers
 
         // PUT: api/Courses/5
         [ResponseType(typeof(void))]
-        public IHttpActionResult PutCourse(int id, CourseModel course)
+        public async Task<IHttpActionResult> PutCourse(int id, CourseModel course)
         {
             if (!ModelState.IsValid)
             {
@@ -57,7 +51,7 @@ namespace GraderApi.Controllers
                 return BadRequest();
             }
 
-            var result = _repository.Update(course);
+            var result = await _repository.Update(course);
             return StatusCode(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
         }
 
@@ -70,7 +64,7 @@ namespace GraderApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var result = _repository.Add(course);
+            var result = await _repository.Add(course);
 
             if (!result)
             {
@@ -84,7 +78,7 @@ namespace GraderApi.Controllers
         [ResponseType(typeof(CourseModel))]
         public async Task<IHttpActionResult> DeleteCourse(int id)
         {
-            var result = _repository.Remove(id);
+            var result = await _repository.Remove(id);
 
             return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
         }

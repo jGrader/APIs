@@ -1,4 +1,4 @@
-﻿namespace JsonSerializer
+﻿namespace Grader.JsonSerializer
 {
     using System;
     using System.Collections.Generic;
@@ -20,8 +20,8 @@
             result.Add("ShortName", cm.ShortName);
             result.Add("CourseNumber", cm.CourseNumber);
             result.Add("Semester", cm.Semester);
-            result.Add("StartTime", cm.StartTime);
-            result.Add("EndTime", cm.EndTime);
+            result.Add("StartDate", cm.StartDate);
+            result.Add("EndDate", cm.EndDate);
             result.Add("OwnerId", cm.OwnerId);
 
             return result;
@@ -184,6 +184,104 @@
             result.Add("PasswordHash", um.PasswordHash);
             result.Add("GraduationYear", um.GraduationYear);
 
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<CourseModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<AdminModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<CourseUserModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<EntityModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<ExcuseModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<ExtensionModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<GradeComponentModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<GradeModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<SSHKeyModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<SubmissionModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<TaskModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<TeamMemberModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<TeamModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<UserModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
             return result;
         }
     }

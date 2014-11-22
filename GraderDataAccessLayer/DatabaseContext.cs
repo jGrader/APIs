@@ -32,6 +32,7 @@ namespace GraderDataAccessLayer
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
         }
     }
 
@@ -41,8 +42,8 @@ namespace GraderDataAccessLayer
         {
             var courses = new List<CourseModel>
             {
-                new CourseModel { Name = "General Procrastination", CourseNumber = "52001", StartTime = new DateTime(2014, 10, 22), EndTime = new DateTime(2014, 11, 23), Semester = 1, ShortName = "GenPro" },
-                new CourseModel { Name = "General Useless Studies", CourseNumber = "71501", StartTime = new DateTime(2014, 1, 2), EndTime = new DateTime(2015, 5, 23), Semester = 2, ShortName = "GenULS" }
+                new CourseModel { Name = "General Procrastination", CourseNumber = "52001", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 1, ShortName = "GenPro" },
+                new CourseModel { Name = "General Useless Studies", CourseNumber = "71501", StartDate = new DateTime(2014, 1, 2), EndDate = new DateTime(2015, 5, 23), Semester = 2, ShortName = "GenULS" }
             };
             courses.ForEach(c => context.Course.Add(c));
             context.SaveChanges();

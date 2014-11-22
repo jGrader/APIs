@@ -10,8 +10,8 @@ namespace GraderDataAccessLayer.Interfaces
     {
         IEnumerable<CourseModel> GetAll();
         CourseModel Get(int id);
-        bool Add(CourseModel item);
-        bool Remove(int id);
-        bool Update(CourseModel item);
+        Task<bool> Add(CourseModel item);
+        Task<bool> Remove(int id);
+        Task<bool> Update(CourseModel item);
     }
 }

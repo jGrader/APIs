@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Linq.Expressions;
 using System.Runtime.Remoting.Messaging;
 using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Models;
@@ -20,16 +21,70 @@ namespace GraderDataAccessLayer.Repositories
 
         public IEnumerable<CourseModel> GetAll()
         {
-            //return await Task.Run(() => _db.Course.Where(c => c.Id > 0));
-            return _db.Course;
+            return _db.Course.Where(c => c.Id > 0);
         }
 
         public CourseModel Get(int id)
         {
-            throw new NotImplementedException();
+            var searchResult = _db.Course.Where(c => c.Id == id);
+            return searchResult.FirstOrDefault();
         }
 
-        public bool Add(CourseModel item)
+        public IEnumerable<CourseModel> GetByName(string name)
+        {
+            var searchResult = _db.Course.Where(c => c.Name == name);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetByShortName(string shortName)
+        {
+            var searchResult = _db.Course.Where(c => c.ShortName == shortName);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetByCourseNumber(string courseNumber)
+        {
+            var searchResult = _db.Course.Where(c => c.CourseNumber == courseNumber);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetBySemester(int semester)
+        {
+            var searchResult = _db.Course.Where(c => c.Semester == semester);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetByYear(int year)
+        {
+            var searchResult = _db.Course.Where(c => c.Year == year);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetByStartDate(DateTime startDate)
+        {
+            var searchResult = _db.Course.Where(c => c.StartDate == startDate);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetByEndDate(DateTime endDate)
+        {
+            var searchResult = _db.Course.Where(c => c.EndDate == endDate);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetByOwnerId(int ownerId)
+        {
+            var searchResult = _db.Course.Where(c => c.OwnerId == ownerId);
+            return searchResult;
+        }
+
+        public IEnumerable<CourseModel> GetByLambda(Expression<Func<CourseModel, bool>> e)
+        {
+            var searchResult = _db.Course.Where(e);
+            return searchResult;
+        }
+
+        public async Task<bool> Add(CourseModel item)
         {
             if (item == null)
             {
@@ -39,7 +94,7 @@ namespace GraderDataAccessLayer.Repositories
             try
             {
                 _db.Course.Add(item);
-                _db.SaveChangesAsync();
+                await _db.SaveChangesAsync();
                 return true;
             }
             catch (DbUpdateConcurrencyException)
@@ -48,7 +103,7 @@ namespace GraderDataAccessLayer.Repositories
             }
         }
 
-        public bool Remove(int id)
+        public async Task<bool> Remove(int id)
         {
             var item = _db.Course.FirstOrDefault(c => c.Id == id);
             if (item == null)
@@ -59,7 +114,7 @@ namespace GraderDataAccessLayer.Repositories
             try
             {
                 _db.Course.Remove(item);
-                _db.SaveChangesAsync();
+                await _db.SaveChangesAsync();
                 return true;
             }
             catch (DbUpdateConcurrencyException)
@@ -68,7 +123,7 @@ namespace GraderDataAccessLayer.Repositories
             }
         }
 
-        public bool Update(CourseModel item)
+        public async Task<bool> Update(CourseModel item)
         {
             var dbItem = _db.Course.FirstOrDefault(c => c.Id == item.Id);
             if (dbItem == null)
@@ -80,7 +135,7 @@ namespace GraderDataAccessLayer.Repositories
             {
                 _db.Course.Remove(dbItem);
                 _db.Course.Add(item);
-                _db.SaveChangesAsync();
+                await _db.SaveChangesAsync();
 
                 return true;
             }

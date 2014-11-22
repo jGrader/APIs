@@ -1,10 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using GraderDataAccessLayer.Interfaces;
+
+using System.Data.Entity;
+using System.Data.Entity.Core;
 using GraderDataAccessLayer.Models;
+using GraderDataAccessLayer.Interfaces;
+
 
 namespace GraderDataAccessLayer.Repositories
 {
@@ -16,14 +18,39 @@ namespace GraderDataAccessLayer.Repositories
         {
             var result = _db.SessionId.FirstOrDefault(s => s.UserId == userId);
             if (result == null)
-                return null;
+            {
+                throw new ObjectNotFoundException();
+            }
 
             return result;
         }
 
-        public Task<bool> IsAuthorized(int userId)
+        public bool IsAuthorized(int? userId)
         {
-            throw new NotImplementedException();
+            if (userId == null)
+            {
+                throw new ArgumentNullException("userId");
+            }
+
+            var item = _db.SessionId.FirstOrDefault(i => i.UserId == userId);
+            if (item == null || item.ExpirationTime > DateTime.UtcNow)
+            {
+                return false;
+            }
+
+            try
+            {
+                _db.SessionId.Remove(item);
+                item.ExpirationTime = DateTime.UtcNow.AddMinutes(15);
+                _db.SessionId.Add(item);
+
+                _db.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private void Dispose(bool disposing)

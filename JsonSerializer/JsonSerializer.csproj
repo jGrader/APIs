@@ -7,7 +7,7 @@
     <ProjectGuid>{FD18AFF1-E18C-48E1-8952-F7C343D1C5C5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JsonSerializer</RootNamespace>
+    <RootNamespace>Grader.JsonSerializer</RootNamespace>
     <AssemblyName>JsonSerializer</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
