@@ -1,18 +1,15 @@
-﻿
-using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Runtime.Remoting.Messaging;
-using GraderDataAccessLayer.Interfaces;
-using GraderDataAccessLayer.Models;
-
-namespace GraderDataAccessLayer.Repositories
+﻿namespace GraderDataAccessLayer.Repositories
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
+    using System.Collections.Generic;
+    
+    using System.Data;
+    using System.Data.Entity.Core;
+    using System.Data.Entity.Infrastructure;
+    using GraderDataAccessLayer.Models;
+    using GraderDataAccessLayer.Interfaces;
 
     public class CourseRepository : ICourseRepository
     {
@@ -20,16 +17,21 @@ namespace GraderDataAccessLayer.Repositories
 
         public IEnumerable<CourseModel> GetAll()
         {
-            //return await Task.Run(() => _db.Course.Where(c => c.Id > 0));
             return _db.Course;
         }
 
         public CourseModel Get(int id)
         {
-            throw new NotImplementedException();
+            var item = _db.Course.FirstOrDefault(c => c.Id == id);
+            if (item == null)
+            {
+                throw new ObjectNotFoundException();
+            }
+
+            return item;
         }
 
-        public bool Add(CourseModel item)
+        public async Task<bool> Add(CourseModel item)
         {
             if (item == null)
             {
@@ -39,7 +41,7 @@ namespace GraderDataAccessLayer.Repositories
             try
             {
                 _db.Course.Add(item);
-                _db.SaveChangesAsync();
+                await _db.SaveChangesAsync();
                 return true;
             }
             catch (DbUpdateConcurrencyException)
@@ -48,7 +50,7 @@ namespace GraderDataAccessLayer.Repositories
             }
         }
 
-        public bool Remove(int id)
+        public async Task<bool> Remove(int id)
         {
             var item = _db.Course.FirstOrDefault(c => c.Id == id);
             if (item == null)
@@ -59,7 +61,7 @@ namespace GraderDataAccessLayer.Repositories
             try
             {
                 _db.Course.Remove(item);
-                _db.SaveChangesAsync();
+                await _db.SaveChangesAsync();
                 return true;
             }
             catch (DbUpdateConcurrencyException)
@@ -68,7 +70,7 @@ namespace GraderDataAccessLayer.Repositories
             }
         }
 
-        public bool Update(CourseModel item)
+        public async Task<bool> Update(CourseModel item)
         {
             var dbItem = _db.Course.FirstOrDefault(c => c.Id == item.Id);
             if (dbItem == null)
@@ -80,7 +82,7 @@ namespace GraderDataAccessLayer.Repositories
             {
                 _db.Course.Remove(dbItem);
                 _db.Course.Add(item);
-                _db.SaveChangesAsync();
+                await _db.SaveChangesAsync();
 
                 return true;
             }
