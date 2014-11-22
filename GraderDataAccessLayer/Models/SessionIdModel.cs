@@ -9,12 +9,12 @@ namespace GraderDataAccessLayer.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        private int Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         public int UserId { get; set; }
 
-        private Guid SessionId { get; set; }
+        public Guid SessionId { get; set; }
         public DateTime ExpirationTime { get; set; }
 
         public SessionIdModel()
