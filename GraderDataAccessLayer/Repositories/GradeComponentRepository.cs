@@ -1,0 +1,35 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using GraderDataAccessLayer.Interfaces;
+
+namespace GraderDataAccessLayer.Repositories
+{
+    class GradeComponentRepository : IGradeComponentRepository
+    {
+        private readonly DatabaseContext _db = new DatabaseContext();
+
+        private void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+            if (_db == null)
+            {
+                return;
+            }
+
+            _db.Dispose();
+            _db = null;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+    }
+}
