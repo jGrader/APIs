@@ -23,7 +23,6 @@ namespace GraderDataAccessLayer.Repositories
             }
 
             _db.Dispose();
-            _db = null;
         }
 
         public void Dispose()
