@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
+using GraderApi.Handlers;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
 
@@ -13,6 +14,7 @@ namespace GraderApi
     {
         public static void Register(HttpConfiguration config)
         {
+            config.MessageHandlers.Add(new AuthorizeHandler());
             // Web API configuration and services
             // Configure Web API to use only bearer token authentication.
             config.SuppressDefaultHostAuthentication();
