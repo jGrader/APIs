@@ -34,7 +34,7 @@
         public int OwnerId { get; set; }
         [Required]
         [ForeignKey("OwnerId")]
-        public virtual UserModel Id { get; set; }
+        public virtual UserModel Owner { get; set; }
         
     }
 }

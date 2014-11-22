@@ -13,7 +13,11 @@ namespace GraderApi
         public static void RegisterComponents()
         {
 			var container = new UnityContainer();
-            container.RegisterType<CourseRepository, CourseRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<ICourseRepository, CourseRepository>(new HierarchicalLifetimeManager());
+
+            var courseRepository = new CourseRepository();
+            container.RegisterInstance<ICourseRepository>(courseRepository);
+
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }
     }

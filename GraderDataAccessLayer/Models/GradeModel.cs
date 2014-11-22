@@ -15,19 +15,19 @@
         public int UserId { get; set; }
         [Required]
         [ForeignKey("UserId")]
-        public virtual UserModel Id { get; set; }
+        public virtual UserModel User { get; set; }
 
         //Navigation property
         public int GraderId { get; set; }
         [Required]
         [ForeignKey("GraderId")]
-        public virtual UserModel Id { get; set; }
+        public virtual UserModel Grader { get; set; }
 
         //Navigation property
         public int EntityId { get; set; }
         [Required]
         [ForeignKey("EntityId")]
-        public virtual EntityModel Id { get; set; }
+        public virtual EntityModel Entity { get; set; }
 
         [Required]
         public int Grade { get; set; }

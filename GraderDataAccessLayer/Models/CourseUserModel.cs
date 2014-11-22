@@ -4,9 +4,15 @@
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    class GradeComponentModel
+
+    public enum PermissionOptions
     {
-        //Scalar Properties
+        canGrade = 1,
+        canCreateEntities = 2
+    }
+
+    class CourseUserModel
+    {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -17,11 +23,14 @@
         [ForeignKey("CourseId")]
         public virtual CourseModel Course { get; set; }
 
+
+        //Navigation property
+        public int UserId { get; set; }
         [Required]
-        [DataType(DataType.Text)]
-        public string Name { get; set; }
+        [ForeignKey("UserId")]
+        public virtual UserModel User { get; set; }
 
         [Required]
-        public int Percentage { get; set; }
+        public int Permissions { get; set; }
     }
 }
