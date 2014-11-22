@@ -14,13 +14,13 @@ namespace GraderApi.Handlers
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            if (!HttpContext.Current.User.Identity.IsAuthenticated)
+           /* if (!HttpContext.Current.User.Identity.IsAuthenticated)
             {
                 var response = new HttpResponseMessage(HttpStatusCode.Forbidden);
                 var tsc = new TaskCompletionSource<HttpResponseMessage>();
                 tsc.SetResult(response);
                 return tsc.Task;
-            }
+            }*/
 
             return base.SendAsync(request, cancellationToken);
         }

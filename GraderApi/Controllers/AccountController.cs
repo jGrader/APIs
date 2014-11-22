@@ -1,12 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
+using System.Globalization;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using System.Web.Security;
+using System.Web.WebPages;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -16,6 +23,7 @@ using Microsoft.Owin.Security.OAuth;
 using GraderApi.Models;
 using GraderApi.Providers;
 using GraderApi.Results;
+
 
 namespace GraderApi.Controllers
 {
@@ -50,6 +58,81 @@ namespace GraderApi.Controllers
         }
 
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; private set; }
+
+        /*
+        private ApplicationSignInManager _signInManager;
+        public ApplicationSignInManager SignInManager
+        {
+            get
+            {
+                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
+            }
+            private set { _signInManager = value; }
+        }
+        // POST api/Account/Login
+        [Route("Login")]
+        public async Task<IHttpActionResult> Login(LoginViewModel model)
+        {
+            //If the data received is invalid (i.e. if a field is empty or such), reload the Login Page
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            //Check with the LDAP server that the user's credentials are valid
+            if (Membership.ValidateUser(model.Username, model.Password))
+            {
+                //If they are, take his data from the server
+                var serverUser = ActiveDirectoryRoleProvider.GetUserEntry(model.Username);
+
+                //Now check if they are logging in for the first time or not
+                var foundUser = await UserManager.FindByNameAsync(model.Username);
+                if (foundUser != null)
+                {
+                    //If this is not his first time, make sure that his account is updated and then sign him/her in and redirect him/her to the page he/she was trying to access before authenticating
+                    foundUser.PhoneNumber = serverUser.Properties["telephoneNumber"].Value.ToString();
+                    foundUser.Email = serverUser.Properties["mail"].Value.ToString();
+
+                    var result = UserManager.Update(foundUser);
+                    if (result.Succeeded)
+                    {
+                        SignInManager<ApplicationUser, string> m = new SignInManager<ApplicationUser, string>(_userManager,);
+                        
+                        await SignInManager.SignInAsync(foundUser, model.RememberMe, true);
+                        return Ok();
+                    }
+                    //If we got so far, then we failed to update the user's data in the database and we have to redisplay the View while mentioning the encountered error(s)
+                    return InternalServerError();
+                }
+                else
+                {
+                    //If this is the first time that the user logs in on this website, create a password-less local account 
+                    var user = new ApplicationUser
+                    {
+                        PhoneNumber = serverUser.Properties["telephoneNumber"].Value.ToString(),
+                        Id = serverUser.Guid.ToString(),
+                        UserName = model.Username,
+                        Email = serverUser.Properties["mail"].Value.ToString(),
+                        PhoneNumberConfirmed = true,
+                        EmailConfirmed = true,
+                    };
+
+                    var result = await UserManager.CreateAsync(user); //Make it password-less so that we don't have to deal with situations such as password changes on the LDAP server
+                    if (result.Succeeded)
+                    {
+                        //If the creation is successful, sign him/her in and redirect him/her to the page he/she was trying to access before authenticating
+                        await SignInManager.SignInAsync(user, model.RememberMe, true);
+                        return Ok();
+                    }
+                    //If we got so far, then we failed to add the user to the database and we have to redisplay the View while mentioning the encountered error(s)
+                    return InternalServerError();
+                }
+            }
+            //If we reach this point, the user's credentials were invalid. Let him know about that!
+            return BadRequest();
+        }
+        */
+
 
         // GET api/Account/UserInfo
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
@@ -489,5 +572,74 @@ namespace GraderApi.Controllers
         }
 
         #endregion
+    }
+
+    public static class ActiveDirectoryRoleProvider
+    {
+        private static string ConnectionStringName = WebConfigurationManager.AppSettings["LDAPConnectionString"];
+        private static string ConnectionUsername = WebConfigurationManager.AppSettings["LDAPUsername"];
+        private static string ConnectionPassword = WebConfigurationManager.AppSettings["LDAPPassword"];
+        private static string AttributeMapUsername = WebConfigurationManager.AppSettings["LDAPAttributeMapUsername"];
+
+        public static DirectoryEntry GetUserEntry(string username)
+        {
+            var root = new DirectoryEntry(WebConfigurationManager.ConnectionStrings[ConnectionStringName].ConnectionString, ConnectionUsername, ConnectionPassword);
+            var searcher = new DirectorySearcher(root, string.Format(CultureInfo.InvariantCulture, "(&(objectClass=user)({0}={1}))", AttributeMapUsername, username));
+
+            SearchResult result = searcher.FindOne();
+
+            if (result != null && !string.IsNullOrEmpty(result.Path))
+                return result.GetDirectoryEntry();
+
+            return null;
+        }
+
+        public static IEnumerable<string> GetRolesForUser(string username)
+        {
+            var allRoles = new List<string>();
+
+            var root = new DirectoryEntry(WebConfigurationManager.ConnectionStrings[ConnectionStringName].ConnectionString, ConnectionUsername, ConnectionPassword);
+
+            var searcher = new DirectorySearcher(root, string.Format(CultureInfo.InvariantCulture, "(&(objectClass=user)({0}={1}))", AttributeMapUsername, username));
+            searcher.PropertiesToLoad.Add("memberOf"); searcher.PropertiesToLoad.Add("employeeType");
+
+            SearchResult result = searcher.FindOne();
+
+            if (result != null && !string.IsNullOrEmpty(result.Path))
+            {
+                DirectoryEntry user = result.GetDirectoryEntry();
+
+                allRoles.Add(user.Properties["employeeType"].Value.ToString()); //This will return either 'Student', 'Professor', 'Technician' etc.
+                PropertyValueCollection groups = user.Properties["memberOf"]; //This will return everything else, like mailing lists etc.
+
+                foreach (string path in groups)
+                {
+                    string[] parts = path.Split(',');
+
+                    if (parts.Length > 0)
+                    {
+                        foreach (string part in parts)
+                        {
+                            string[] p = part.Split('=');
+
+                            if (p[0].Equals("cn", StringComparison.OrdinalIgnoreCase))
+                            {
+                                allRoles.Add(p[1]);
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            return allRoles.ToArray();
+        }
+
+        public static bool IsUserInRole(string username, string roleName)
+        {
+            IEnumerable<string> roles = GetRolesForUser(username);
+
+            return roles.Any(role => role.Equals(roleName, StringComparison.OrdinalIgnoreCase));
+        }
     }
 }
