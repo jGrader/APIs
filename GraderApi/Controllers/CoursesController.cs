@@ -29,15 +29,18 @@ namespace GraderApi.Controllers
         public HttpResponseMessage GetCourses()
         {
             var courses =  _repository.GetAll();
-            var result = Request.CreateResponse(HttpStatusCode.Accepted, courses);
-            return result;
+            return Request.CreateResponse(HttpStatusCode.Accepted, courses);
         }
 
         // GET: api/Courses/5
-        public Course GetCourse(int id)
+        public HttpResponseMessage GetCourse(int id)
         {
             var course = _repository.Get(id);
-            return course;
+            if (course == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            return Request.CreateResponse(HttpStatusCode.Accepted, course);
         }
 
         // PUT: api/Courses/5

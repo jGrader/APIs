@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraderApi", "GraderApi\Grad
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraderDataAccessLayer", "GraderDataAccessLayer\GraderDataAccessLayer.csproj", "{F8A2941C-65AC-41D7-AF65-8A4443209898}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.cs", "Services.cs\Services.cs.csproj", "{EB402009-5A3B-418A-B52B-EF579349FD56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{F8A2941C-65AC-41D7-AF65-8A4443209898}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8A2941C-65AC-41D7-AF65-8A4443209898}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8A2941C-65AC-41D7-AF65-8A4443209898}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB402009-5A3B-418A-B52B-EF579349FD56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB402009-5A3B-418A-B52B-EF579349FD56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB402009-5A3B-418A-B52B-EF579349FD56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB402009-5A3B-418A-B52B-EF579349FD56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
