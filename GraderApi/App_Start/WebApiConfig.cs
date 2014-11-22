@@ -15,6 +15,7 @@ namespace GraderApi
         public static void Register(HttpConfiguration config)
         {
             config.MessageHandlers.Add(new AuthorizeHandler());
+            config.MessageHandlers.Add(new PermissionsHandler());
             // Web API configuration and services
             // Configure Web API to use only bearer token authentication.
             config.SuppressDefaultHostAuthentication();
