@@ -52,6 +52,11 @@
   <ItemGroup>
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="Interfaces\ISessionIdRepository.cs" />
+    <Compile Include="Interfaces\ISshKeyRepository.cs" />
+    <Compile Include="Interfaces\ISubmissionRepository.cs" />
+    <Compile Include="Interfaces\ITeamMemberRepository.cs" />
+    <Compile Include="Interfaces\ITeamRepository.cs" />
+    <Compile Include="Interfaces\IUserRepository.cs" />
     <Compile Include="Models\AdminModel.cs" />
     <Compile Include="Models\CourseModel.cs" />
     <Compile Include="Models\CourseUserModel.cs" />
@@ -61,7 +66,7 @@
     <Compile Include="Models\GradeComponentModel.cs" />
     <Compile Include="Models\GradeModel.cs" />
     <Compile Include="Models\SessionIdModel.cs" />
-    <Compile Include="Models\SSHKeyModel.cs" />
+    <Compile Include="Models\SshKeyModel.cs" />
     <Compile Include="Models\SubmissionModel.cs" />
     <Compile Include="Models\TaskModel.cs" />
     <Compile Include="Models\TeamMemberModel.cs" />
