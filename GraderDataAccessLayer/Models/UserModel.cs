@@ -29,7 +29,6 @@ namespace GraderDataAccessLayer.Models
         [DataType(DataType.Text)]
         public string UserName { get; set; }
 
-        [Required]
         [DataType(DataType.Text)]
         public string PasswordHash { get; set; }
 

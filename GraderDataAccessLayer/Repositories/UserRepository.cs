@@ -41,6 +41,16 @@ namespace GraderDataAccessLayer.Repositories
             return result;
         }
 
+        public UserModel GetByUsername(string username)
+        {
+            var result = _db.User.FirstOrDefault(u => u.UserName == username);
+            if (result == null)
+            {
+                throw new ObjectNotFoundException();
+            }
+            return result;
+        }
+
         public string GetEmail(int id)
         {
             throw new NotImplementedException();

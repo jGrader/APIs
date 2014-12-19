@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,6 +25,22 @@ namespace GraderDataAccessLayer.Repositories
             }
 
             return result;
+        }
+
+        public async Task<Guid> Add(int userId)
+        {
+            try
+            {
+                var sessionModel = new SessionIdModel(userId);
+
+                _db.SessionId.Add(sessionModel);
+                await _db.SaveChangesAsync();
+                return sessionModel.SessionId;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Guid.Empty;
+            }
         }
 
         public SessionIdModel Get(int userId)
