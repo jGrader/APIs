@@ -52,7 +52,7 @@ namespace GraderApi.Handlers
                 try
                 {
                     var searchResult = _sessionIdRepository.GetBySesionId(new Guid(sessionId));
-                    if (_sessionIdRepository.IsAuthorized(searchResult.UserId))
+                    if (_sessionIdRepository.IsAuthorized(searchResult))
                     {
                         try
                         {
@@ -72,7 +72,7 @@ namespace GraderApi.Handlers
                     }
                     else
                     {
-                        return CreateTask(request, HttpStatusCode.BadRequest, Messages.ExpiredSessionId);
+                        return CreateTask(request, HttpStatusCode.Unauthorized, Messages.ExpiredSessionId);
                     }
                 }
                 catch (Exception)

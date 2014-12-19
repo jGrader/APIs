@@ -11,6 +11,6 @@
     {
         SessionIdModel GetBySesionId(Guid sessionId);
         SessionIdModel Get(int userId);
-        bool IsAuthorized(int? userId);
+        bool IsAuthorized(SessionIdModel sessionIdModel);
     }
 }

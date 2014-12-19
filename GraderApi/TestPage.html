@@ -20,7 +20,7 @@
                 var newTextBoxDiv = $(document.createElement('div'))
                      .attr("id", 'HeaderDiv' + header_counter);
 
-                newTextBoxDiv.after().html('<input type="text" name="headerName' + header_counter +'" id=headerName' + header_counter + '"value="" >' +
+                newTextBoxDiv.after().html('<input type="text" name="headerName' + header_counter +'" id=headerName' + header_counter + ' "value="" >' +
                       '<input type="text" name="headerValue' + header_counter +
                       '" id="headerValue' + header_counter + '" value="" >');
 
@@ -47,9 +47,9 @@
                 var newTextBoxDiv = $(document.createElement('div'))
                      .attr("id", 'CookieDiv' + cookie_counter);
 
-                newTextBoxDiv.after().html('<input type="text" name="headerName' + cookie_counter + '" id=headerName' + cookie_counter + '"value="" >' +
-                      '<input type="text" name="headerValue' + cookie_counter +
-                      '" id="headerValue' + cookie_counter + '" value="" >');
+                newTextBoxDiv.after().html('<input type="text" name="cookieName' + cookie_counter + '" id=cookieName' + cookie_counter + '" value="" >' +
+                      '<input type="text" name="cookieValue' + cookie_counter +
+                      '" id="cookieValue' + cookie_counter + '" value="" >');
 
                 newTextBoxDiv.appendTo("#CookiesGroup");
 
@@ -77,9 +77,15 @@
                 var url = $("#url").val();
                 var i;
                 var headers = new Array();
+                clearListCookies();
 
                 for (i = 1; i < header_counter; i++) {
                     headers[$('#headerName' + i).val()] = $('#headerValue' + i).val();
+                    console.log($('#headerName' + i).val());
+                }
+
+                for (i = 1; i < cookie_counter; i++) {
+                    document.cookie = $('#cookieName' + i).val() + "=" + $('#cookieName' + i).val();
                 }
 
                 $.ajax({
@@ -132,6 +138,22 @@
                 alert(msg);
             });*/
 
+            function clearListCookies() {
+                var cookies = document.cookie.split(";");
+                for (var i = 0; i < cookies.length; i++) {
+                    var spcook = cookies[i].split("=");
+                    deleteCookie(spcook[0]);
+                }
+                function deleteCookie(cookiename) {
+                    var d = new Date();
+                    d.setDate(d.getDate() - 1);
+                    var expires = ";expires=" + d;
+                    var name = cookiename;
+                    //alert(name);
+                    var value = "";
+                    document.cookie = name + "=" + value + expires + "; path=/acc/html";
+                }
+            }
 
         });
     </script>

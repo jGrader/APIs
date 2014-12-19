@@ -37,25 +37,23 @@ namespace GraderDataAccessLayer.Repositories
             return result;
         }
 
-        public bool IsAuthorized(int? userId)
+        public bool IsAuthorized(SessionIdModel sessionIdModel)
         {
-            if (userId == null)
+            if (sessionIdModel == null)
             {
-                throw new ArgumentNullException("userId");
+                throw new ArgumentNullException("sessionIdModel");
             }
 
-            var item = _db.SessionId.FirstOrDefault(i => i.UserId == userId);
-            if (item == null || item.ExpirationTime > DateTime.UtcNow)
+            
+            if (sessionIdModel.ExpirationTime < DateTime.UtcNow)
             {
                 return false;
             }
 
             try
             {
-                _db.SessionId.Remove(item);
-                item.ExpirationTime = DateTime.UtcNow.AddMinutes(15);
-                _db.SessionId.Add(item);
-
+                sessionIdModel.ExpirationTime = DateTime.UtcNow.AddMinutes(15);
+                _db.Entry(sessionIdModel).State = EntityState.Modified;
                 _db.SaveChanges();
                 return true;
             }
