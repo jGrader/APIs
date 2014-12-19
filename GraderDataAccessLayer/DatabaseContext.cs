@@ -48,6 +48,11 @@ namespace GraderDataAccessLayer
                 new CourseModel { Name = "General Useless Studies", CourseNumber = "71501", StartDate = new DateTime(2014, 1, 2), EndDate = new DateTime(2015, 5, 23), Semester = 2, ShortName = "GenULS" }
             };
 
+            var users = new List<UserModel>
+            {
+                new UserModel {Email = "f.stankovski@jacobs-university.de", GraduationYear = "2015", Name = "Filip", PasswordHash = "", Surname = "Stankovski", UserName = "fstankovsk"}
+            };
+
             var sessions = new List<SessionIdModel>
             {
 
@@ -55,11 +60,14 @@ namespace GraderDataAccessLayer
 
             var courseUsers = new List<CourseUserModel>
             {
-                new CourseUserModel() {ExcuseLimit = 0, ExtensionLimit = 1, UserId = 1, CourseId = 2, Permissions = 700}
+                new CourseUserModel {ExcuseLimit = 0, ExtensionLimit = 1, UserId = 1, CourseId = 2, Permissions = 700}
             };
             courses.ForEach(c => context.Course.Add(c));
+            users.ForEach(u => context.User.Add(u));
+
+            context.SaveChanges();
+
             courseUsers.ForEach(cu => context.CourseUser.Add(cu));
-            // users.ForEach(u => context.User.Add(u));
             sessions.ForEach(s => context.SessionId.Add(s));
 
             context.SaveChanges();
