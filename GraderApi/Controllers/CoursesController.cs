@@ -32,17 +32,8 @@ namespace GraderApi.Controllers
         // GET: api/Courses
         public HttpResponseMessage GetCourses()
         {
-            var currentUser = HttpContext.Current.User as UserPrincipal;
-            if (currentUser == null)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, Messages.UserNotFound);
-            }
-            if (currentUser.User == null)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, Messages.UserNotFound);
-            }
-            var courses = _courseUserRepository.GetByUser(currentUser.User.Id);
-            return Request.CreateResponse(HttpStatusCode.Accepted, courses.ToJson());
+            var result = _courseRepository.GetAll();
+            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // GET: api/Courses/5
@@ -53,7 +44,7 @@ namespace GraderApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
-            return Request.CreateResponse(HttpStatusCode.Accepted, course);
+            return Request.CreateResponse(HttpStatusCode.Accepted, course.ToJson());
         }
 
         // PUT: api/Courses/5

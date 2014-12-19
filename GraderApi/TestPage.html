@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Simple Testing HTML</title>
+</head>
+<body>
+
+    <h1>Simple Testing HTML</h1>
+    
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var header_counter = 1;
+            var cookie_counter = 1;
+
+            $("#addButton").click(function () {
+
+                var newTextBoxDiv = $(document.createElement('div'))
+                     .attr("id", 'HeaderDiv' + header_counter);
+
+                newTextBoxDiv.after().html('<input type="text" name="headerName' + header_counter +'" id=headerName' + header_counter + '"value="" >' +
+                      '<input type="text" name="headerValue' + header_counter +
+                      '" id="headerValue' + header_counter + '" value="" >');
+
+                newTextBoxDiv.appendTo("#HeaderGroup");
+
+
+                header_counter++;
+            });
+
+            $("#removeButton").click(function () {
+                if (header_counter == 1) {
+                    alert("No more textbox to remove");
+                    return false;
+                }
+
+                header_counter--;
+
+                $("#HeaderDiv" + header_counter).remove();
+
+            });
+
+            $("#addCookie").click(function () {
+
+                var newTextBoxDiv = $(document.createElement('div'))
+                     .attr("id", 'CookieDiv' + cookie_counter);
+
+                newTextBoxDiv.after().html('<input type="text" name="headerName' + cookie_counter + '" id=headerName' + cookie_counter + '"value="" >' +
+                      '<input type="text" name="headerValue' + cookie_counter +
+                      '" id="headerValue' + cookie_counter + '" value="" >');
+
+                newTextBoxDiv.appendTo("#CookiesGroup");
+
+
+                cookie_counter++;
+            });
+
+            $("#removeCookie").click(function () {
+                if (cookie_counter == 1) {
+                    alert("No more textbox to remove");
+                    return false;
+                }
+
+                cookie_counter--;
+
+                $("#CookieDiv" + cookie_counter).remove();
+
+            });
+
+            $("#sendButton").click(function() {
+                if ($("#url").val() == null) {
+                    alert("No URL selected");
+                    return false;
+                }
+                var url = $("#url").val();
+                var i;
+                var headers = new Array();
+
+                for (i = 1; i < header_counter; i++) {
+                    headers[$('#headerName' + i).val()] = $('#headerValue' + i).val();
+                }
+
+                $.ajax({
+                    url: url,
+                    headers: headers,
+                    success: function (data) {
+                        $("#resultDiv").empty();
+                        $("#resultDiv").append(formatData(data));
+                    }
+                });
+            });
+
+            function formatItem(data) {
+                var result = "";
+                for (var prop in data) {
+                    result += "<td>" + data[prop] + "</td>";
+                }
+                return result;
+            }
+
+            function getProps(data) {
+                var result = "";
+                for (var prop in data) {
+                    result += "<td><b>" + prop + "</b></td>";
+                }
+                return result;
+            }
+
+            function formatData(data) {
+                var test;
+                var result = "";
+                if (data.constructor === Array) {
+                    data.forEach(function (val, index, array) {
+                        test = val;
+                        result += "<tr>" + formatItem(val) + "</tr>";
+                    });
+                } else {
+                    test = data;
+                    result += "<tr>" + formatItem(data) + "</tr>"
+                }
+                return "<table border='1'>" + getProps(test) + "<tr>" + result + "</tr></table>";
+            }
+
+            /*$("#getButtonValue").click(function () {
+
+                var msg = '';
+                for (i = 1; i < counter; i++) {
+                    msg += "\n Textbox #" + i + " : " + $('#textbox' + i).val();
+                }
+                alert(msg);
+            });*/
+
+
+        });
+    </script>
+    <div>
+        <h2>URL</h2>
+        <input type="text" width="20" id="url" value="api/Courses"/>
+    </div>
+
+    <div id='HeaderGroup'>
+        <h3>Headers</h3>
+    </div>
+    <div>
+        <input type='button' value='Add Button' id='addButton'>
+        <input type='button' value='Remove Button' id='removeButton'>
+    </div>
+    
+    <div id='CookiesGroup'>
+        <h3>Cookies</h3>
+    </div>
+    <div>
+        <input type='button' value='Add Button' id='addCookie'>
+        <input type='button' value='Remove Button' id='removeCookie'>
+        <input type="button" value="Send Request" id="sendButton" style="height:200px; width:1000px" />
+        <h2>RESULTS</h2>
+    </div>
+    <div id="resultDiv">
+    </div>
+</body>
+</html>
