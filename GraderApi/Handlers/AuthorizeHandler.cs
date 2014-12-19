@@ -129,7 +129,8 @@ namespace GraderApi.Handlers
                             UserName = username,
                             Name = serverUser.Properties["givenName"].Value.ToString(),
                             Surname = serverUser.Properties["sn"].Value.ToString(),
-                            Email = serverUser.Properties["mail"].Value.ToString()
+                            Email = serverUser.Properties["mail"].Value.ToString(),
+                            GraduationYear = serverUser.Properties["description"].Value.ToString()
                         };
 
                         var result = _userRepository.Add(user);
@@ -144,12 +145,12 @@ namespace GraderApi.Handlers
 
 
                     var newSessionId = _sessionIdRepository.Add(userId);
-                    if (newSessionId.Result == Guid.Empty)
+                    if (newSessionId == Guid.Empty)
                     {
                         return CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
                     }
 
-                    return CreateTask(request, HttpStatusCode.Accepted, newSessionId.Result);
+                    return CreateTask(request, HttpStatusCode.Accepted, newSessionId);
                 }
                 else
                 {

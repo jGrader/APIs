@@ -1,5 +1,7 @@
 ﻿
 
+using System.Data;
+using System.Data.Entity.Infrastructure;
 using GraderDataAccessLayer.Interfaces;
 
 namespace GraderDataAccessLayer.Repositories
@@ -58,7 +60,21 @@ namespace GraderDataAccessLayer.Repositories
 
         public bool Add(UserModel item)
         {
-            throw new NotImplementedException();
+            if (item == null)
+            {
+                throw new ArgumentNullException("item");
+            }
+
+            try
+            {
+                _db.User.Add(item);
+                _db.SaveChanges();
+                return true;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return false;
+            }
         }
 
         public bool Remove(int id)
@@ -68,7 +84,24 @@ namespace GraderDataAccessLayer.Repositories
 
         public bool Update(UserModel item)
         {
-            throw new NotImplementedException();
+            var dbItem = _db.User.FirstOrDefault(c => c.Id == item.Id);
+            if (dbItem == null)
+            {
+                throw new ArgumentNullException("item");
+            }
+
+            try
+            {
+                _db.User.Remove(dbItem);
+                _db.User.Add(item);
+                _db.SaveChanges();
+
+                return true;
+            }
+            catch (DBConcurrencyException)
+            {
+                return false;
+            }
         }
     }
 }

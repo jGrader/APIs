@@ -27,14 +27,14 @@ namespace GraderDataAccessLayer.Repositories
             return result;
         }
 
-        public async Task<Guid> Add(int userId)
+        public Guid Add(int userId)
         {
             try
             {
                 var sessionModel = new SessionIdModel(userId);
 
                 _db.SessionId.Add(sessionModel);
-                await _db.SaveChangesAsync();
+                _db.SaveChanges();
                 return sessionModel.SessionId;
             }
             catch (DbUpdateConcurrencyException)

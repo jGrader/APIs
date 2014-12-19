@@ -11,7 +11,7 @@
     {
         SessionIdModel GetBySesionId(Guid sessionId);
         SessionIdModel Get(int userId);
-        Task<Guid> Add(int userId);
+        Guid Add(int userId);
         bool IsAuthorized(SessionIdModel sessionIdModel);
     }
 }
