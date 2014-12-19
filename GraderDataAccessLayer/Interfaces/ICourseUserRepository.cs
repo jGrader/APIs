@@ -10,7 +10,7 @@ namespace GraderDataAccessLayer.Interfaces
     public interface ICourseUserRepository
     {
         IEnumerable<CourseUserModel> GetAll();
-        IEnumerable<CourseUserModel> Get(int id);
+        CourseUserModel Get(int id);
         IEnumerable<CourseUserModel> GetByCourseId(int courseId);
         IEnumerable<CourseUserModel> GetByUser(int userId);
         IEnumerable<CourseUserModel> GetByExtensionLimit(int extLimit);

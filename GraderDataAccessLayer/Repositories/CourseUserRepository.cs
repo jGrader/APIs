@@ -19,10 +19,10 @@ namespace GraderDataAccessLayer.Repositories
             return result;
         }
 
-        public IEnumerable<CourseUserModel> Get(int id)
+        public CourseUserModel Get(int id)
         {
             var result = _context.CourseUser.Where(cu => cu.Id == id);
-            return result;
+            return result.FirstOrDefault();
         }
 
         public IEnumerable<CourseUserModel> GetByCourseId(int courseId)
