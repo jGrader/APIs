@@ -120,6 +120,12 @@
   <data name="ExpiredSessionId" xml:space="preserve">
     <value>The provided session ID has expired. Please log in again.</value>
   </data>
+  <data name="InternalDatabaseError" xml:space="preserve">
+    <value>There was an internal error. Please try again!</value>
+  </data>
+  <data name="InvalidCredentials" xml:space="preserve">
+    <value>The entered username and/or password do not match!</value>
+  </data>
   <data name="InvalidSessionId" xml:space="preserve">
     <value>The provided session ID is invalid</value>
   </data>

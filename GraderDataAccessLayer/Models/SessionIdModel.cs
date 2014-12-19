@@ -17,9 +17,10 @@ namespace GraderDataAccessLayer.Models
         public Guid SessionId { get; set; }
         public DateTime ExpirationTime { get; set; }
 
-        public SessionIdModel()
+        public SessionIdModel(int userId)
         {
             SessionId = Guid.NewGuid();
+            UserId = userId;
             ExpirationTime = DateTime.UtcNow.AddMinutes(15);
         }
     }

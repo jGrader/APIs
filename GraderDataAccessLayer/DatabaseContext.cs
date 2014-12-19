@@ -50,7 +50,7 @@ namespace GraderDataAccessLayer
 
             var sessions = new List<SessionIdModel>
             {
-                new SessionIdModel {ExpirationTime = new DateTime(2014, 12, 31), SessionId = new Guid(), UserId = 1}
+
             };
 
             var courseUsers = new List<CourseUserModel>

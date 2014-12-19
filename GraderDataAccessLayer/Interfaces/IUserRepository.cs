@@ -12,6 +12,7 @@
         IEnumerable<UserModel> GetAll();
         IEnumerable<UserModel> GetAllByGraduationYear(int year);
         UserModel Get(int id);
+        UserModel GetByUsername(string username);
         string GetEmail(int id);
         bool Add(UserModel item);
         bool Remove(int id);
