@@ -1,4 +1,6 @@
-﻿namespace GraderDataAccessLayer.Models
+﻿using System.Security.Principal;
+
+namespace GraderDataAccessLayer.Models
 {
     using System;
     using System.ComponentModel.DataAnnotations;
@@ -6,6 +8,7 @@
    
     public class UserModel
     {
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -16,7 +19,7 @@
 
         [Required]
         [DataType(DataType.Text)]
-        public string SureName { get; set; }
+        public string Surname { get; set; }
 
         [Required]
         [DataType(DataType.Text)]

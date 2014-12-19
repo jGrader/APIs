@@ -7,12 +7,16 @@
 
     public enum PermissionOptions
     {
-        canGrade = 1,
-        canCreateEntities = 2
+        CanGrade  = 1,
+        CanCreateEntities = 2
     }
 
     public class CourseUserModel
     {
+        public CourseUserModel()
+        {
+            
+        }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -32,5 +36,11 @@
 
         [Required]
         public int Permissions { get; set; }
+
+        [Required]
+        public int ExtensionLimit { get; set; }
+
+        [Required]
+        public int ExcuseLimit { get; set; }
     }
 }

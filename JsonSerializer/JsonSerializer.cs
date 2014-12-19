@@ -46,6 +46,8 @@
             result.Add("CourseId", cum.CourseId);
             result.Add("UserId", cum.UserId);
             result.Add("Permissions", cum.Permissions);
+            result.Add("ExtensionLimit", cum.ExtensionLimit);
+            result.Add("ExcuseLimit", cum.ExcuseLimit);
 
             return result;
         }
@@ -178,7 +180,7 @@
 
             result.Add("Id", um.Id);
             result.Add("Name", um.Name);
-            result.Add("SureName", um.SureName);
+            result.Add("Surname", um.Surname);
             result.Add("Email", um.Email);
             result.Add("UserName", um.UserName);
             result.Add("PasswordHash", um.PasswordHash);
@@ -243,7 +245,7 @@
             return result;
         }
 
-        public static JArray ToJson(this IEnumerable<SSHKeyModel> cm)
+        public static JArray ToJson(this IEnumerable<SshKeyModel> cm)
         {
             var query = (from c in cm select c.ToJson());
             var result = new JArray(query);

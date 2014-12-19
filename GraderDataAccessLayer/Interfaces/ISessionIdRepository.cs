@@ -9,6 +9,7 @@
 
     public interface ISessionIdRepository : IDisposable
     {
+        SessionIdModel GetBySesionId(Guid sessionId);
         SessionIdModel Get(int userId);
         bool IsAuthorized(int? userId);
     }

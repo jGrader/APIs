@@ -21,7 +21,10 @@ namespace GraderApi
             var sessionIdRepository = new SessionIdRepository();
             container.RegisterInstance<ISessionIdRepository>(sessionIdRepository);
 
-            GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
+            var courseUserRepository = new CourseUserRepository();
+            container.RegisterInstance<ICourseUserRepository>(courseUserRepository);
+
+            GlobalConfiguration.Configuration.DependencyResolver = new UnityResolver(container);
         }
     }
 }

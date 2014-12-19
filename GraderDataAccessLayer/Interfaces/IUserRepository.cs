@@ -7,7 +7,7 @@
     using System.Threading.Tasks;
     using GraderDataAccessLayer.Models;
 
-    interface IUserRepository
+    public interface IUserRepository
     {
         IEnumerable<UserModel> GetAll();
         IEnumerable<UserModel> GetAllByGraduationYear(int year);

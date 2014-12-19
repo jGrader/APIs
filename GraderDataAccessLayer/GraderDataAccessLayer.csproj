@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseContext.cs" />
+    <Compile Include="Interfaces\ICourseUserRepository.cs" />
     <Compile Include="Interfaces\ISessionIdRepository.cs" />
     <Compile Include="Interfaces\ISshKeyRepository.cs" />
     <Compile Include="Interfaces\ISubmissionRepository.cs" />
@@ -73,12 +74,14 @@
     <Compile Include="Models\TeamModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\CourseUserRepository.cs" />
     <Compile Include="Repositories\GradeComponentRepository.cs" />
     <Compile Include="Interfaces\ICourseRepository.cs" />
     <Compile Include="Interfaces\IGradeComponentRepository.cs" />
     <Compile Include="Interfaces\ITaskRepositoy.cs" />
     <Compile Include="Repositories\SessionIdRepository.cs" />
     <Compile Include="Repositories\TaskRepository.cs" />
+    <Compile Include="Repositories\UserRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

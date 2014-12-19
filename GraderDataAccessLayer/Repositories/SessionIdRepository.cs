@@ -14,6 +14,18 @@ namespace GraderDataAccessLayer.Repositories
     {
         DatabaseContext _db = new DatabaseContext();
 
+        public SessionIdModel GetBySesionId(Guid sessionId)
+        {
+            var result = _db.SessionId.FirstOrDefault(s => s.SessionId == sessionId);
+
+            if (result == null)
+            {
+                throw new ObjectNotFoundException();
+            }
+
+            return result;
+        }
+
         public SessionIdModel Get(int userId)
         {
             var result = _db.SessionId.FirstOrDefault(s => s.UserId == userId);

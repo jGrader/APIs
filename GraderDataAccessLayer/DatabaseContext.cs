@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
+using System.Security.Principal;
 using GraderDataAccessLayer.Models;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
@@ -45,7 +47,21 @@ namespace GraderDataAccessLayer
                 new CourseModel { Name = "General Procrastination", CourseNumber = "52001", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 1, ShortName = "GenPro" },
                 new CourseModel { Name = "General Useless Studies", CourseNumber = "71501", StartDate = new DateTime(2014, 1, 2), EndDate = new DateTime(2015, 5, 23), Semester = 2, ShortName = "GenULS" }
             };
+
+            var sessions = new List<SessionIdModel>
+            {
+                new SessionIdModel {ExpirationTime = new DateTime(2014, 12, 31), SessionId = new Guid(), UserId = 1}
+            };
+
+            var courseUsers = new List<CourseUserModel>
+            {
+                new CourseUserModel() {ExcuseLimit = 0, ExtensionLimit = 1, UserId = 1, CourseId = 2, Permissions = 700}
+            };
             courses.ForEach(c => context.Course.Add(c));
+            courseUsers.ForEach(cu => context.CourseUser.Add(cu));
+            // users.ForEach(u => context.User.Add(u));
+            sessions.ForEach(s => context.SessionId.Add(s));
+
             context.SaveChanges();
         }
     }
