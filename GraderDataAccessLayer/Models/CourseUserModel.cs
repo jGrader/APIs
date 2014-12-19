@@ -23,13 +23,13 @@
 
         //Navigation property
         public int CourseId { get; set; }
+
         [Required]
         [ForeignKey("CourseId")]
         public virtual CourseModel Course { get; set; }
 
-
-        //Navigation property
         public int UserId { get; set; }
+        //Navigation property
         [Required]
         [ForeignKey("UserId")]
         public virtual UserModel User { get; set; }

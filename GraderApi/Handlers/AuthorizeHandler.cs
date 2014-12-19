@@ -82,16 +82,6 @@ namespace GraderApi.Handlers
                 }
 
             }
-            else
-            {
-                var user = _userRepository.Get(1);
-                var principal = new UserPrincipal(new GenericIdentity("filip"), new string[] {}, user );
-                Thread.CurrentPrincipal = principal;
-                if (HttpContext.Current != null)
-                {
-                    HttpContext.Current.User = principal;
-                }
-            }
 
             // var url = request.RequestUri.LocalPath.
 
