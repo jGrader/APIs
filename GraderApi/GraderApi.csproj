@@ -228,6 +228,7 @@
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="CourseConstraint.cs" />
+    <Compile Include="CoursePermissions.cs" />
     <Compile Include="DependencyResolver.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

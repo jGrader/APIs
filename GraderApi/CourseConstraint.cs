@@ -28,7 +28,7 @@ namespace GraderApi.Constraints
                     return false;
                 }
                 var result = _courseUserRepository.GetByCourseId(courseId);
-                return (result == null);
+                return (result != null);
 
             }
 

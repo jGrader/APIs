@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity.Core;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using GraderDataAccessLayer.Interfaces;
@@ -21,8 +22,17 @@ namespace GraderDataAccessLayer.Repositories
 
         public CourseUserModel Get(int id)
         {
+<<<<<<< Updated upstream
             var result = _context.CourseUser.Where(cu => cu.Id == id);
             return result.FirstOrDefault();
+=======
+            var result = _context.CourseUser.FirstOrDefault(cu => cu.Id == id);
+            if (result == null)
+            {
+                throw new NotImplementedException();
+            }
+            return result;
+>>>>>>> Stashed changes
         }
 
         public IEnumerable<CourseUserModel> GetByCourseId(int courseId)
@@ -52,6 +62,12 @@ namespace GraderDataAccessLayer.Repositories
         public IEnumerable<CourseUserModel> GetByPermissions(int permissions)
         {
             var result = _context.CourseUser.Where(cu => cu.Permissions == permissions);
+            return result;
+        }
+
+        public IEnumerable<CourseUserModel> GetByLambda(Expression<Func<CourseUserModel, bool>> exp)
+        {
+            var result = _context.CourseUser.Where(exp);
             return result;
         }
     }
