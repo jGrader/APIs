@@ -150,6 +150,22 @@ namespace GraderApi.Handlers
                         return CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
                     }
 
+                    try
+                    {
+                        var user = _userRepository.Get(userId);
+                        var principal = new UserPrincipal(new GenericIdentity("filip"), new string[] { }, user);
+
+                        Thread.CurrentPrincipal = principal;
+                        if (HttpContext.Current != null)
+                        {
+                            HttpContext.Current.User = principal;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        return CreateTask(request, HttpStatusCode.Unauthorized, Messages.UserNotFound);
+                    }
+
                     return CreateTask(request, HttpStatusCode.Accepted, newSessionId);
                 }
                 else
