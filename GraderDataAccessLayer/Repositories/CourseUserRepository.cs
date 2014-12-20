@@ -22,6 +22,9 @@ namespace GraderDataAccessLayer.Repositories
 
         public CourseUserModel Get(int id)
         {
+            var result = _context.CourseUser.Where(cu => cu.Id == id);
+            return result.FirstOrDefault();
+            /*
 <<<<<<< Updated upstream
             var result = _context.CourseUser.Where(cu => cu.Id == id);
             return result.FirstOrDefault();
@@ -33,6 +36,7 @@ namespace GraderDataAccessLayer.Repositories
             }
             return result;
 >>>>>>> Stashed changes
+             * */
         }
 
         public IEnumerable<CourseUserModel> GetByCourseId(int courseId)
