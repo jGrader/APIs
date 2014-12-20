@@ -11,6 +11,23 @@
     <script type="text/javascript">
 
         $(document).ready(function () {
+            var sessionId = "";
+
+            $("button#login").click(function() {
+                var url = "api/Courses";
+                var headers = new Array();
+                headers["Username"] = $("input#username").val();
+                headers["Password"] = $("#password").val();
+
+                $.ajax({
+                    url: url,
+                    headers: headers,
+                    success: function (data) {
+                        sessionId = data;
+                    }
+                });
+            });
+
 
             var header_counter = 1;
             var cookie_counter = 1;
@@ -18,11 +35,11 @@
             $("#addButton").click(function () {
 
                 var newTextBoxDiv = $(document.createElement('div'))
-                     .attr("id", 'HeaderDiv' + header_counter);
+                    .attr("id", 'HeaderDiv' + header_counter);
 
                 newTextBoxDiv.after().html('<input type="text" name="headerName' + header_counter +'" id=headerName' + header_counter + ' "value="" >' +
-                      '<input type="text" name="headerValue' + header_counter +
-                      '" id="headerValue' + header_counter + '" value="" >');
+                    '<input type="text" name="headerValue' + header_counter +
+                    '" id="headerValue' + header_counter + '" value="" >');
 
                 newTextBoxDiv.appendTo("#HeaderGroup");
 
@@ -45,11 +62,11 @@
             $("#addCookie").click(function () {
 
                 var newTextBoxDiv = $(document.createElement('div'))
-                     .attr("id", 'CookieDiv' + cookie_counter);
+                    .attr("id", 'CookieDiv' + cookie_counter);
 
                 newTextBoxDiv.after().html('<input type="text" name="cookieName' + cookie_counter + '" id=cookieName' + cookie_counter + '" value="" >' +
-                      '<input type="text" name="cookieValue' + cookie_counter +
-                      '" id="cookieValue' + cookie_counter + '" value="" >');
+                    '<input type="text" name="cookieValue' + cookie_counter +
+                    '" id="cookieValue' + cookie_counter + '" value="" >');
 
                 newTextBoxDiv.appendTo("#CookiesGroup");
 
@@ -87,6 +104,8 @@
                 for (i = 1; i < cookie_counter; i++) {
                     document.cookie = $('#cookieName' + i).val() + "=" + $('#cookieName' + i).val();
                 }
+
+                headers["SessionId"] = sessionId;
 
                 $.ajax({
                     url: url,
@@ -160,6 +179,12 @@
 
         });
     </script>
+    <div>
+        <h2>LOGIN</h2>
+        <input type="text" width="20" id="username"/>
+        <input type="password" width="20" id="password"/>
+        <button id="login">Authenticate</button>
+    </div>
     <div>
         <h2>URL</h2>
         <input type="text" width="20" id="url" value="api/Courses"/>
