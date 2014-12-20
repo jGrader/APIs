@@ -22,17 +22,12 @@ namespace GraderDataAccessLayer.Repositories
 
         public CourseUserModel Get(int id)
         {
-<<<<<<< Updated upstream
-            var result = _context.CourseUser.Where(cu => cu.Id == id);
-            return result.FirstOrDefault();
-=======
             var result = _context.CourseUser.FirstOrDefault(cu => cu.Id == id);
             if (result == null)
             {
                 throw new NotImplementedException();
             }
             return result;
->>>>>>> Stashed changes
         }
 
         public IEnumerable<CourseUserModel> GetByCourseId(int courseId)
