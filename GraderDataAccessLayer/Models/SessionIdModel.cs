@@ -28,5 +28,10 @@ namespace GraderDataAccessLayer.Models
             UserId = userId;
             ExpirationTime = DateTime.UtcNow.AddMinutes(15);
         }
+
+        public SessionIdModel()
+        {
+            
+        }
     }
 }

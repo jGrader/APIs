@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using GraderDataAccessLayer.Models;
@@ -16,5 +17,6 @@ namespace GraderDataAccessLayer.Interfaces
         IEnumerable<CourseUserModel> GetByExtensionLimit(int extLimit);
         IEnumerable<CourseUserModel> GetByExcuseLimit(int excLimit);
         IEnumerable<CourseUserModel> GetByPermissions(int permissions);
+        IEnumerable<CourseUserModel> GetByLambda(Expression<Func<CourseUserModel, bool>> exp);
     }
 }

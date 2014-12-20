@@ -55,7 +55,7 @@ namespace GraderDataAccessLayer
 
             var sessions = new List<SessionIdModel>
             {
-
+                new SessionIdModel(1)
             };
 
             var courseUsers = new List<CourseUserModel>

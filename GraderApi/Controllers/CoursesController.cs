@@ -37,9 +37,10 @@ namespace GraderApi.Controllers
         }
 
         // GET: api/Courses/5
-        public HttpResponseMessage GetCourse(int id)
+        [Authorize(Roles = "CanSeeFullGrades")]
+        public HttpResponseMessage GetCourse(int courseId)
         {
-            var course = _courseRepository.Get(id);
+            var course = _courseRepository.Get(courseId);
             if (course == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
