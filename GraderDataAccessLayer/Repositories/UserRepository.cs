@@ -1,6 +1,7 @@
 ﻿
 
 using System.Data;
+using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using GraderDataAccessLayer.Interfaces;
 
@@ -92,8 +93,7 @@ namespace GraderDataAccessLayer.Repositories
 
             try
             {
-                _db.User.Remove(dbItem);
-                _db.User.Add(item);
+                _db.Entry(item).State = EntityState.Modified;
                 _db.SaveChanges();
 
                 return true;

@@ -79,11 +79,9 @@ namespace GraderApi.Handlers
                     return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidSessionId);
                 }
             }
-            else if (request.Headers.Contains(HeaderConstants.AuthorizeHeader))
-                //This means that the request does not contain a SessionId and that it is a login request so we expect an Authorize header
+            else if (request.Headers.Contains(HeaderConstants.AuthorizeHeader)) //This means that the request does not contain a SessionId and that it is a login request so we expect an Authorize header
             {
-                var authorizationData = request.Headers.GetValues(HeaderConstants.AuthorizeHeader).FirstOrDefault();
-                    //get the Base64 encoded string of username:password
+                var authorizationData = request.Headers.GetValues(HeaderConstants.AuthorizeHeader).FirstOrDefault(); //get the Base64 encoded string of username:password
                 if (authorizationData == null)
                 {
                     return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCredentials);
@@ -103,8 +101,7 @@ namespace GraderApi.Handlers
                     var serverUser = ActiveDirectoryRoleProvider.GetUserEntry(credentials.Username);
                     if (serverUser == null)
                     {
-                        return CreateTask(request, HttpStatusCode.InternalServerError,
-                            Messages.InternalDatabaseError);
+                        return CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
                     }
 
                     var userId = -1;
