@@ -61,11 +61,11 @@ namespace GraderApi {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Password.
+        ///   Looks up a localized string similar to Authorize.
         /// </summary>
-        internal static string PasswordHeader {
+        internal static string AuthorizeHeader {
             get {
-                return ResourceManager.GetString("PasswordHeader", resourceCulture);
+                return ResourceManager.GetString("AuthorizeHeader", resourceCulture);
             }
         }
         
@@ -75,15 +75,6 @@ namespace GraderApi {
         internal static string SessionIdHeader {
             get {
                 return ResourceManager.GetString("SessionIdHeader", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Username.
-        /// </summary>
-        internal static string UsernameHeader {
-            get {
-                return ResourceManager.GetString("UsernameHeader", resourceCulture);
             }
         }
     }

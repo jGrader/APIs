@@ -16,14 +16,14 @@
             $("button#login").click(function() {
                 var url = "api/Courses";
                 var headers = new Array();
-                headers["Username"] = $("input#username").val();
-                headers["Password"] = $("#password").val();
+                headers["Authorize"] = btoa($("input#username").val() + ":" + $("#password").val()); //Base64 encoding
 
                 $.ajax({
                     url: url,
                     headers: headers,
                     success: function (data) {
                         sessionId = data;
+                        $("#loginStatus").text("Logged in");
                     }
                 });
             });
@@ -113,6 +113,9 @@
                     success: function (data) {
                         $("#resultDiv").empty();
                         $("#resultDiv").append(formatData(data));
+                    },
+                    error: function() {
+                        $("#loginStatus").text("NOT LOGGED IN");
                     }
                 });
             });
@@ -184,6 +187,7 @@
         <input type="text" width="20" id="username"/>
         <input type="password" width="20" id="password"/>
         <button id="login">Authenticate</button>
+        <h3 id="loginStatus">NOT LOGGED IN</h3>
     </div>
     <div>
         <h2>URL</h2>

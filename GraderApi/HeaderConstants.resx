@@ -117,13 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="PasswordHeader" xml:space="preserve">
-    <value>Password</value>
+  <data name="AuthorizeHeader" xml:space="preserve">
+    <value>Authorize</value>
   </data>
   <data name="SessionIdHeader" xml:space="preserve">
     <value>SessionId</value>
-  </data>
-  <data name="UsernameHeader" xml:space="preserve">
-    <value>Username</value>
   </data>
 </root>

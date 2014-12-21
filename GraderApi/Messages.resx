@@ -129,6 +129,9 @@
   <data name="InvalidCredentials" xml:space="preserve">
     <value>The entered username and/or password do not match!</value>
   </data>
+  <data name="InvalidRequest" xml:space="preserve">
+    <value>The request is invalid - please make sure that you are using an authorized client.</value>
+  </data>
   <data name="InvalidSessionId" xml:space="preserve">
     <value>The provided session ID is invalid</value>
   </data>
