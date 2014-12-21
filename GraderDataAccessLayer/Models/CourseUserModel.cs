@@ -17,22 +17,17 @@
         {
             
         }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        //Navigation property
+        //Scalar properties
+        [Required]
         public int CourseId { get; set; }
 
         [Required]
-        [ForeignKey("CourseId")]
-        public virtual CourseModel Course { get; set; }
-
         public int UserId { get; set; }
-        //Navigation property
-        [Required]
-        [ForeignKey("UserId")]
-        public virtual UserModel User { get; set; }
 
         [Required]
         public int Permissions { get; set; }
@@ -42,5 +37,13 @@
 
         [Required]
         public int ExcuseLimit { get; set; }
+
+
+        //Navigation properties
+        [ForeignKey("UserId")]
+        public virtual UserModel User { get; set; }
+
+        [ForeignKey("CourseId")]
+        public virtual CourseModel Course { get; set; } 
     }
 }

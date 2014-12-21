@@ -72,21 +72,18 @@ namespace GraderApi.Handlers
             }
             catch (Exception)
             {
-                var res = CreateTask(request, HttpStatusCode.BadRequest, Messages.UserNotFound);
-                return res;
+                return CreateTask(request, HttpStatusCode.BadRequest, Messages.UserNotFound);
             }
-            
-            
+              
             return base.SendAsync(request, cancellationToken);
-           
         }
 
-        protected string[] GetPermissions(int permissions)
+        private string[] GetPermissions(int permissions)
         {
             var res = new List<string>();
             foreach (var permission in Enum.GetNames(typeof(CoursePermissions)))
             {
-                if (permissions%2 == 1)
+                if (permissions % 2 == 1)
                 {
                     res.Add(permission);
                 }

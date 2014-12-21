@@ -15,6 +15,5 @@ namespace GraderApi
         CanGrantExtensions = 1<<4,
         CanGrantExcuses = 1<<5,
         CanSeeFullGrades = 1<<6,
-
     }
 }

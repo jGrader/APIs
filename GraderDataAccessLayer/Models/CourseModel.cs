@@ -34,9 +34,8 @@
 
         //Navigation properties
         public int OwnerId { get; set; }
-/*
+
         [ForeignKey("OwnerId")]
-        public virtual UserModel Owner { get; set; }
-  */      
+        public virtual UserModel Owner { get; set; }    
     }
 }

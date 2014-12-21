@@ -1,6 +1,5 @@
 ﻿namespace GraderDataAccessLayer.Models
 {
-    using System;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,17 +10,18 @@
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        //Navigation property
-        public int CourseId { get; set; }
-        [Required]
-        [ForeignKey("CourseId")]
-        public virtual CourseModel Course { get; set; }
-
         [Required]
         [DataType(DataType.Text)]
         public string Name { get; set; }
 
         [Required]
         public int Percentage { get; set; }
+
+        //Navigation properties
+        [Required]
+        public int CourseId { get; set; }
+        
+        [ForeignKey("CourseId")]
+        public virtual CourseModel Course { get; set; }
     }
 }

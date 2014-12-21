@@ -42,34 +42,37 @@ namespace GraderDataAccessLayer
     {
         protected override void Seed(DatabaseContext context)
         {
-            var courses = new List<CourseModel>
-            {
-                new CourseModel { Name = "General Procrastination", CourseNumber = "52001", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 1, ShortName = "GenPro", Year = 2014, OwnerId = 1},
-                new CourseModel { Name = "General Useless Studies", CourseNumber = "71501", StartDate = new DateTime(2014, 1, 2), EndDate = new DateTime(2015, 5, 23), Semester = 2, ShortName = "GenULS", Year = 2014}
-            };
-
             var users = new List<UserModel>
             {
                 new UserModel {Email = "f.stankovski@jacobs-university.de", GraduationYear = "2015", Name = "Filip", PasswordHash = "", Surname = "Stankovski", UserName = "fstankovsk"}
             };
+            users.ForEach(u => context.User.Add(u));
+            context.SaveChanges();
 
-            var sessions = new List<SessionIdModel>
+            var courses = new List<CourseModel>
             {
-                new SessionIdModel(1)
+                new CourseModel { Name = "General Procrastination", CourseNumber = "52001", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 1, ShortName = "GenPro", Year = 2014, OwnerId = 1},
+                new CourseModel { Name = "General Useless Studies", CourseNumber = "71501", StartDate = new DateTime(2014, 1, 2), EndDate = new DateTime(2015, 5, 23), Semester = 2, ShortName = "GenULS", Year = 2014, OwnerId = 1}
             };
+            courses.ForEach(c => context.Course.Add(c));
+            context.SaveChanges();
+
+            var gradeComponents = new List<GradeComponentModel>
+            {
+                new GradeComponentModel() { CourseId = 2, Name = "Midterm examination", Percentage = 20 },
+                new GradeComponentModel() { CourseId = 2, Name = "Final examination", Percentage = 30 },
+                new GradeComponentModel() { CourseId = 2, Name = "Homework assignments", Percentage = 20 },
+                new GradeComponentModel() { CourseId = 2, Name = "Weekly quizes", Percentage = 30 },
+            };
+            gradeComponents.ForEach(g => context.GradeComponent.Add(g));
+            context.SaveChanges();
 
             var courseUsers = new List<CourseUserModel>
             {
                 new CourseUserModel {ExcuseLimit = 0, ExtensionLimit = 1, UserId = 1, CourseId = 2, Permissions = 700}
             };
-            courses.ForEach(c => context.Course.Add(c));
-            users.ForEach(u => context.User.Add(u));
-
-            context.SaveChanges();
-
+            
             courseUsers.ForEach(cu => context.CourseUser.Add(cu));
-            sessions.ForEach(s => context.SessionId.Add(s));
-
             context.SaveChanges();
         }
     }
