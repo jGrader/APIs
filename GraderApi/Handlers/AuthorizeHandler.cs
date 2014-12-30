@@ -111,10 +111,8 @@ namespace GraderApi.Handlers
                         var foundUser = _userRepository.GetByUsername(credentials.Username);
 
                         //If we reached this point, it's not the first time -- make sure the info is updated and move on
-                        foundUser.Email = serverUser.Properties["mail"].Value.ToString();
-                        foundUser.GraduationYear = serverUser.Properties["description"].Value.ToString();
-
                         foundUser.Email = serverUser.Properties[LdapFields.Email].Value.ToString();
+                        foundUser.GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString();
 
                         var result = _userRepository.Update(foundUser);
                         if (!result)
