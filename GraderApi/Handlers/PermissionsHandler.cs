@@ -81,14 +81,22 @@ namespace GraderApi.Handlers
         private string[] GetPermissions(int permissions)
         {
             var res = new List<string>();
-            foreach (var permission in Enum.GetNames(typeof(CoursePermissions)))
+            var names = Enum.GetNames(typeof (CoursePermissions));
+            foreach (var permission in names)
             {
-                if (permissions % 2 == 1)
+                if ((uint) Enum.Parse(typeof (CoursePermissions), permission) == 0)
+                {
+                    continue;
+                }
+
+                if (permissions%2 == 1)
                 {
                     res.Add(permission);
                 }
                 permissions = permissions >> 1;
             }
+            if(res.Count == 0)
+                res.Add(Enum.GetName(typeof(CoursePermissions), 0));
             return res.ToArray();
         }
     }

@@ -1,4 +1,8 @@
-﻿using System;
+﻿using GraderApi.Principals;
+using GraderDataAccessLayer.Interfaces;
+using GraderDataAccessLayer.Models;
+using GraderDataAccessLayer.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.Core;
 using System.DirectoryServices;
@@ -13,10 +17,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Security;
-using GraderApi.Principals;
-using GraderDataAccessLayer.Interfaces;
-using GraderDataAccessLayer.Models;
-using GraderDataAccessLayer.Repositories;
 
 
 namespace GraderApi.Handlers
@@ -50,30 +50,30 @@ namespace GraderApi.Handlers
                 try
                 {
                     var searchResult = _sessionIdRepository.GetBySesionId(new Guid(sessionId));
-                    if (_sessionIdRepository.IsAuthorized(searchResult)) //If the sessionId is active, then slide the expiration time and log the user in
-                    {
-                        try
-                        {
-                            var user = _userRepository.Get(searchResult.UserId);
-                            var principal = new UserPrincipal(new GenericIdentity(user.UserName), new string[] { }, user);
 
-                            Thread.CurrentPrincipal = principal;
-                            if (HttpContext.Current != null)
-                            {
-                                HttpContext.Current.User = principal;
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            return CreateTask(request, HttpStatusCode.Unauthorized, Messages.UserNotFound);
-                        }
-                    }
-                    else //The sessionId is not active; let the client know in order to redirect to the login screen
+                    if (!_sessionIdRepository.IsAuthorized(searchResult))
                     {
                         return CreateTask(request, HttpStatusCode.Unauthorized, Messages.ExpiredSessionId);
                     }
+                    
+                    try
+                    {
+                        var user = _userRepository.Get(searchResult.UserId);
+                        var principal = new UserPrincipal(new GenericIdentity(user.UserName), new string[] { }, user);
+
+                        Thread.CurrentPrincipal = principal;
+                        if (HttpContext.Current != null)
+                        {
+                            HttpContext.Current.User = principal;
+                        }
+                    }
+
+                    catch (ObjectNotFoundException)
+                    {
+                        return CreateTask(request, HttpStatusCode.Unauthorized, Messages.UserNotFound);
+                    }
                 }
-                catch (Exception)
+                catch (ObjectNotFoundException)
                 {
                     //Log
                     return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidSessionId);
@@ -114,6 +114,8 @@ namespace GraderApi.Handlers
                         foundUser.Email = serverUser.Properties["mail"].Value.ToString();
                         foundUser.GraduationYear = serverUser.Properties["description"].Value.ToString();
 
+                        foundUser.Email = serverUser.Properties[LdapFields.Email].Value.ToString();
+
                         var result = _userRepository.Update(foundUser);
                         if (!result)
                         {
@@ -129,10 +131,10 @@ namespace GraderApi.Handlers
                         var user = new UserModel
                         {
                             UserName = credentials.Username,
-                            Name = serverUser.Properties["givenName"].Value.ToString(),
-                            Surname = serverUser.Properties["sn"].Value.ToString(),
-                            Email = serverUser.Properties["mail"].Value.ToString(),
-                            GraduationYear = serverUser.Properties["description"].Value.ToString()
+                            Name = serverUser.Properties[LdapFields.Name].Value.ToString(),
+                            Surname = serverUser.Properties[LdapFields.Surname].Value.ToString(),
+                            Email = serverUser.Properties[LdapFields.Email].Value.ToString(),
+                            GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString()
                         };
 
                         var result = _userRepository.Add(user);
@@ -163,7 +165,7 @@ namespace GraderApi.Handlers
                     try
                     {
                         var user = _userRepository.Get(userId);
-                        var principal = new UserPrincipal(new GenericIdentity(user.UserName), new string[] {}, user);
+                        var principal = new UserPrincipal(new GenericIdentity(user.UserName), new string[] { }, user);
 
                         Thread.CurrentPrincipal = principal;
                         if (HttpContext.Current != null)
@@ -238,17 +240,17 @@ namespace GraderApi.Handlers
 
         private static class ActiveDirectoryRoleProvider
         {
-            private static readonly string ConnectionStringName = WebConfigurationManager.AppSettings["LDAPConnectionString"];
-            private static readonly string ConnectionUsername = WebConfigurationManager.AppSettings["LDAPUsername"];
-            private static readonly string ConnectionPassword = WebConfigurationManager.AppSettings["LDAPPassword"];
-            private static readonly string AttributeMapUsername = WebConfigurationManager.AppSettings["LDAPAttributeMapUsername"];
+            private static readonly string ConnectionStringName = WebConfigurationManager.AppSettings[LdapFields.ConnectionStringField];
+            private static readonly string ConnectionUsername = WebConfigurationManager.AppSettings[LdapFields.UsernameField];
+            private static readonly string ConnectionPassword = WebConfigurationManager.AppSettings[LdapFields.PasswordField];
+            private static readonly string AttributeMapUsername = WebConfigurationManager.AppSettings[LdapFields.AttributeMapUsernameField];
 
             public static DirectoryEntry GetUserEntry(string username)
             {
                 var root = new DirectoryEntry(WebConfigurationManager.ConnectionStrings[ConnectionStringName].ConnectionString, ConnectionUsername, ConnectionPassword);
-                var searcher = new DirectorySearcher(root, string.Format(CultureInfo.InvariantCulture, "(&(objectClass=user)({0}={1}))", AttributeMapUsername, username));
+                var searcher = new DirectorySearcher(root, string.Format(CultureInfo.InvariantCulture, LdapFields.UserQuery, AttributeMapUsername, username));
 
-                SearchResult result = searcher.FindOne();
+                var result = searcher.FindOne();
 
                 if (result != null && !string.IsNullOrEmpty(result.Path))
                     return result.GetDirectoryEntry();
@@ -256,52 +258,56 @@ namespace GraderApi.Handlers
                 return null;
             }
 
-            public static string[] GetRolesForUser(string username)
+            private static IEnumerable<string> GetRolesForUser(string username)
             {
-                var allRoles = new List<string>();
+                // var allRoles = new List<string>();
 
                 var root = new DirectoryEntry(WebConfigurationManager.ConnectionStrings[ConnectionStringName].ConnectionString, ConnectionUsername, ConnectionPassword);
 
-                var searcher = new DirectorySearcher(root, string.Format(CultureInfo.InvariantCulture, "(&(objectClass=user)({0}={1}))", AttributeMapUsername, username));
-                searcher.PropertiesToLoad.Add("memberOf"); searcher.PropertiesToLoad.Add("employeeType");
+                var searcher = new DirectorySearcher(root, string.Format(CultureInfo.InvariantCulture, LdapFields.UserQuery, AttributeMapUsername, username));
+                searcher.PropertiesToLoad.Add(LdapFields.Member); searcher.PropertiesToLoad.Add(LdapFields.EmployeeType);
 
-                SearchResult result = searcher.FindOne();
+                var result = searcher.FindOne();
 
                 if (result != null && !string.IsNullOrEmpty(result.Path))
                 {
-                    DirectoryEntry user = result.GetDirectoryEntry();
+                    var user = result.GetDirectoryEntry();
 
-                    allRoles.Add(user.Properties["employeeType"].Value.ToString()); //This will return either 'Student', 'Professor', 'Technician' etc.
-                    PropertyValueCollection groups = user.Properties["memberOf"]; //This will return everything else, like mailing lists etc.
+                    yield return user.Properties[LdapFields.EmployeeType].Value.ToString(); //This will return either 'Student', 'Professor', 'Technician' etc.
+                    var groups = user.Properties[LdapFields.Member]; //This will return everything else, like mailing lists etc.
 
                     foreach (string path in groups)
                     {
-                        string[] parts = path.Split(',');
+                        var parts = path.Split(',');
 
-                        if (parts.Length > 0)
+                        if (parts.Length <= 0)
                         {
-                            foreach (string part in parts)
-                            {
-                                string[] p = part.Split('=');
+                            continue;
+                        }
 
-                                if (p[0].Equals("cn", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    allRoles.Add(p[1]);
-                                }
+                        foreach (var part in parts)
+                        {
+                            var p = part.Split('=');
+
+                            if (p.Length == 0)
+                            {
+                                continue;
+                            }
+
+                            if (p[0].Equals(LdapFields.CampusNet, StringComparison.OrdinalIgnoreCase))
+                            {
+                                yield return p[1];
                             }
                         }
                     }
                 }
-
-
-                return allRoles.ToArray();
             }
 
             public static bool IsUserInRole(string username, string roleName)
             {
-                string[] roles = GetRolesForUser(username);
+                IEnumerable<string> roles = GetRolesForUser(username);
 
-                foreach (string role in roles)
+                foreach (var role in roles)
                 {
                     if (role.Equals(roleName, StringComparison.OrdinalIgnoreCase))
                     {
