@@ -48,7 +48,7 @@
             return new UnityResolver(child);
         }
 
-        public void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
             {

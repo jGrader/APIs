@@ -64,6 +64,7 @@
     <Compile Include="Models\EntityModel.cs" />
     <Compile Include="Models\ExcuseModel.cs" />
     <Compile Include="Models\ExtensionModel.cs" />
+    <Compile Include="Models\FileModel.cs" />
     <Compile Include="Models\GradeComponentModel.cs" />
     <Compile Include="Models\GradeModel.cs" />
     <Compile Include="Models\SessionIdModel.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Interfaces\IGradeComponentRepository.cs" />
     <Compile Include="Interfaces\ITaskRepositoy.cs" />
     <Compile Include="Repositories\SessionIdRepository.cs" />
+    <Compile Include="Repositories\SubmissionRepository.cs" />
     <Compile Include="Repositories\TaskRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
   </ItemGroup>

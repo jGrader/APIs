@@ -4,6 +4,8 @@
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Data.Entity.Core;
+    using System.Globalization;
+    using System.IO;
     using System.Linq;
     using Interfaces;
     using Models;
@@ -114,11 +116,52 @@
                 return false;
             }
         }
+
+        public bool AddFile(FileModel file)
+        {
+            if (file == null)
+            {
+                throw new ArgumentNullException();
+            }
+            try
+            {
+                if (File.Exists(file.Filename))
+                {
+                    var extension = Path.GetExtension(file.Filename);
+                    var name = Path.ChangeExtension(file.Filename, null);
+                    var i = 1;
+                    while (File.Exists(name + i.ToString(CultureInfo.InvariantCulture) + extension))
+                    {
+                        i++;
+                    }
+                    file.Filename = name + i.ToString(CultureInfo.InvariantCulture) + extension;
+                }
+                // File.Create(file.Filename);
+                File.WriteAllText(file.Filename, file.Contents);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         public bool Remove(int id)
         {
             throw new NotImplementedException();
         }
+
+        public bool RemoveFile(FileModel file)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool Update(SubmissionModel item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UpdateFile(FileModel file)
         {
             throw new NotImplementedException();
         }

@@ -4,7 +4,7 @@
     using System;
     using System.Collections.Generic;
 
-    interface ISubmissionRepository
+    public interface ISubmissionRepository
     {
         IEnumerable<SubmissionModel> GetAll();
         IEnumerable<SubmissionModel> GetByEntityId(int id);
@@ -21,8 +21,12 @@
 
         SubmissionModel Get(int id);
         bool Add(SubmissionModel item);
+        bool AddFile(FileModel file);
         bool Remove(int id);
+        bool RemoveFile(FileModel file);
         bool Update(SubmissionModel item);
+        bool UpdateFile(FileModel file);
+
         /* Why do these exist?
         int GetUserId(int id);
         int GetEntityId(int id);
