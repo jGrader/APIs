@@ -189,6 +189,24 @@
             return result;
         }
 
+        public static JObject ToJson(this FileModel fm)
+        {
+            var result = new JObject();
+
+            result.Add("Filename", fm.Filename);
+            result.Add("Contents", fm.Contents);
+            result.Add("Username", fm.Username);
+
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<FileModel> fm)
+        {
+            var query = (from f in fm select f.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
         public static JArray ToJson(this IEnumerable<CourseModel> cm)
         {
             var query = (from c in cm select c.ToJson());

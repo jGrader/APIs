@@ -31,7 +31,7 @@
         public string FilePath { get; set; }
 
         [Required]
-        [DataType(DataType.Text)]
-        public string TimeStamp { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime TimeStamp { get; set; }
     }
 }

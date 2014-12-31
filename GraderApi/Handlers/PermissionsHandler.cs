@@ -1,4 +1,7 @@
-﻿using System;
+﻿using GraderApi.Principals;
+using GraderDataAccessLayer.Interfaces;
+using GraderDataAccessLayer.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -9,9 +12,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
-using GraderApi.Principals;
-using GraderDataAccessLayer.Interfaces;
-using GraderDataAccessLayer.Repositories;
 
 
 namespace GraderApi.Handlers
@@ -52,7 +52,7 @@ namespace GraderApi.Handlers
                 var courseUser = _courseUserRepository.GetByLambda(cu => (cu.UserId == curUser.User.Id) && (cu.CourseId == courseId)).FirstOrDefault();
                 if (courseUser == null) 
                 {
-                    //The user is not registeres for this course
+                    //The user is not registered for this course
                     return CreateTask(request, HttpStatusCode.Forbidden, Messages.InvalidRequest);
                 }
 
@@ -81,6 +81,7 @@ namespace GraderApi.Handlers
             return tsc.Task;
         }
 
+        // This has to be a string[] instead of IEnumerable because of the constructor in the GenericPrincipal
         private static string[] GetPermissions(int permissions)
         {
             var res = new List<string>();

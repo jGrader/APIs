@@ -48,9 +48,24 @@
             return new UnityResolver(child);
         }
 
+        public void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+            if (container == null)
+            {
+                return;
+            }
+
+            container.Dispose();
+            container = null;
+        }
         public void Dispose()
         {
-            container.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }   
 }

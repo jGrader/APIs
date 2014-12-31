@@ -1,22 +1,18 @@
-﻿using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using GraderDataAccessLayer.Interfaces;
-
-
-namespace GraderDataAccessLayer.Repositories
+﻿namespace GraderDataAccessLayer.Repositories
 {
+    using Interfaces;
+    using Models;
     using System;
     using System.Collections.Generic;
-    using GraderDataAccessLayer.Models;
-    using System.Linq;
+    using System.Data;
+    using System.Data.Entity;
     using System.Data.Entity.Core;
-    using System.Text;
-    using System.Threading.Tasks;
+    using System.Data.Entity.Infrastructure;
+    using System.Linq;
 
     public class UserRepository : IUserRepository
     {
-        private DatabaseContext _db = new DatabaseContext();
+        private readonly DatabaseContext _db = new DatabaseContext();
 
         public IEnumerable<UserModel> GetAll()
         {

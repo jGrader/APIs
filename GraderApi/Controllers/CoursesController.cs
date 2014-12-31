@@ -1,19 +1,14 @@
-﻿using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web;
-using System.Web.Http;
-using System.Web.Http.Description;
-
-using System.Threading.Tasks;
-using Grader.JsonSerializer;
-using GraderApi.Principals;
-using GraderDataAccessLayer.Models;
-using GraderDataAccessLayer.Repositories;
-
-
-namespace GraderApi.Controllers
+﻿namespace GraderApi.Controllers
 {
+    using Grader.JsonSerializer;
+    using GraderDataAccessLayer.Models;
+    using GraderDataAccessLayer.Repositories;
+    using System.Net;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+    using System.Web.Http;
+    using System.Web.Http.Description;
+
     public class CoursesController : ApiController
     {
         private readonly CourseRepository _courseRepository;
