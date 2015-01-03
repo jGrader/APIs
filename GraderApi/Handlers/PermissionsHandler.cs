@@ -36,11 +36,11 @@ namespace GraderApi.Handlers
             InnerHandler = new HttpControllerDispatcher(httpConfiguration); 
         }
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var curUser = HttpContext.Current.User as UserPrincipal;
             if (curUser == null) { // Make sure that there is nothing fishy about the user's login status
-                return await CreateTask(request, HttpStatusCode.BadRequest, Messages.UserNotFound);
+                return CreateTask(request, HttpStatusCode.BadRequest, Messages.UserNotFound);
             }
 
 
@@ -53,11 +53,11 @@ namespace GraderApi.Handlers
                     var courseIdString = request.GetRouteData().Values["courseId"] as string;
 
                     if (courseIdString == null) { // Make sure that the route is valid 
-                        return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                        return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
                     }
 
                     if (!int.TryParse(courseIdString, out courseId)) { // Make sure that the courseId is valid; the CourseConstraint class does this already, but just to be safe
-                        return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                        return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
                     }
                 }
                     break;
@@ -66,58 +66,61 @@ namespace GraderApi.Handlers
                     var gradeComponentIdString = request.GetRouteData().Values["gradeComponentId"] as string;
 
                     if (gradeComponentIdString == null) { // Make sure that the route is valid 
-                        return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                        return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
                     }
 
                     if (!int.TryParse(gradeComponentIdString, out gradeComponentId)) { // Make sure that the courseId is valid; the CourseConstraint class does this already, but just to be safe
-                        return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                        return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
                     }
                     //Initialize the courseId ... for the following lines
-                    var gradeComponent = await _gradeComponentRepository.Get(gradeComponentId);
-                    if (gradeComponent == null) {
-                        return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                    var gradeComponent = Task.Run(() => _gradeComponentRepository.Get(gradeComponentId));
+                    Task.WaitAll(gradeComponent);
+                    if (gradeComponent.Result == null) {
+                        return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
                     }
-                    courseId = gradeComponent.CourseId;
+                    courseId = gradeComponent.Result.CourseId;
                 }
                     break;
             }
 
             
-            var adminUser = _adminRepository.GetByUserId(curUser.User.Id);
-            if (adminUser != null) //This means that the user is an admin
+            var adminUser = Task.Run(() => _adminRepository.GetByUserId(curUser.User.Id));
+            Task.WaitAll(adminUser);
+            if (adminUser.Result != null) //This means that the user is an admin
             {
-                if (adminUser.IsSuperUser) // SuperUser which can do ANYTHING; just add that and exit
+                if (adminUser.Result.IsSuperUser) // SuperUser which can do ANYTHING; just add that and exit
                 {
                     var superUserPermission = GetOwnerPermissions();
                     UpdatePrincipal(curUser, superUserPermission);
 
-                    return await base.SendAsync(request, cancellationToken);
+                    return base.SendAsync(request, cancellationToken);
                 }
 
                 //If we reach this point, he/she is an admin but not SuperUser; find out if (s)he owns this course!
-                var adminCourse = await _courseRepository.Get(courseId);
-                if (adminCourse == null) { // Just to be safe
-                    return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                var adminCourse = Task.Run(() => _courseRepository.Get(courseId));
+                Task.WaitAll(adminCourse);
+                if (adminCourse.Result == null) { // Just to be safe
+                    return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
                 }
 
-                if (adminCourse.OwnerId == curUser.User.Id) { // Current user is the owner; give all possible rights and exit
+                if (adminCourse.Result.OwnerId == curUser.User.Id) { // Current user is the owner; give all possible rights and exit
                     var ownerPermissions = GetOwnerPermissions();
                     UpdatePrincipal(curUser, ownerPermissions);
 
-                    return await base.SendAsync(request, cancellationToken);
+                    return base.SendAsync(request, cancellationToken);
                 }
             }
 
             // If we reached this point, the user is either not an admin / superUser or doesn't own the course; treat as a regular user no matter what
             var courseUser = _courseUserRepository.GetByLambda(cu => (cu.UserId == curUser.User.Id) && (cu.CourseId == courseId)).FirstOrDefault();
             if (courseUser == null) { //The user is not registered for this course         
-                return await CreateTask(request, HttpStatusCode.Forbidden, Messages.InvalidRequest);
+                return CreateTask(request, HttpStatusCode.Forbidden, Messages.InvalidRequest);
             }
 
             var permissions = GetUserPermissions(courseUser.Permissions);
             UpdatePrincipal(curUser, permissions);
               
-            return await base.SendAsync(request, cancellationToken);
+            return base.SendAsync(request, cancellationToken);
         }
 
         private Task<HttpResponseMessage> CreateTask(HttpRequestMessage request, HttpStatusCode code, Object data)
