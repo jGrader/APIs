@@ -65,19 +65,16 @@
         [Authorize(Roles = "CanUpdateCourse")]
         public async Task<IHttpActionResult> PutCourse(int id, CourseModel course)
         {
-            if (!ModelState.IsValid)
-            {
+            if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
 
-            if (id != course.Id)
-            {
+            if (id != course.Id) {
                 return BadRequest();
             }
 
             var result = await _courseRepository.Update(course);
-            if (result == null)
-            {
+            if (result == null) {
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
 

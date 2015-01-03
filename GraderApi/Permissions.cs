@@ -17,5 +17,8 @@
         CanCreateCourse = 1,
         CanUpdateCourse = 1<<1,
         CanDeleteCourse = 1<<2,
+        CanCreateGradedPart = 1<<3,
+        CanUpdateGradedPart = 1<<4,
+        CanDeleteGradedPart = 1<<5,
     }
 }

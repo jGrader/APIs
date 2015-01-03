@@ -15,14 +15,15 @@
     {
         private DatabaseContext _db = new DatabaseContext();
 
-        public async Task<IEnumerable<CourseModel>> GetAll()
-        {
-            return await _db.Course.ToListAsync();
-        }
+
         public async Task<CourseModel> Get(int courseId)
         {
             return await _db.Course.FirstOrDefaultAsync(c => c.Id == courseId);
         }
+        public async Task<IEnumerable<CourseModel>> GetAll()
+        {
+            return await _db.Course.ToListAsync();
+        }     
 
         public async Task<IEnumerable<CourseModel>> GetByName(string name)
         {

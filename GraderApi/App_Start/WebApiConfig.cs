@@ -1,7 +1,9 @@
-﻿using GraderApi.Constraints;
+﻿using System.Collections.Generic;
+using GraderApi.Constraints;
 using GraderApi.Handlers;
 using System.Net.Http.Headers;
 using System.Web.Http;
+using GraderDataAccessLayer.Models;
 
 
 namespace GraderApi
@@ -23,7 +25,15 @@ namespace GraderApi
                 name: "CourseRoute",
                 routeTemplate: "api/Courses/{courseId}",
                 defaults: new { },
-                constraints: new { courseId = new CourseConstraint() },
+                constraints: new { courseId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
+            );
+            
+            config.Routes.MapHttpRoute(
+                name: "GradeComponentRoute",
+                routeTemplate: "api/GradeComponents/{gradeComponentId}",
+                defaults: new { },
+                constraints: new { gradeComponentId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 

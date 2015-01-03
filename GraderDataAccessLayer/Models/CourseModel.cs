@@ -1,6 +1,7 @@
 ﻿namespace GraderDataAccessLayer.Models
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -41,6 +42,8 @@
         public int OwnerId { get; set; }
 
         [ForeignKey("OwnerId")]
-        public virtual UserModel Owner { get; set; }    
+        public virtual UserModel Owner { get; set; }
+
+        public virtual ICollection<GradeComponentModel> GradeComponents { get; set; }
     }
 }

@@ -13,21 +13,20 @@
     {
         private DatabaseContext _db = new DatabaseContext();
 
-        public IEnumerable<AdminModel> GetAll()
-        {
-            return _db.Admin.Where(w => w.Id > 0);
-        }
-
-        public AdminModel GetByUserId(int userId)
-        {
-            var searchResult = _db.Admin.Where(w => w.UserId == userId);
-            return searchResult.FirstOrDefault();
-        }
 
         public AdminModel Get(int id)
         {
             var searchResult = _db.Admin.Where(w => w.Id == id);
             return searchResult.FirstOrDefault();
+        }
+        public AdminModel GetByUserId(int userId)
+        {
+            var searchResult = _db.Admin.Where(w => w.UserId == userId);
+            return searchResult.FirstOrDefault();
+        }
+        public IEnumerable<AdminModel> GetAll()
+        {
+            return _db.Admin.Where(w => w.Id > 0);
         }
 
         public async Task<AdminModel> Add(AdminModel item)
@@ -49,7 +48,6 @@
                 return null;
             }
         }
-
         public async Task<AdminModel> Update(AdminModel item)
         {
             var dbItem = _db.Admin.FirstOrDefault(c => c.Id == item.Id);
@@ -67,7 +65,6 @@
                 return null;
             }
         }
-
         public async Task<bool> Delete(int userId)
         {
             var item = _db.Admin.FirstOrDefault(c => c.UserId == userId);

@@ -9,8 +9,8 @@
 
     public interface ICourseRepository : IDisposable
     {
-        Task<IEnumerable<CourseModel>> GetAll();
         Task<CourseModel> Get(int courseId);
+        Task<IEnumerable<CourseModel>> GetAll();
 
         Task<IEnumerable<CourseModel>> GetByName(string name);
         Task<IEnumerable<CourseModel>> GetByShortName(string shortName);

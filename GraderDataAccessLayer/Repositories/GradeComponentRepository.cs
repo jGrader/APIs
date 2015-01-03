@@ -1,36 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GraderDataAccessLayer.Interfaces;
-using GraderDataAccessLayer.Models;
-
-namespace GraderDataAccessLayer.Repositories
+﻿namespace GraderDataAccessLayer.Repositories
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Data.Common;
+    using System.Data.Entity;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer.Models;
+
+
     public class GradeComponentRepository : IGradeComponentRepository
     {
         private DatabaseContext _db = new DatabaseContext();
 
-        public IEnumerable<GradeComponentModel> GetAll(int courseId)
-        {
-            var searchResult = _db.GradeComponent.Where(c => c.CourseId == courseId);
-            return searchResult;
-        }
 
         public async Task<GradeComponentModel> Get(int id)
         {
-            var searchResult = await _db.GradeComponent.FirstOrDefaultAsync(c => c.Id == id);
-            return searchResult;
+            return await _db.GradeComponent.FirstOrDefaultAsync(c => c.Id == id);
+        }
+        public async Task<IEnumerable<GradeComponentModel>> GetAll()
+        {
+            return await _db.GradeComponent.ToListAsync();
+        }
+        public async Task<IEnumerable<GradeComponentModel>> GetAllByCourse(int courseId)
+        {
+            var searchResult = _db.GradeComponent.Where(w => w.CourseId == courseId);
+            return await searchResult.ToListAsync();
         }
 
-        public async Task<bool> Add(GradeComponentModel item)
+        public async Task<GradeComponentModel> Add(GradeComponentModel item)
         {
-            if (item == null)
-            {
+            if (item == null) {
                 throw new ArgumentNullException("item");
             }
 
@@ -38,38 +39,36 @@ namespace GraderDataAccessLayer.Repositories
             {
                 _db.GradeComponent.Add(item);
                 await _db.SaveChangesAsync();
-                return true;
+
+                //Load virtual properties and return object
+                _db.Entry(item).Reference(r => r.Course).Load();
+                return item;
             }
-            catch (RetryLimitExceededException)
-            {
-                return false;
+            catch (DbException) {
+                return null;
             }
         }
-
-        public async Task<bool> Update(GradeComponentModel item)
+        public async Task<GradeComponentModel> Update(GradeComponentModel item)
         {
-            if (item == null)
-            {
+            var dbItem = _db.GradeComponent.FirstOrDefault(c => c.Id == item.Id);
+            if (dbItem == null) {
                 throw new ArgumentNullException("item");
             }
 
             try
             {
-                _db.Entry(item).State = EntityState.Modified;
+                _db.Entry(dbItem).CurrentValues.SetValues(item);
                 await _db.SaveChangesAsync();
-                return true;
+                return await Get(item.Id);
             }
-            catch (RetryLimitExceededException)
-            {
-                return false;
+            catch (DbException) {
+                return null;
             }
         }
-
-        public async Task<bool> Remove(int id)
+        public async Task<bool> Delete(int id)
         {
             var item = _db.GradeComponent.FirstOrDefault(c => c.Id == id);
-            if (item == null)
-            {
+            if (item == null) {
                 throw new ArgumentNullException("id");
             }
 
@@ -79,8 +78,7 @@ namespace GraderDataAccessLayer.Repositories
                 await _db.SaveChangesAsync();
                 return true;
             }
-            catch (RetryLimitExceededException)
-            {
+            catch (DbException) {
                 return false;
             }
         }
@@ -97,6 +95,7 @@ namespace GraderDataAccessLayer.Repositories
             }
 
             _db.Dispose();
+            _db = null;
         }
         public void Dispose()
         {
