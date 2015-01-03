@@ -48,37 +48,51 @@ namespace GraderApi.Handlers
             var routeTemplate = request.GetRouteData().Route.RouteTemplate;
             switch (routeTemplate)
             {
-                case "api/Courses/{courseId}":
+                case "api/{controller}/{courseId}":
                 {
-                    var courseIdString = request.GetRouteData().Values["courseId"] as string;
+                    var controllerName = request.GetRouteData().Values["controller"] as string;
+                    switch (controllerName)
+                    {
+                        case "Courses":
+                        {
+                            var courseIdString = request.GetRouteData().Values["courseId"] as string;
 
-                    if (courseIdString == null) { // Make sure that the route is valid 
-                        return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
-                    }
+                            if (courseIdString == null)
+                            { // Make sure that the route is valid 
+                                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                            }
 
-                    if (!int.TryParse(courseIdString, out courseId)) { // Make sure that the courseId is valid; the CourseConstraint class does this already, but just to be safe
-                        return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
-                    }
-                }
-                    break;
-                case "api/GradeComponents/{gradeComponentId}":
-                {
-                    var gradeComponentIdString = request.GetRouteData().Values["gradeComponentId"] as string;
+                            if (!int.TryParse(courseIdString, out courseId))
+                            { // Make sure that the courseId is valid; the CourseConstraint class does this already, but just to be safe
+                                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                            }
+                        }
+                            break;
+                        case "GradeComponents":
+                        {
+                            var gradeComponentIdString = request.GetRouteData().Values["gradeComponentId"] as string;
 
-                    if (gradeComponentIdString == null) { // Make sure that the route is valid 
-                        return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
-                    }
+                            if (gradeComponentIdString == null)
+                            { // Make sure that the route is valid 
+                                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                            }
 
-                    if (!int.TryParse(gradeComponentIdString, out gradeComponentId)) { // Make sure that the courseId is valid; the CourseConstraint class does this already, but just to be safe
-                        return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                            if (!int.TryParse(gradeComponentIdString, out gradeComponentId))
+                            { // Make sure that the courseId is valid; the CourseConstraint class does this already, but just to be safe
+                                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                            }
+                            //Initialize the courseId ... for the following lines
+                            var gradeComponent = Task.Run(() => _gradeComponentRepository.Get(gradeComponentId), cancellationToken);
+                            Task.WaitAll(gradeComponent);
+                            if (gradeComponent.Result == null)
+                            {
+                                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                            }
+                            courseId = gradeComponent.Result.CourseId;
+                        }
+                            break;
                     }
-                    //Initialize the courseId ... for the following lines
-                    var gradeComponent = Task.Run(() => _gradeComponentRepository.Get(gradeComponentId), cancellationToken);
-                    Task.WaitAll(gradeComponent);
-                    if (gradeComponent.Result == null) {
-                        return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
-                    }
-                    courseId = gradeComponent.Result.CourseId;
+                    
                 }
                     break;
             }
