@@ -1,6 +1,5 @@
 ﻿namespace GraderDataAccessLayer.Models
 {
-    using System;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -10,13 +9,15 @@
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        //Navigation property
-        public int UserId { get; set; }
+        //Scalar properties
         [Required]
-        [ForeignKey("UserId")]
-        public virtual UserModel User { get; set; }
+        public int UserId { get; set; }
 
         [Required]
         public bool IsSuperUser { get; set; }
+
+        //Navigation properties
+        [ForeignKey("UserId")]
+        public virtual UserModel User { get; set; }
     }
 }

@@ -44,11 +44,20 @@ namespace GraderDataAccessLayer
         {
             var users = new List<UserModel>
             {
-                new UserModel {Email = "f.stankovski@jacobs-university.de", GraduationYear = "2015", Name = "Filip", PasswordHash = "", Surname = "Stankovski", UserName = "fstankovsk"}
+                new UserModel {Email = "f.stankovski@jacobs-university.de", GraduationYear = "2015", Name = "Filip", PasswordHash = "", Surname = "Stankovski", UserName = "fstankovsk"},
+                new UserModel { Email = "a.hegyes@jacobs-university.de", GraduationYear = "2017", Name = "Antonius Cezar", PasswordHash = "", Surname = "Hegyes", UserName = "ahegyes" }
             };
             users.ForEach(u => context.User.Add(u));
             context.SaveChanges();
 
+            var admins = new List<AdminModel>
+            {
+                new AdminModel { UserId = 1, IsSuperUser  = true },
+                new AdminModel { UserId = 2, IsSuperUser =  true }
+            };
+            admins.ForEach(a => context.Admin.Add(a));
+            context.SaveChanges();
+            
             var courses = new List<CourseModel>
             {
                 new CourseModel { Name = "General Procrastination", CourseNumber = "52001", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 1, ShortName = "GenPro", Year = 2014, OwnerId = 1},

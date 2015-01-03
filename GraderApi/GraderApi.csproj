@@ -229,7 +229,7 @@
     <Compile Include="Controllers\GradeComponentController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="CourseConstraint.cs" />
-    <Compile Include="CoursePermissions.cs" />
+    <Compile Include="Permissions.cs" />
     <Compile Include="DependencyResolver.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -317,7 +317,6 @@
       <LastGenOutput>HeaderConstants.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="LdapFields.resx">
-      <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>LdapFields.Designer.cs</LastGenOutput>
     </EmbeddedResource>

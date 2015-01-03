@@ -8,6 +8,8 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using GraderDataAccessLayer;
+using GraderDataAccessLayer.Models;
+using GraderDataAccessLayer.Repositories;
 
 
 namespace GraderApi

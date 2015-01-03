@@ -2,37 +2,28 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
     using GraderDataAccessLayer.Models;
-    using System.Linq.Expressions;
+
 
     public interface ICourseRepository : IDisposable
     {
-        IEnumerable<CourseModel> GetAll();
-        CourseModel Get(int id);
+        Task<IEnumerable<CourseModel>> GetAll();
+        Task<CourseModel> Get(int courseId);
 
-        IEnumerable<CourseModel> GetByName(string name);
+        Task<IEnumerable<CourseModel>> GetByName(string name);
+        Task<IEnumerable<CourseModel>> GetByShortName(string shortName);
+        Task<IEnumerable<CourseModel>> GetByCourseNumber(string courseNumber);
+        Task<IEnumerable<CourseModel>> GetBySemester(int semester);
+        Task<IEnumerable<CourseModel>> GetByYear(int year);
+        Task<IEnumerable<CourseModel>> GetByStartDate(DateTime startDate);
+        Task<IEnumerable<CourseModel>> GetByEndDate(DateTime endDate);
+        Task<IEnumerable<CourseModel>> GetByOwnerId(int ownerId);
+        Task<IEnumerable<CourseModel>> GetByLambda(Expression<Func<CourseModel, bool>> e);
 
-        IEnumerable<CourseModel> GetByShortName(string shortName);
-
-        IEnumerable<CourseModel> GetByCourseNumber(string courseNumber);
-
-        IEnumerable<CourseModel> GetBySemester(int semester);
-
-        IEnumerable<CourseModel> GetByYear(int year);
-
-        IEnumerable<CourseModel> GetByStartDate(DateTime startDate);
-
-        IEnumerable<CourseModel> GetByEndDate(DateTime endDate);
-
-        IEnumerable<CourseModel> GetByOwnerId(int ownerId);
-
-        IEnumerable<CourseModel> GetByLambda(Expression<Func<CourseModel, bool>> e);
-
-        Task<bool> Add(CourseModel item);
-
-        Task<bool> Remove(int id);
-
-        Task<bool> Update(CourseModel item);
+        Task<CourseModel> Add(CourseModel item);
+        Task<CourseModel> Update(CourseModel item);
+        Task<bool> Delete(int id);
     }
 }

@@ -21,8 +21,8 @@ namespace GraderApi
 
             config.Routes.MapHttpRoute(
                 name: "CourseRoute",
-                routeTemplate: "api/{controller}/{courseId}",
-                defaults: new {courseId = 1},
+                routeTemplate: "api/Courses/{courseId}",
+                defaults: new { },
                 constraints: new { courseId = new CourseConstraint() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );

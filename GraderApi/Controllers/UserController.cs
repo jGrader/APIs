@@ -16,14 +16,12 @@ namespace GraderApi.Controllers
         private readonly CourseRepository _courseRepository;
         private readonly CourseUserRepository _courseUserRepository;
 
-        public UserController(
-            CourseRepository courseRepository,
-            CourseUserRepository courseUserRepository
-            )
+        public UserController(CourseRepository courseRepository, CourseUserRepository courseUserRepository)
         {
             _courseRepository = courseRepository;
             _courseUserRepository = courseUserRepository;
         }
+
         public HttpResponseMessage GetAllUsers()
         {
             throw new NotImplementedException();

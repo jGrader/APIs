@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace GraderApi
+﻿namespace GraderApi
 {
     public enum CoursePermissions
     {
@@ -15,5 +10,12 @@ namespace GraderApi
         CanGrantExtensions = 1<<4,
         CanGrantExcuses = 1<<5,
         CanSeeFullGrades = 1<<6,
+    }
+
+    public enum AdminPermissions
+    {
+        CanCreateCourse = 1,
+        CanUpdateCourse = 1<<1,
+        CanDeleteCourse = 1<<2,
     }
 }

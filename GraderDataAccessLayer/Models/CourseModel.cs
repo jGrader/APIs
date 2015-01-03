@@ -22,17 +22,22 @@
         [DataType(DataType.Text)]
         public string ShortName { get; set; }
 
+        [Required]
         public int Semester { get; set; }
 
+        [Required]
         public int Year { get; set; }
 
+        [Required]
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
 
+        [Required]
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
         //Navigation properties
+        [Required]
         public int OwnerId { get; set; }
 
         [ForeignKey("OwnerId")]

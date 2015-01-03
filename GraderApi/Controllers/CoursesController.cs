@@ -1,50 +1,68 @@
 ﻿namespace GraderApi.Controllers
 {
-    using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Repositories;
+    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.Http.Description;
+    using Grader.JsonSerializer;
+    using GraderDataAccessLayer.Models;
+    using GraderDataAccessLayer.Repositories;
+
 
     public class CoursesController : ApiController
     {
         private readonly CourseRepository _courseRepository;
         private readonly CourseUserRepository _courseUserRepository;
 
-        public CoursesController(
-                CourseRepository courseRepository,
-                CourseUserRepository courseUserRepository
-            )
-
+        public CoursesController(CourseRepository courseRepository, CourseUserRepository courseUserRepository)
         {
             _courseRepository = courseRepository;
             _courseUserRepository = courseUserRepository;
         }
 
         // GET: api/Courses
-        public HttpResponseMessage GetCourses()
+        [ResponseType(typeof(IEnumerable<CourseModel>))]
+        public async Task<HttpResponseMessage> GetCourse()
         {
-            var result = _courseRepository.GetAll();
+            var result = await _courseRepository.GetAll();
             return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // GET: api/Courses/5
-        [Authorize(Roles = "CanSeeFullGrades")]
-        public HttpResponseMessage GetCourse(int courseId)
+        [ResponseType(typeof(CourseModel))]
+        [Authorize(Roles = "CanSeeGrades")]
+        public async Task<HttpResponseMessage> GetCourse(int courseId)
         {
-            var course = _courseRepository.Get(courseId);
-            if (course == null)
-            {
+            var course = await _courseRepository.Get(courseId);
+            if (course == null) {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
+
             return Request.CreateResponse(HttpStatusCode.Accepted, course.ToJson());
+        }
+
+        // POST: api/Courses
+        [ResponseType(typeof(void))]
+        [Authorize(Roles = "CanCreateCourse")]
+        public async Task<IHttpActionResult> PostCourseModel(CourseModel course)
+        {
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _courseRepository.Add(course);
+            if (result == null) {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+
+            return CreatedAtRoute("CourseRoute", new { courseId = course.Id }, course);
         }
 
         // PUT: api/Courses/5
         [ResponseType(typeof(void))]
+        [Authorize(Roles = "CanUpdateCourse")]
         public async Task<IHttpActionResult> PutCourse(int id, CourseModel course)
         {
             if (!ModelState.IsValid)
@@ -58,42 +76,30 @@
             }
 
             var result = await _courseRepository.Update(course);
-            return StatusCode(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
-        }
-
-        // POST: api/Courses
-        [ResponseType(typeof(CourseModel))]
-        public async Task<IHttpActionResult> PostCourse(CourseModel course)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var result = await _courseRepository.Add(course);
-
-            if (!result)
+            if (result == null)
             {
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
 
-            return CreatedAtRoute("DefaultApi", new {id = course.Id}, course);
+            return StatusCode(HttpStatusCode.OK);
         }
 
         // DELETE: api/Courses/5
-        [ResponseType(typeof(CourseModel))]
-        public async Task<IHttpActionResult> DeleteCourse(int id)
+        [ResponseType(typeof(void))]
+        [Authorize(Roles = "CanDeleteCourse")]
+        public async Task<IHttpActionResult> DeleteCourseModel(int courseId)
         {
-            var result = await _courseRepository.Remove(id);
-
+            var result = await _courseRepository.Delete(courseId);
             return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
         }
+
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
                 _courseRepository.Dispose();
+                _courseUserRepository.Dispose();
             }
             base.Dispose(disposing);
         }

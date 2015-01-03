@@ -12,7 +12,7 @@ namespace GraderDataAccessLayer.Repositories
 {
     public class CourseUserRepository : ICourseUserRepository
     {
-        private readonly DatabaseContext _context = new DatabaseContext();
+        private DatabaseContext _context = new DatabaseContext();
 
         public IEnumerable<CourseUserModel> GetAll()
         {
@@ -65,5 +65,25 @@ namespace GraderDataAccessLayer.Repositories
             var result = _context.CourseUser.Where(exp);
             return result;
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        private void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+            if (_context == null)
+            {
+                return;
+            }
+
+            _context.Dispose();
+            _context = null;
+        }      
     }
 }

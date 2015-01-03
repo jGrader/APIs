@@ -18,59 +18,72 @@ namespace GraderApi.Handlers
 {
     public class PermissionsHandler : DelegatingHandler
     {
+        private readonly IAdminRepository _adminRepository;
+        private readonly ICourseRepository _courseRepository;
         private readonly ICourseUserRepository _courseUserRepository;
 
         public PermissionsHandler(HttpConfiguration httpConfiguration)
         {
+            _adminRepository = new AdminRepository();
+            _courseRepository = new CourseRepository();
             _courseUserRepository = new CourseUserRepository();
+
             InnerHandler = new HttpControllerDispatcher(httpConfiguration); 
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var courseIdString = request.GetRouteData().Values["courseId"] as string;
 
-            if (courseIdString == null)
-            {
-                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+            if (courseIdString == null) { // Make sure that the route is valid 
+                return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
+
             int courseId;
-            if (!int.TryParse(courseIdString, out courseId))
-            {
-                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+            if (!int.TryParse(courseIdString, out courseId)) { // Make sure that the courseId is valid; the CourseConstraint class does this already, but just to be safe
+                return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
 
             var curUser = HttpContext.Current.User as UserPrincipal;
-            if (curUser == null)
-            {
-                return CreateTask(request, HttpStatusCode.BadRequest, Messages.UserNotFound);
+            if (curUser == null) { // Make sure that there is nothing fishy about the user's login status
+                return await CreateTask(request, HttpStatusCode.BadRequest, Messages.UserNotFound);
             }
-            
-            
-            try
+
+            var adminUser = _adminRepository.GetByUserId(curUser.User.Id);
+            if (adminUser != null) //This means that the user is an admin
             {
-                var courseUser = _courseUserRepository.GetByLambda(cu => (cu.UserId == curUser.User.Id) && (cu.CourseId == courseId)).FirstOrDefault();
-                if (courseUser == null) 
+                if (adminUser.IsSuperUser == true) // SuperUser which can do ANYTHING; just add that and exit
                 {
-                    //The user is not registered for this course
-                    return CreateTask(request, HttpStatusCode.Forbidden, Messages.InvalidRequest);
+                    var superUserPermission = GetOwnerPermissions();
+                    UpdatePrincipal(curUser, superUserPermission);
+
+                    return await base.SendAsync(request, cancellationToken);
                 }
 
-                var permissions = GetPermissions(courseUser.Permissions);
-                var principal = new UserPrincipal(new GenericIdentity(curUser.User.UserName), permissions, curUser.User);
+                //If we reach this point, he/she is an admin but not SuperUser; find out if (s)he owns this course!
+                var adminCourse = await _courseRepository.Get(courseId);
+                if (adminCourse == null) { // Just to be safe
+                    return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                }
 
-                Thread.CurrentPrincipal = principal;
-                if (HttpContext.Current != null)
-                {
-                    HttpContext.Current.User = principal;
+                if (adminCourse.OwnerId == curUser.User.Id) { // Current user is the owner; give all possible rights and exit
+                    var ownerPermissions = GetOwnerPermissions();
+                    UpdatePrincipal(curUser, ownerPermissions);
+
+                    return await base.SendAsync(request, cancellationToken);
                 }
             }
-            catch (Exception)
-            {
-                return CreateTask(request, HttpStatusCode.BadRequest, Messages.UserNotFound);
+
+            // If we reached this point, the user is either not an admin / superUser or doesn't own the course; treat as a regular user no matter what
+            var courseUser = _courseUserRepository.GetByLambda(cu => (cu.UserId == curUser.User.Id) && (cu.CourseId == courseId)).FirstOrDefault();
+            if (courseUser == null) { //The user is not registered for this course         
+                return await CreateTask(request, HttpStatusCode.Forbidden, Messages.InvalidRequest);
             }
+
+            var permissions = GetUserPermissions(courseUser.Permissions);
+            UpdatePrincipal(curUser, permissions);
               
-            return base.SendAsync(request, cancellationToken);
+            return await base.SendAsync(request, cancellationToken);
         }
 
         private Task<HttpResponseMessage> CreateTask(HttpRequestMessage request, HttpStatusCode code, Object data)
@@ -81,8 +94,19 @@ namespace GraderApi.Handlers
             return tsc.Task;
         }
 
+        private static void UpdatePrincipal(UserPrincipal curUser, string[] newPermissions)
+        {
+            var principal = new UserPrincipal(new GenericIdentity(curUser.User.UserName), newPermissions, curUser.User);
+
+            Thread.CurrentPrincipal = principal;
+            if (HttpContext.Current != null)
+            {
+                HttpContext.Current.User = principal;
+            }
+        }
+
         // This has to be a string[] instead of IEnumerable because of the constructor in the GenericPrincipal
-        private static string[] GetPermissions(int permissions)
+        private static string[] GetUserPermissions(int permissions)
         {
             var res = new List<string>();
             var names = Enum.GetNames(typeof (CoursePermissions));
@@ -102,6 +126,13 @@ namespace GraderApi.Handlers
                 //If the user has no permissions, simply add 'Nothing' - 0 in the enum
                 res.Add(Enum.GetName(typeof (CoursePermissions), 0));
             }
+            return res.ToArray();
+        }
+        private static string[] GetOwnerPermissions()
+        {
+            var res = Enum.GetNames(typeof (CoursePermissions)).ToList(); //Add all regular CoursePermissions
+            res.AddRange(Enum.GetNames(typeof (AdminPermissions))); //Add all AdminPermissions
+
             return res.ToArray();
         }
     }
