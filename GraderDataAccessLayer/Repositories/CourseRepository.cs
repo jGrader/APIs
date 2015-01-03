@@ -22,7 +22,7 @@
         }
         public async Task<IEnumerable<CourseModel>> GetAll()
         {
-            return await _db.Course.ToListAsync();
+            return _db.Course;
         }     
 
         public async Task<IEnumerable<CourseModel>> GetByName(string name)
