@@ -73,7 +73,7 @@ namespace GraderApi.Handlers
                         return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
                     }
                     //Initialize the courseId ... for the following lines
-                    var gradeComponent = Task.Run(() => _gradeComponentRepository.Get(gradeComponentId));
+                    var gradeComponent = Task.Run(() => _gradeComponentRepository.Get(gradeComponentId), cancellationToken);
                     Task.WaitAll(gradeComponent);
                     if (gradeComponent.Result == null) {
                         return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -84,7 +84,7 @@ namespace GraderApi.Handlers
             }
 
             
-            var adminUser = Task.Run(() => _adminRepository.GetByUserId(curUser.User.Id));
+            var adminUser = Task.Run(() => _adminRepository.GetByUserId(curUser.User.Id), cancellationToken);
             Task.WaitAll(adminUser);
             if (adminUser.Result != null) //This means that the user is an admin
             {
@@ -97,7 +97,7 @@ namespace GraderApi.Handlers
                 }
 
                 //If we reach this point, he/she is an admin but not SuperUser; find out if (s)he owns this course!
-                var adminCourse = Task.Run(() => _courseRepository.Get(courseId));
+                var adminCourse = Task.Run(() => _courseRepository.Get(courseId), cancellationToken);
                 Task.WaitAll(adminCourse);
                 if (adminCourse.Result == null) { // Just to be safe
                     return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
