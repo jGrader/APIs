@@ -21,7 +21,7 @@
         }
         public async Task<IEnumerable<GradeComponentModel>> GetAll()
         {
-            return _db.GradeComponent;
+            return await Task.Run(() => _db.GradeComponent);
         }
         public async Task<IEnumerable<GradeComponentModel>> GetAllByCourse(int courseId)
         {
