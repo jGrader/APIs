@@ -16,7 +16,7 @@
             $("button#login").click(function() {
                 var url = "api/Courses";
                 var headers = new Array();
-                headers["Authorize"] = btoa($("input#username").val() + ":" + $("#password").val()); //Base64 encoding
+                headers["Authorization"] = "Basic" + " " + btoa($("input#username").val() + ":" + $("#password").val()); //Base64 encoding
 
                 $.ajax({
                     url: url,

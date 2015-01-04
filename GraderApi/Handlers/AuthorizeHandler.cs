@@ -219,7 +219,8 @@ namespace GraderApi.Handlers
         }
         private static Credentials ParseAuthorizationHeader(string authHeader)
         {
-            string[] credentials = Encoding.UTF8.GetString(Convert.FromBase64String(authHeader)).Split(new[] { ':' });
+            var base64Credentials = authHeader.Split(' ')[1]; // Format is 'Basic string64Credentials'
+            string[] credentials = Encoding.UTF8.GetString(Convert.FromBase64String(base64Credentials)).Split(new[] { ':' });
             if (credentials.Length != 2 || string.IsNullOrEmpty(credentials[0]) || string.IsNullOrEmpty(credentials[1]))
             {
                 return null;

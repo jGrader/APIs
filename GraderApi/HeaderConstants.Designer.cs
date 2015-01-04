@@ -61,7 +61,7 @@ namespace GraderApi {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Authorize.
+        ///   Looks up a localized string similar to Authorization.
         /// </summary>
         internal static string AuthorizeHeader {
             get {
