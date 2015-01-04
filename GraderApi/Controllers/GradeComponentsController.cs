@@ -30,7 +30,7 @@
 
         // GET: api/GradeComponents/5
         [ResponseType(typeof(GradeComponentModel))]
-        [Authorize(Roles = "CanSeeGrades")]
+        [PermissionsAuthorize(CoursePermissions.CanSeeGrades)]
         public async Task<HttpResponseMessage> GetGradeComponent(int gradeComponentId)
         {
             var gradeComponent = await _gradeComponentRepository.Get(gradeComponentId);
@@ -44,7 +44,7 @@
 
         // POST: api/GradeComponents
         [ResponseType(typeof(GradeComponentModel))]
-        [Authorize(Roles = "CanCreateGradedPart")]
+        [PermissionsAuthorize(AdminPermissions.CanCreateGradedPart)]
         public async Task<IHttpActionResult> PostGradeComponent(GradeComponentModel gradeComponentModel)
         {
             if (!ModelState.IsValid) {
@@ -61,7 +61,7 @@
 
         // PUT: api/GradeComponents/5
         [ResponseType(typeof(void))]
-        [Authorize(Roles = "CanUpdateGradedPart")]
+        [PermissionsAuthorize(AdminPermissions.CanUpdateGradedPart)]
         public async Task<IHttpActionResult> PutGradeComponent(int gradeComponentId, GradeComponentModel gradeComponentModel)
         {
             if (!ModelState.IsValid) {
@@ -82,7 +82,7 @@
 
         // DELETE: api/GradeComponents/5
         [ResponseType(typeof(GradeComponentModel))]
-        [Authorize(Roles = "CanDeleteGradedPart")]
+        [PermissionsAuthorize(AdminPermissions.CanDeleteGradedPart)]
         public async Task<IHttpActionResult> DeleteGradeComponent(int gradeComponentId)
         {
             var result = await _gradeComponentRepository.Delete(gradeComponentId);

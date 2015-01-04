@@ -32,7 +32,7 @@
 
         // GET: api/Courses/5
         [ResponseType(typeof(CourseModel))]
-        [Authorize(Roles = "CanSeeGrades")]
+        [PermissionsAuthorize(CoursePermissions.CanSeeGrades)]
         public async Task<HttpResponseMessage> GetCourse(int courseId)
         {
             var course = await _courseRepository.Get(courseId);
@@ -45,7 +45,7 @@
 
         // POST: api/Courses
         [ResponseType(typeof(CourseModel))]
-        [Authorize(Roles = "CanCreateCourse")]
+        [PermissionsAuthorize(AdminPermissions.CanCreateCourse)]
         public async Task<IHttpActionResult> PostCourseModel(CourseModel course)
         {
             if (!ModelState.IsValid) {
@@ -62,7 +62,7 @@
 
         // PUT: api/Courses/5
         [ResponseType(typeof(void))]
-        [Authorize(Roles = "CanUpdateCourse")]
+        [PermissionsAuthorize(AdminPermissions.CanUpdateCourse)]
         public async Task<IHttpActionResult> PutCourse(int courseId, CourseModel course)
         {
             if (!ModelState.IsValid) {
@@ -83,7 +83,7 @@
 
         // DELETE: api/Courses/5
         [ResponseType(typeof(void))]
-        [Authorize(Roles = "CanDeleteCourse")]
+        [PermissionsAuthorize(AdminPermissions.CanDeleteCourse)]
         public async Task<IHttpActionResult> DeleteCourseModel(int courseId)
         {
             var result = await _courseRepository.Delete(courseId);
