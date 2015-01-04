@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public interface ISubmissionRepository
+    public interface ISubmissionRepository : IDisposable
     {
         Task<SubmissionModel> Get(int id);
         Task<IEnumerable<SubmissionModel>> GetAllByEntityId(int id);

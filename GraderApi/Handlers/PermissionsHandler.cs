@@ -46,7 +46,7 @@ namespace GraderApi.Handlers
             var routeTemplate = request.GetRouteData().Route.RouteTemplate;
             switch (routeTemplate)
             {
-                case "api/{controller}/{courseId}":
+                case "api/{controller}/{action}/{courseId}":
                 {
                     var controllerName = request.GetRouteData().Values["controller"] as string;
                     switch (controllerName)

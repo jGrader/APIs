@@ -44,7 +44,7 @@
         }
 
         // POST: api/Courses
-        [ResponseType(typeof(void))]
+        [ResponseType(typeof(CourseModel))]
         [Authorize(Roles = "CanCreateCourse")]
         public async Task<IHttpActionResult> PostCourseModel(CourseModel course)
         {
@@ -57,19 +57,19 @@
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
 
-            return CreatedAtRoute("CourseRoute", new { courseId = course.Id }, course);
+            return CreatedAtRoute("CourseRoute", new { courseId = result.Id }, result.ToJson());
         }
 
         // PUT: api/Courses/5
         [ResponseType(typeof(void))]
         [Authorize(Roles = "CanUpdateCourse")]
-        public async Task<IHttpActionResult> PutCourse(int id, CourseModel course)
+        public async Task<IHttpActionResult> PutCourse(int courseId, CourseModel course)
         {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
 
-            if (id != course.Id) {
+            if (courseId != course.Id) {
                 return BadRequest();
             }
 

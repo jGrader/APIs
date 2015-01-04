@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using GraderApi.Constraints;
-using GraderApi.Handlers;
+﻿using GraderApi.Handlers;
 using System.Net.Http.Headers;
 using System.Web.Http;
-using GraderDataAccessLayer.Models;
 
 
 namespace GraderApi
@@ -22,19 +19,54 @@ namespace GraderApi
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(
+                name: "UserRoute",
+                routeTemplate: "api/{controller}/{action}/{userId}",
+                defaults: new { },
+                constraints: new { controller = "Users", userId = new ApiRouteConstraints() }
+            );
+
+            config.Routes.MapHttpRoute(
                 name: "CourseRoute",
-                routeTemplate: "api/{controller}/{courseId}",
+                routeTemplate: "api/{controller}/{action}/{courseId}",
                 defaults: new { },
                 constraints: new { controller = "Courses", courseId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
+
+            config.Routes.MapHttpRoute(
+                name: "CourseUserRoute",
+                routeTemplate: "api/{controller}/{action}/{courseUserId}",
+                defaults: new { },
+                constraints: new { controller = "CourseUsers", courseUserId = new ApiRouteConstraints() }
+            );
             
             config.Routes.MapHttpRoute(
                 name: "GradeComponentRoute",
-                routeTemplate: "api/{controller}/{gradeComponentId}",
+                routeTemplate: "api/{controller}/{action}/{gradeComponentId}",
                 defaults: new { },
                 constraints: new { controller = "GradeComponents", gradeComponentId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "TaskRoute",
+                routeTemplate: "api/{controller}/{action}/{taskId}",
+                defaults: new { },
+                constraints: new { controller = "Tasks", taskId = new ApiRouteConstraints() }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "EntityRoute",
+                routeTemplate: "api/{controller}/{action}/{entityId}",
+                defaults: new { },
+                constraints: new { controller = "Entities", entityId = new ApiRouteConstraints() }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "SubmissionRoute",
+                routeTemplate: "api/{controller}/{action}/{submissionId}",
+                defaults: new { },
+                constraints: new { controller = "Submissions", submissionId = new ApiRouteConstraints() }
             );
 
             config.Routes.MapHttpRoute(

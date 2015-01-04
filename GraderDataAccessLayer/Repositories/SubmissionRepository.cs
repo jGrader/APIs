@@ -117,7 +117,6 @@
         }
 
 
-
         public async Task<FileModel> GetFile(int courseId, string entityName, string username, string filename)
         {
             // submissions\{courseId}\{entityName}\{username}\{filename}
@@ -128,7 +127,7 @@
                 return null;
             }
             var text = await Task.Run(() => File.ReadAllText(file));
-            var result = new FileModel {Filename = file, Username = username, Contents = text};
+            var result = new FileModel { Filename = file, Username = username, Contents = text };
             return result;
         }
 
@@ -145,7 +144,7 @@
             {
                 var sr = fileInfo.OpenText();
                 var s = await sr.ReadToEndAsync();
-                result.Add(new FileModel {Filename = fileInfo.FullName, Contents = s, Username = String.Empty});
+                result.Add(new FileModel { Filename = fileInfo.FullName, Contents = s, Username = String.Empty });
             }
 
             return result;
@@ -166,7 +165,7 @@
         {
             throw new NotImplementedException();
         }
-
+        
         public async Task<bool> Add(FileModel item)
         {
             if (item == null)
@@ -187,7 +186,7 @@
                     item.Filename = name + i.ToString(CultureInfo.InvariantCulture) + extension;
                 }
                 // File.Create(file.Filename);
-                await Task.Run(() => File.WriteAllText(item.Filename, item.Contents));
+                File.WriteAllText(item.Filename, item.Contents);
                 return true;
             }
             catch (Exception)
@@ -223,6 +222,6 @@
 
             _db.Dispose();
             _db = null;
-        }      
+        }    
     }
 }

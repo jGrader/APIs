@@ -7,7 +7,7 @@
     using System.Threading.Tasks;
 
 
-    public interface ICourseUserRepository
+    public interface ICourseUserRepository : IDisposable
     {
         Task<CourseUserModel> Get(int id);
 

@@ -10,43 +10,48 @@
     using System.Threading.Tasks;
 
 
-    public class TaskRepository : ITaskRepositoy
+    public class EntityRepository : IEntityRepository
     {
         private DatabaseContext _db = new DatabaseContext();
-    
 
-        public async Task<TaskModel> Get(int id)
-        {
-            var searchResult = await _db.Task.FirstOrDefaultAsync(t => t.Id == id);
-            return searchResult;
-        }
 
-        public async Task<IEnumerable<TaskModel>> GetAll()
+        public async Task<EntityModel> Get(int id)
         {
-            return await Task.Run(() => _db.Task);
-        }
-        public async Task<IEnumerable<TaskModel>> GetAllByName(string name)
-        {
-            var searchResult = await Task.Run(() => _db.Task.Where(w => w.Name == name));
-            return searchResult;
-        }
-        public async Task<IEnumerable<TaskModel>> GetAllByCourse(int courseId)
-        {
-            var searchResult = await Task.Run(() => _db.Task.Where(w => w.CourseId == courseId));
-            return searchResult;
-        }
-        public async Task<IEnumerable<TaskModel>> GetAllByGradeComponent(int gradeComponentId)
-        {
-            var searchResult = await Task.Run(() => _db.Task.Where(w => w.GradeComponentId == gradeComponentId));
-            return searchResult;
-        }
-        public async Task<IEnumerable<TaskModel>> GetAllByCourseAndGradeComponent(int courseId, int gradeComponentId)
-        {
-            var searchResult = await Task.Run(() => _db.Task.Where(w => w.CourseId == courseId && w.GradeComponentId == gradeComponentId));
+            var searchResult = await _db.Entity.FirstOrDefaultAsync(e => e.Id == id);
             return searchResult;
         }
 
-        public async Task<TaskModel> Add(TaskModel item)
+        public async Task<IEnumerable<EntityModel>> GetAll()
+        {
+            return await Task.Run(() => _db.Entity);
+        }
+        public async Task<IEnumerable<EntityModel>> GetAllForTask(int taskId)
+        {
+            var searchResult = await Task.Run(() => _db.Entity.Where(e => e.TaskId == taskId));
+            return searchResult;
+        }
+        public async Task<IEnumerable<EntityModel>> GetAllByName(string name)
+        {
+            var searchResult = await Task.Run(() => _db.Entity.Where(e => e.Name == name));
+            return searchResult;
+        }
+        public async Task<IEnumerable<EntityModel>> GetAllByOpenDate(DateTime openTime)
+        {
+            var searchResult = await Task.Run(() => _db.Entity.Where(e => e.OpenTime == openTime));
+            return searchResult;
+        }
+        public async Task<IEnumerable<EntityModel>> GetAllByCloseDate(DateTime closeTime)
+        {
+            var searchResult = await Task.Run(() => _db.Entity.Where(e => e.CloseTime == closeTime));
+            return searchResult;
+        }
+        public async Task<IEnumerable<EntityModel>> GetAllActiveBetweenDates(DateTime time1, DateTime time2)
+        {
+            var searchResult = await Task.Run(() => _db.Entity.Where(e => e.OpenTime > time1 && e.CloseTime < time2));
+            return searchResult;
+        }
+
+        public async Task<EntityModel> Add(EntityModel item)
         {
             if (item == null)
             {
@@ -55,13 +60,12 @@
 
             try
             {
-                _db.Task.Add(item);
+                _db.Entity.Add(item);
                 await _db.SaveChangesAsync();
 
                 //Load virtual properties and return object
-                _db.Entry(item).Reference(c => c.Course).Load();
-                _db.Entry(item).Reference(c => c.GradeComponent).Load();
-                _db.Entry(item).Reference(c => c.Entities).Load();
+                _db.Entry(item).Reference(c => c.Task).Load();
+                _db.Entry(item).Reference(c => c.Submissions).Load();
                 return item;
             }
             catch (DbException)
@@ -69,9 +73,9 @@
                 return null;
             }
         }
-        public async Task<TaskModel> Update(TaskModel item)
+        public async Task<EntityModel> Update(EntityModel item)
         {
-            var dbItem = await _db.Task.FirstOrDefaultAsync(c => c.Id == item.Id);
+            var dbItem = await _db.Entity.FirstOrDefaultAsync(c => c.Id == item.Id);
             if (dbItem == null)
             {
                 throw new ArgumentNullException("item");
@@ -90,7 +94,7 @@
         }
         public async Task<bool> Delete(int id)
         {
-            var item = await _db.Task.FirstOrDefaultAsync(c => c.Id == id);
+            var item = await _db.Entity.FirstOrDefaultAsync(c => c.Id == id);
             if (item == null)
             {
                 throw new ArgumentNullException("id");
@@ -98,7 +102,7 @@
 
             try
             {
-                _db.Task.Remove(item);
+                _db.Entity.Remove(item);
                 await _db.SaveChangesAsync();
                 return true;
             }
@@ -127,6 +131,6 @@
 
             _db.Dispose();
             _db = null;
-        }
+        }      
     }
 }
