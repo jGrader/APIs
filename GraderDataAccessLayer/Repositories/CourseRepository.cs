@@ -109,7 +109,7 @@
         }
         public async Task<bool> Delete(int id)
         {
-            var item = _db.Course.FirstOrDefault(c => c.Id == id);
+            var item = await _db.Course.FirstOrDefaultAsync(c => c.Id == id);
             if (item == null) {
                 throw new ArgumentNullException("id");
             }

@@ -4,57 +4,44 @@
     using Models;
     using System;
     using System.Collections.Generic;
-    using System.Data;
+    using System.Data.Common;
     using System.Data.Entity;
-    using System.Data.Entity.Core;
-    using System.Data.Entity.Infrastructure;
     using System.Linq;
+    using System.Threading.Tasks;
+
 
     public class UserRepository : IUserRepository
     {
-        private readonly DatabaseContext _db = new DatabaseContext();
+        private DatabaseContext _db = new DatabaseContext();
 
-        public IEnumerable<UserModel> GetAll()
+
+        public async Task<UserModel> Get(int id)
         {
-            var result = _db.User.Where(u => u.Id > 0);
-            if (!result.Any())
-            {
-                throw new ObjectNotFoundException();
-            }
-            return result;
+            var searchResult = await _db.User.FirstOrDefaultAsync(u => u.Id == id);
+            return searchResult;
+        }
+        public async Task<UserModel> GetByUsername(string username)
+        {
+            var searchResult = await _db.User.FirstOrDefaultAsync(u => u.UserName == username);
+            return searchResult;
         }
 
-        public IEnumerable<UserModel> GetAllByGraduationYear(int year)
+        public async Task<IEnumerable<UserModel>> GetAll()
         {
-            throw new NotImplementedException();
+            return await Task.Run(() => _db.User);
+        }
+        public async Task<IEnumerable<UserModel>> GetAllByGraduationYear(string year)
+        {
+            return await Task.Run(() => _db.User.Where(w => w.GraduationYear == year));
         }
 
-        public UserModel Get(int id)
+        public async Task<string> GetEmail(int id)
         {
-            var result = _db.User.FirstOrDefault(u => u.Id == id);
-            if (result == null)
-            {
-                throw new ObjectNotFoundException();
-            }
-            return result;
+            var searchResult = await _db.User.FirstOrDefaultAsync(w => w.Id == id);
+            return searchResult == null ? string.Empty : searchResult.Email;
         }
 
-        public UserModel GetByUsername(string username)
-        {
-            var result = _db.User.FirstOrDefault(u => u.UserName == username);
-            if (result == null)
-            {
-                throw new ObjectNotFoundException();
-            }
-            return result;
-        }
-
-        public string GetEmail(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Add(UserModel item)
+        public async Task<UserModel> Add(UserModel item)
         {
             if (item == null)
             {
@@ -64,21 +51,15 @@
             try
             {
                 _db.User.Add(item);
-                _db.SaveChanges();
-                return true;
+                await _db.SaveChangesAsync();
+                return item;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbException)
             {
-                return false;
+                return null;
             }
         }
-
-        public bool Remove(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Update(UserModel item)
+        public async Task<UserModel> Update(UserModel item)
         {
             var dbItem = _db.User.FirstOrDefault(c => c.Id == item.Id);
             if (dbItem == null)
@@ -88,15 +69,54 @@
 
             try
             {
-                _db.Entry(item).State = EntityState.Modified;
-                _db.SaveChanges();
+                _db.Entry(dbItem).CurrentValues.SetValues(item);
+                await _db.SaveChangesAsync();
+                return await Get(item.Id);
+            }
+            catch (DbException)
+            {
+                return null;
+            }
+        }
+        public async Task<bool> Delete(int userId)
+        {
+            var item = await _db.User.FirstOrDefaultAsync(c => c.Id == userId);
+            if (item == null)
+            {
+                throw new ArgumentNullException("userId");
+            }
 
+            try
+            {
+                _db.User.Remove(item);
+                await _db.SaveChangesAsync();
                 return true;
             }
-            catch (DBConcurrencyException)
+            catch (DbException)
             {
                 return false;
             }
         }
+
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        private void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+            if (_db == null)
+            {
+                return;
+            }
+
+            _db.Dispose();
+            _db = null;
+        }      
     }
 }

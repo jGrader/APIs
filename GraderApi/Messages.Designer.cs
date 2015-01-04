@@ -61,6 +61,15 @@ namespace GraderApi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The server was unable to establish a connection to LDAP.
+        /// </summary>
+        internal static string CannotConnectToLdap {
+            get {
+                return ResourceManager.GetString("CannotConnectToLdap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The provided session ID has expired. Please log in again..
         /// </summary>
         internal static string ExpiredSessionId {

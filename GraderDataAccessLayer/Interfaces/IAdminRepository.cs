@@ -7,9 +7,9 @@
 
     public interface IAdminRepository : IDisposable
     {
-        IEnumerable<AdminModel> GetAll();
-        AdminModel GetByUserId(int userId);
-        AdminModel Get(int id);
+        Task<AdminModel> Get(int id);
+        Task<AdminModel> GetByUserId(int userId);
+        Task<IEnumerable<AdminModel>> GetAll();
 
         Task<AdminModel> Add(AdminModel item);
         Task<AdminModel> Update(AdminModel item);

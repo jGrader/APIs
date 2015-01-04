@@ -1,7 +1,5 @@
-﻿using System.Web.Routing;
-using GraderApi.Principals;
+﻿using GraderApi.Principals;
 using GraderDataAccessLayer.Interfaces;
-using GraderDataAccessLayer.Models;
 using GraderDataAccessLayer.Repositories;
 using System;
 using System.Collections.Generic;
@@ -14,7 +12,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
-using Microsoft.Ajax.Utilities;
 
 
 namespace GraderApi.Handlers
@@ -36,11 +33,12 @@ namespace GraderApi.Handlers
             InnerHandler = new HttpControllerDispatcher(httpConfiguration); 
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var curUser = HttpContext.Current.User as UserPrincipal;
             if (curUser == null) { // Make sure that there is nothing fishy about the user's login status
-                return CreateTask(request, HttpStatusCode.BadRequest, Messages.UserNotFound);
+                return await CreateTask(request, HttpStatusCode.BadRequest, 
+                    Messages.UserNotFound);
             }
 
 
@@ -59,12 +57,14 @@ namespace GraderApi.Handlers
 
                             if (courseIdString == null)
                             { // Make sure that the route is valid 
-                                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                                return await CreateTask(request, HttpStatusCode.BadRequest, 
+                                    Messages.InvalidCourse);
                             }
 
                             if (!int.TryParse(courseIdString, out courseId))
                             { // Make sure that the courseId is valid; the CourseConstraint class does this already, but just to be safe
-                                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                                return await CreateTask(request, HttpStatusCode.BadRequest, 
+                                    Messages.InvalidCourse);
                             }
                         }
                             break;
@@ -74,21 +74,23 @@ namespace GraderApi.Handlers
 
                             if (gradeComponentIdString == null)
                             { // Make sure that the route is valid 
-                                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                                return await CreateTask(request, HttpStatusCode.BadRequest, 
+                                    Messages.InvalidCourse);
                             }
 
                             if (!int.TryParse(gradeComponentIdString, out gradeComponentId))
                             { // Make sure that the courseId is valid; the CourseConstraint class does this already, but just to be safe
-                                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                                return await CreateTask(request, HttpStatusCode.BadRequest, 
+                                    Messages.InvalidCourse);
                             }
                             //Initialize the courseId ... for the following lines
-                            var gradeComponent = Task.Run(() => _gradeComponentRepository.Get(gradeComponentId), cancellationToken);
-                            Task.WaitAll(gradeComponent);
-                            if (gradeComponent.Result == null)
+                            var gradeComponent = await _gradeComponentRepository.Get(gradeComponentId);
+                            if (gradeComponent == null)
                             {
-                                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                                return await CreateTask(request, HttpStatusCode.BadRequest, 
+                                    Messages.InvalidCourse);
                             }
-                            courseId = gradeComponent.Result.CourseId;
+                            courseId = gradeComponent.CourseId;
                         }
                             break;
                     }
@@ -98,43 +100,42 @@ namespace GraderApi.Handlers
             }
 
             
-            var adminUser = Task.Run(() => _adminRepository.GetByUserId(curUser.User.Id), cancellationToken);
-            Task.WaitAll(adminUser);
-            if (adminUser.Result != null) //This means that the user is an admin
+            var adminUser = await _adminRepository.GetByUserId(curUser.User.Id);
+            if (adminUser != null) //This means that the user is an admin
             {
-                if (adminUser.Result.IsSuperUser) // SuperUser which can do ANYTHING; just add that and exit
+                if (adminUser.IsSuperUser) // SuperUser which can do ANYTHING; just add that and exit
                 {
                     var superUserPermission = GetOwnerPermissions();
                     UpdatePrincipal(curUser, superUserPermission);
 
-                    return base.SendAsync(request, cancellationToken);
+                    return await base.SendAsync(request, cancellationToken);
                 }
 
                 //If we reach this point, he/she is an admin but not SuperUser; find out if (s)he owns this course!
-                var adminCourse = Task.Run(() => _courseRepository.Get(courseId), cancellationToken);
-                Task.WaitAll(adminCourse);
-                if (adminCourse.Result == null) { // Just to be safe
-                    return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                var adminCourse = await _courseRepository.Get(courseId);
+                if (adminCourse == null) { // Just to be safe
+                    return await CreateTask(request, HttpStatusCode.BadRequest, 
+                        Messages.InvalidCourse);
                 }
 
-                if (adminCourse.Result.OwnerId == curUser.User.Id) { // Current user is the owner; give all possible rights and exit
+                if (adminCourse.OwnerId == curUser.User.Id) { // Current user is the owner; give all possible rights and exit
                     var ownerPermissions = GetOwnerPermissions();
                     UpdatePrincipal(curUser, ownerPermissions);
 
-                    return base.SendAsync(request, cancellationToken);
+                    return await base.SendAsync(request, cancellationToken);
                 }
             }
 
             // If we reached this point, the user is either not an admin / superUser or doesn't own the course; treat as a regular user no matter what
             var courseUser = _courseUserRepository.GetByLambda(cu => (cu.UserId == curUser.User.Id) && (cu.CourseId == courseId)).FirstOrDefault();
             if (courseUser == null) { //The user is not registered for this course         
-                return CreateTask(request, HttpStatusCode.Forbidden, Messages.InvalidRequest);
+                return await CreateTask(request, HttpStatusCode.Forbidden, Messages.InvalidRequest);
             }
 
             var permissions = GetUserPermissions(courseUser.Permissions);
             UpdatePrincipal(curUser, permissions);
               
-            return base.SendAsync(request, cancellationToken);
+            return await base.SendAsync(request, cancellationToken);
         }
 
         private Task<HttpResponseMessage> CreateTask(HttpRequestMessage request, HttpStatusCode code, Object data)

@@ -7,19 +7,8 @@ namespace GraderDataAccessLayer.Models
 {
     public class SessionIdModel
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-
-        [Required]
-        public int UserId { get; set; }
-
-        public Guid SessionId { get; set; }
-        public DateTime ExpirationTime { get; set; }
-
         public SessionIdModel()
         {
-            
         }
 
         public SessionIdModel(int userId)
@@ -28,5 +17,20 @@ namespace GraderDataAccessLayer.Models
             UserId = userId;
             ExpirationTime = DateTime.UtcNow.AddMinutes(15);
         }
+
+        //Scalar Properties
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        public Guid SessionId { get; set; }
+        public DateTime ExpirationTime { get; set; }
+
+        //Navigation Properties
+        [Required]
+        public int UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public virtual UserModel User { get; set; }
     }
 }

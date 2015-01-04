@@ -1,12 +1,14 @@
 ﻿namespace GraderDataAccessLayer.Repositories
 {
+    using Interfaces;
+    using Models;
+
     using System;
     using System.Collections.Generic;
     using System.Data.Common;
+    using System.Data.Entity;
     using System.Linq;
     using System.Threading.Tasks;
-    using GraderDataAccessLayer.Interfaces;
-    using GraderDataAccessLayer.Models;
 
 
     public class AdminRepository : IAdminRepository
@@ -14,19 +16,19 @@
         private DatabaseContext _db = new DatabaseContext();
 
 
-        public AdminModel Get(int id)
+        public async Task<AdminModel> Get(int id)
         {
-            var searchResult = _db.Admin.Where(w => w.Id == id);
-            return searchResult.FirstOrDefault();
+            var searchResult = await _db.Admin.FirstOrDefaultAsync(a => a.Id == id);
+            return searchResult;
         }
-        public AdminModel GetByUserId(int userId)
+        public async Task<AdminModel> GetByUserId(int userId)
         {
-            var searchResult = _db.Admin.Where(w => w.UserId == userId);
-            return searchResult.FirstOrDefault();
+            var searchResult = await _db.Admin.FirstOrDefaultAsync(a => a.UserId == userId);
+            return searchResult;
         }
-        public IEnumerable<AdminModel> GetAll()
+        public async Task<IEnumerable<AdminModel>> GetAll()
         {
-            return _db.Admin.Where(w => w.Id > 0);
+            return await Task.Run(() => _db.Admin);
         }
 
         public async Task<AdminModel> Add(AdminModel item)
@@ -59,7 +61,7 @@
             {
                 _db.Entry(dbItem).CurrentValues.SetValues(item);
                 await _db.SaveChangesAsync();
-                return Get(item.Id);
+                return await Get(item.Id);
             }
             catch (DbException) {
                 return null;

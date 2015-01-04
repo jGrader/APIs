@@ -1,17 +1,18 @@
 ﻿namespace GraderDataAccessLayer.Interfaces
 {
+    using Models;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
-    using GraderDataAccessLayer.Models;
+
 
     public interface ISessionIdRepository : IDisposable
     {
-        SessionIdModel GetBySesionId(Guid sessionId);
-        SessionIdModel Get(int userId);
-        Guid Add(int userId);
-        bool IsAuthorized(SessionIdModel sessionIdModel);
+        Task<SessionIdModel> GetBySesionId(Guid sessionId);
+        Task<SessionIdModel> Get(int userId);
+
+        Task<bool> IsAuthorized(SessionIdModel sessionIdModel);
+
+        Task<SessionIdModel> Add(int userId);
+        Task<bool> Delete(int id);
     }
 }

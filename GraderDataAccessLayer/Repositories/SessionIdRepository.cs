@@ -1,67 +1,37 @@
-﻿using System;
-using System.Data.Entity.Infrastructure;
-using System.Linq;
-using System.Threading.Tasks;
-
-using System.Data.Entity;
-using System.Data.Entity.Core;
-using GraderDataAccessLayer.Models;
-using GraderDataAccessLayer.Interfaces;
-
-
-namespace GraderDataAccessLayer.Repositories
+﻿namespace GraderDataAccessLayer.Repositories
 {
+    using Models;
+    using Interfaces;
+    using System;
+    using System.Data.Common;
+    using System.Data.Entity;
+    using System.Threading.Tasks;
+
+
     public class SessionIdRepository : ISessionIdRepository
     {
         DatabaseContext _db = new DatabaseContext();
 
-        public SessionIdModel GetBySesionId(Guid sessionId)
+
+        public async Task<SessionIdModel> GetBySesionId(Guid sessionId)
         {
-            var result = _db.SessionId.FirstOrDefault(s => s.SessionId == sessionId);
-
-            if (result == null)
-            {
-                throw new ObjectNotFoundException();
-            }
-
-            return result;
+            var searchResult = await _db.SessionId.FirstOrDefaultAsync(s => s.SessionId == sessionId);
+            return searchResult;
+        }
+        public async Task<SessionIdModel> Get(int userId)
+        {
+            var searchResult = await _db.SessionId.FirstOrDefaultAsync(s => s.UserId == userId);
+            return searchResult;
         }
 
-        public Guid Add(int userId)
-        {
-            try
-            {
-                var sessionModel = new SessionIdModel(userId);
-
-                _db.SessionId.Add(sessionModel);
-                _db.SaveChanges();
-                return sessionModel.SessionId;
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return Guid.Empty;
-            }
-        }
-
-        public SessionIdModel Get(int userId)
-        {
-            var result = _db.SessionId.FirstOrDefault(s => s.UserId == userId);
-            if (result == null)
-            {
-                throw new ObjectNotFoundException();
-            }
-
-            return result;
-        }
-
-        public bool IsAuthorized(SessionIdModel sessionIdModel)
+        public async Task<bool> IsAuthorized(SessionIdModel sessionIdModel)
         {
             if (sessionIdModel == null)
             {
                 throw new ArgumentNullException("sessionIdModel");
             }
 
-            
+
             if (sessionIdModel.ExpirationTime < DateTime.UtcNow)
             {
                 return false;
@@ -71,15 +41,63 @@ namespace GraderDataAccessLayer.Repositories
             {
                 sessionIdModel.ExpirationTime = DateTime.UtcNow.AddMinutes(15);
                 _db.Entry(sessionIdModel).State = EntityState.Modified;
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (DbException)
             {
                 return false;
             }
         }
 
+        public async Task<SessionIdModel> Add(int userId)
+        {
+            var dbUser = await _db.User.FirstOrDefaultAsync(u => u.Id == userId);
+            if (dbUser == null)
+            {
+                throw new ArgumentNullException("userId");
+            }
+
+            try
+            {
+                var newSession = new SessionIdModel(userId);
+                _db.SessionId.Add(newSession);
+                await _db.SaveChangesAsync();
+
+                //Load virtual properties and return object
+                _db.Entry(newSession).Reference(c => c.User).Load();
+                return newSession;
+            }
+            catch (DbException)
+            {
+                return null;
+            }
+        }
+        public async Task<bool> Delete(int id)
+        {
+            var dbSession = await _db.SessionId.FirstOrDefaultAsync(u => u.Id == id);
+            if (dbSession == null)
+            {
+                throw new ArgumentNullException("id");
+            }
+
+            try
+            {
+                _db.SessionId.Remove(dbSession);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (DbException)
+            {
+                return false;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
         private void Dispose(bool disposing)
         {
             if (!disposing)
@@ -93,12 +111,6 @@ namespace GraderDataAccessLayer.Repositories
 
             _db.Dispose();
             _db = null;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        }      
     }
 }

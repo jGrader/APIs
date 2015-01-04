@@ -1,21 +1,22 @@
 ﻿namespace GraderDataAccessLayer.Interfaces
 {
+    using Models;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
-    using GraderDataAccessLayer.Models;
 
-    public interface IUserRepository
+    public interface IUserRepository : IDisposable
     {
-        IEnumerable<UserModel> GetAll();
-        IEnumerable<UserModel> GetAllByGraduationYear(int year);
-        UserModel Get(int id);
-        UserModel GetByUsername(string username);
-        string GetEmail(int id);
-        bool Add(UserModel item);
-        bool Remove(int id);
-        bool Update(UserModel item);
+        Task<UserModel> Get(int id);
+        Task<UserModel> GetByUsername(string username);
+
+        Task<IEnumerable<UserModel>> GetAll();
+        Task<IEnumerable<UserModel>> GetAllByGraduationYear(string year);
+        
+        Task<string> GetEmail(int id);
+
+        Task<UserModel> Add(UserModel item);
+        Task<UserModel> Update(UserModel item);
+        Task<bool> Delete(int userId);
     }
 }

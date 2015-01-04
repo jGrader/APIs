@@ -4,7 +4,6 @@ using GraderDataAccessLayer.Models;
 using GraderDataAccessLayer.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core;
 using System.DirectoryServices;
 using System.Globalization;
 using System.Linq;
@@ -34,11 +33,11 @@ namespace GraderApi.Handlers
             _sessionIdRepository = new SessionIdRepository();
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             if (request == null || !String.Equals(request.RequestUri.Scheme, "https", StringComparison.OrdinalIgnoreCase))
             {
-                return CreateTask(request, HttpStatusCode.BadRequest, Messages.NotHttps);
+                return await CreateTask(request, HttpStatusCode.BadRequest, Messages.NotHttps);
             }
 
             if (request.Headers.Contains(HeaderConstants.SessionIdHeader))
@@ -47,38 +46,38 @@ namespace GraderApi.Handlers
                 var sessionId = request.Headers.GetValues(HeaderConstants.SessionIdHeader).FirstOrDefault();
                 if (sessionId == null || String.IsNullOrEmpty(sessionId))
                 {
-                    return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidSessionId);
+                    // The sessionId parameter is unreadeable for some weird reason...
+                    return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidSessionId);
                 }
-                try
+
+                var searchResult = await _sessionIdRepository.GetBySesionId(new Guid(sessionId));
+                if (searchResult == null)
                 {
-                    var searchResult = _sessionIdRepository.GetBySesionId(new Guid(sessionId));
-
-                    if (!_sessionIdRepository.IsAuthorized(searchResult))
-                    {
-                        return CreateTask(request, HttpStatusCode.Unauthorized, Messages.ExpiredSessionId);
-                    }
-                    
-                    try
-                    {
-                        var user = _userRepository.Get(searchResult.UserId);
-                        var principal = new UserPrincipal(new GenericIdentity(user.UserName), new string[] { }, user);
-
-                        Thread.CurrentPrincipal = principal;
-                        if (HttpContext.Current != null)
-                        {
-                            HttpContext.Current.User = principal;
-                        }
-                    }
-
-                    catch (ObjectNotFoundException)
-                    {
-                        return CreateTask(request, HttpStatusCode.Unauthorized, Messages.UserNotFound);
-                    }
+                    // The sessionId is cannot be found in the database
+                    return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidSessionId);
                 }
-                catch (ObjectNotFoundException)
+
+                var isAuthorized = await _sessionIdRepository.IsAuthorized(searchResult);
+                if (!isAuthorized)
                 {
-                    //Log
-                    return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidSessionId);
+                    // The sessionId is expired
+                    return await CreateTask(request, HttpStatusCode.Unauthorized, Messages.ExpiredSessionId);
+                }
+
+                // The sessionId checks out
+                var user = await _userRepository.Get(searchResult.UserId);
+                if (user == null)
+                {
+                    return await CreateTask(request, HttpStatusCode.Unauthorized, Messages.UserNotFound);
+                }
+
+                // We now know to which user it belongs so we set that user as the current UserPrincipal
+                var principal = new UserPrincipal(new GenericIdentity(user.UserName), new string[] { }, user);
+
+                Thread.CurrentPrincipal = principal;
+                if (HttpContext.Current != null)
+                {
+                    HttpContext.Current.User = principal;
                 }
             }
             else if (request.Headers.Contains(HeaderConstants.AuthorizeHeader)) //This means that the request does not contain a SessionId and that it is a login request so we expect an Authorize header
@@ -86,136 +85,121 @@ namespace GraderApi.Handlers
                 var authorizationData = request.Headers.GetValues(HeaderConstants.AuthorizeHeader).FirstOrDefault(); //get the Base64 encoded string of username:password
                 if (authorizationData == null)
                 {
-                    return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCredentials);
+                    return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCredentials);
                 }
 
-                var credentials = ParseAuthorizationHeader(authorizationData);
-                    //from the Base64 string (username:password), get the two individual parts
+                var credentials = ParseAuthorizationHeader(authorizationData); //from the Base64 string (username:password), get the two individual parts
                 if (credentials == null)
                 {
-                    return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCredentials);
+                    return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCredentials);
                 }
+
                 try
                 {
 	                //Check with the LDAP server that the user's credentials are valid
-	                if (Membership.ValidateUser(credentials.Username, credentials.Password))
-	                {
-	                    //If they are, take his data from the server
-	                    var serverUser = ActiveDirectoryRoleProvider.GetUserEntry(credentials.Username);
-	                    if (serverUser == null)
-	                    {
-	                        return CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
-	                    }
+                    if (!Membership.ValidateUser(credentials.Username, credentials.Password))
+                    {
+                        //If we reach this point, the user's credentials were invalid. Let him know about that!
+                        return await CreateTask(request, HttpStatusCode.BadRequest, 
+                            Messages.InvalidCredentials);
+                    }
 
-	                    var userId = -1;
-	                    try
-	                    {
-	                        //Now check if they are logging in for the first time or not
-	                        var foundUser = _userRepository.GetByUsername(credentials.Username);
+                    //If they are, take his data from the server
+                    var serverUser = ActiveDirectoryRoleProvider.GetUserEntry(credentials.Username);
+                    if (serverUser == null)
+                    {
+                        return await CreateTask(request, HttpStatusCode.InternalServerError, 
+                            Messages.InternalDatabaseError);
+                    }
 
-	                        //If we reached this point, it's not the first time -- make sure the info is updated and move on
-	                        foundUser.Email = serverUser.Properties[LdapFields.Email].Value.ToString();
-	                        foundUser.GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString();
+                    var userId = -1;
+                    //Now check if they are logging in for the first time or not
+                    var foundUser = await _userRepository.GetByUsername(credentials.Username);
+                    if (foundUser != null)
+                    {
+                        //If we reached this point, it's not the first time -- make sure the info is updated and move on
+                        foundUser.Email = serverUser.Properties[LdapFields.Email].Value.ToString();
+                        foundUser.GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString();
 
-	                        var result = _userRepository.Update(foundUser);
-	                        if (!result)
-	                        {
-	                            return CreateTask(request, HttpStatusCode.InternalServerError,
-	                                Messages.InternalDatabaseError);
-	                        }
+                        var result = await _userRepository.Update(foundUser);
+                        if (result == null)
+                        {
+                            return await CreateTask(request, HttpStatusCode.InternalServerError, 
+                                Messages.InternalDatabaseError);
+                        }
 
-	                        userId = foundUser.Id;
-	                    }
-	                    catch (ObjectNotFoundException)
-	                    {
-	                        //If we reached this point, it is the first time that the user logs in on this website, create a password-less local account 
-	                        var user = new UserModel
-	                        {
-	                            UserName = credentials.Username,
-	                            Name = serverUser.Properties[LdapFields.Name].Value.ToString(),
-	                            Surname = serverUser.Properties[LdapFields.Surname].Value.ToString(),
-	                            Email = serverUser.Properties[LdapFields.Email].Value.ToString(),
-	                            GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString()
-	                        };
+                        userId = foundUser.Id;
+                    }
+                    else
+                    {
+                        //If we reached this point, it is the first time that the user logs in on this website, create a password-less local account 
+                        var user = new UserModel
+                        {
+                            UserName = credentials.Username,
+                            Name = serverUser.Properties[LdapFields.Name].Value.ToString(),
+                            Surname = serverUser.Properties[LdapFields.Surname].Value.ToString(),
+                            Email = serverUser.Properties[LdapFields.Email].Value.ToString(),
+                            GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString()
+                        };
 
-	                        var result = _userRepository.Add(user);
-	                        if (!result)
-	                        {
-	                            return CreateTask(request, HttpStatusCode.InternalServerError,
-	                                Messages.InternalDatabaseError);
-	                        }
+                        var result = await _userRepository.Add(user);
+                        if (result == null)
+                        {
+                            // We failed to add the new user to the database
+                            return await CreateTask(request, HttpStatusCode.InternalServerError, 
+                                Messages.InternalDatabaseError);
+                        }
 
-	                        //The Id gets set by the database, so the 'user' variable does not know it
-	                        userId = _userRepository.GetByUsername(credentials.Username).Id;
-	                    }
+                        userId = result.Id;                   
+                    }
+   
+                    if (userId == -1) 
+                    {
+                        //If the userId is -1, then something still went wrong; but what?
+                        return await CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
+                    }
 
-	                    if (userId == -1) //If the userId is -1, then something still went wrong; but what?
-	                    {
-	                        return CreateTask(request, HttpStatusCode.InternalServerError,
-	                            Messages.InternalDatabaseError);
-	                    }
+                    //At this point, the user certainly has a local account and his credentials check out
+                    var newSessionModel = await _sessionIdRepository.Add(userId);
+                    if (newSessionModel.SessionId == Guid.Empty)
+                    {
+                        return await CreateTask(request, HttpStatusCode.InternalServerError,
+                            Messages.InternalDatabaseError);
+                    }
 
-	                    //At this point, the user certainly has a local account and his credentials check out
-	                    var newSessionId = _sessionIdRepository.Add(userId);
-	                    if (newSessionId == Guid.Empty)
-	                    {
-	                        return CreateTask(request, HttpStatusCode.InternalServerError,
-	                            Messages.InternalDatabaseError);
-	                    }
+                    var userDb = await _userRepository.Get(userId);
+                    if (userDb == null)
+                    {
+                        return await CreateTask(request, HttpStatusCode.BadRequest, 
+                            Messages.UserNotFound);
+                    }
 
-	                    try
-	                    {
-	                        var user = _userRepository.Get(userId);
-	                        var principal = new UserPrincipal(new GenericIdentity(user.UserName), new string[] { }, user);
+                    // Set the user as the current UserPrincipal
+                    var principal = new UserPrincipal(new GenericIdentity(userDb.UserName), new string[] { }, userDb);
 
-	                        Thread.CurrentPrincipal = principal;
-	                        if (HttpContext.Current != null)
-	                        {
-	                            HttpContext.Current.User = principal;
-	                        }
-	                    }
-	                    catch (Exception)
-	                    {
-	                        return CreateTask(request, HttpStatusCode.Unauthorized, Messages.UserNotFound);
-	                    }
+                    Thread.CurrentPrincipal = principal;
+                    if (HttpContext.Current != null)
+                    {
+                        HttpContext.Current.User = principal;
+                    }
 
-	                    //Everythin is fine; Hallelujah! Send the client the active sessionId so that it can use it in future requests
-	                    return CreateTask(request, HttpStatusCode.Accepted, newSessionId);
-	                }
-
-                    //If we reach this point, the user's credentials were invalid. Let him know about that!
-                    return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCredentials);
+                    //Everythin is fine; Hallelujah! Send the client the active sessionId so that it can use it in future requests
+                    return await CreateTask(request, HttpStatusCode.Accepted, newSessionModel.SessionId);
                 }
                 catch(ConfigurationErrorsException)
                 {
-                    return CreateTask(request, HttpStatusCode.ServiceUnavailable, Messages.CannotConnectToLdap);
+                    var tsk = Task.Run(() => CreateTask(request, HttpStatusCode.ServiceUnavailable, Messages.CannotConnectToLdap), cancellationToken);
+                    Task.WaitAll(tsk);
+                    return tsk.Result;
                 }
             }
             else
             {
                 //If we got so far, something is wrong with the request; deny all access
-                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidRequest);
+                return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidRequest);
             }
 
-            return base.SendAsync(request, cancellationToken);
-
-            //FILIP WANTS THE CODE BELOW TO STAY HERE COMMENTED OUT
-            /*
-            var url = request.RequestUri.LocalPath.
-             
-            var sessionIdRepository = new SessionIdRepository();
-            var query = request.RequestUri.ParseQueryString();
-            int userId = int.TryParse(query["UserId"], out userId) ? userId : 0;
-
-            var result = sessionIdRepository.IsAuthorized(userId);
-            if (!result)
-            {
-                var response = new HttpResponseMessage(HttpStatusCode.Forbidden);
-                var tsc = new TaskCompletionSource<HttpResponseMessage>();
-                tsc.SetResult(response);
-                return tsc.Task;
-            }
-            */
+            return await base.SendAsync(request, cancellationToken);
         }
 
         private static Task<HttpResponseMessage> CreateTask(HttpRequestMessage request, HttpStatusCode code, Object data)
