@@ -21,8 +21,8 @@
         Task<bool> DeleteSubmission(int sumbmissionId);
 
 
-        Task<FileModel> GetFile(int id);
-        Task<IEnumerable<FileModel>> GetAllFiles();
+        Task<FileModel> GetFile(int courseId, string entityName, string username, string filename);
+        Task<IEnumerable<FileModel>> GetAllFiles(int courseId);
         Task<IEnumerable<FileModel>> GetAllFilesByEntityId(int id);
         Task<IEnumerable<FileModel>> GetAllFilesBefore(DateTime timestamp);
         Task<IEnumerable<FileModel>> GetAllFilesAfter(DateTime timestamp);

@@ -1,5 +1,7 @@
 ﻿namespace GraderDataAccessLayer.Repositories
 {
+    using System.Configuration;
+    using System.Runtime.InteropServices;
     using Interfaces;
     using Models;
     using System;
@@ -116,14 +118,37 @@
 
 
 
-        public async Task<FileModel> GetFile(int id)
+        public async Task<FileModel> GetFile(int courseId, string entityName, string username, string filename)
         {
-            throw new NotImplementedException();
+            // submissions\{courseId}\{entityName}\{username}\{filename}
+            // var location = @"submissions\{0}\{1}\{2}\{3}";
+            var file = String.Format(ConfigurationManager.AppSettings["submissionLocation"], courseId, entityName, username, filename);
+            if (!File.Exists(file))
+            {
+                return null;
+            }
+            var text = await Task.Run(() => File.ReadAllText(file));
+            var result = new FileModel {Filename = file, Username = username, Contents = text};
+            return result;
         }
 
-        public async Task<IEnumerable<FileModel>> GetAllFiles()
+        // NOT TESTED AT ALL!!
+        public async Task<IEnumerable<FileModel>> GetAllFiles(int courseId)
         {
-            throw new NotImplementedException();
+            var result = new List<FileModel>();
+
+            var coursePath = String.Format("submissions\\{0}\\", courseId);
+            var directory = new DirectoryInfo(coursePath);
+            var fileList = directory.GetFiles("*.*", SearchOption.AllDirectories);
+
+            foreach (var fileInfo in fileList)
+            {
+                var sr = fileInfo.OpenText();
+                var s = await sr.ReadToEndAsync();
+                result.Add(new FileModel {Filename = fileInfo.FullName, Contents = s, Username = String.Empty});
+            }
+
+            return result;
         }
         public async Task<IEnumerable<FileModel>> GetAllFilesByEntityId(int id)
         {
@@ -162,7 +187,7 @@
                     item.Filename = name + i.ToString(CultureInfo.InvariantCulture) + extension;
                 }
                 // File.Create(file.Filename);
-                File.WriteAllText(item.Filename, item.Contents);
+                await Task.Run(() => File.WriteAllText(item.Filename, item.Contents));
                 return true;
             }
             catch (Exception)
