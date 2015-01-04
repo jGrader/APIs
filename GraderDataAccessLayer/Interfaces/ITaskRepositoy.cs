@@ -1,12 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GraderDataAccessLayer.Interfaces
+﻿namespace GraderDataAccessLayer.Interfaces
 {
-    interface ITaskRepositoy : IDisposable
+    using Models;
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
+
+    public interface ITaskRepositoy : IDisposable
     {
+        Task<TaskModel> Get(int id);
+        
+        Task<IEnumerable<TaskModel>> GetAll();
+        Task<IEnumerable<TaskModel>> GetAllByName(string name);
+        Task<IEnumerable<TaskModel>> GetAllByCourse(int courseId);
+        Task<IEnumerable<TaskModel>> GetAllByGradeComponent(int gradeComponentId);
+        Task<IEnumerable<TaskModel>> GetAllByCourseAndGradeComponent(int courseId, int gradeComponentId);
+
+        Task<TaskModel> Add(TaskModel item);
+        Task<TaskModel> Update(TaskModel item);
+        Task<bool> Delete(int id);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace GraderDataAccessLayer.Models
 {
-    using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,16 +14,19 @@
         [DataType(DataType.Text)]
         public string Name { get; set; }
 
-        //Navigation property
-        public int GradeComponentId { get; set; }
+        //Navigation properties
         [Required]
+        public int CourseId { get; set; }
+
+        [Required]
+        public int GradeComponentId { get; set; }
+
+        [ForeignKey("CourseId")]
+        public virtual CourseModel Course { get; set; }
+
         [ForeignKey("GradeComponentId")]
         public virtual GradeComponentModel GradeComponent { get; set; }
 
-        //Navigation property
-        public int CourseId { get; set; }
-        [Required]
-        [ForeignKey("CourseId")]
-        public virtual CourseModel Course { get; set; }
+        public virtual ICollection<EntityModel> Entities { get; set; }
     }
 }
