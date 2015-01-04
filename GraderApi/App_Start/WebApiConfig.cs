@@ -25,17 +25,17 @@ namespace GraderApi
                 name: "CourseRoute",
                 routeTemplate: "api/{controller}/{courseId}",
                 defaults: new { },
-                constraints: new { courseId = new ApiRouteConstraints() },
+                constraints: new { controller = "Courses", courseId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
             
-            /*config.Routes.MapHttpRoute(
+            config.Routes.MapHttpRoute(
                 name: "GradeComponentRoute",
-                routeTemplate: "api/GradeComponents/{gradeComponentId}",
+                routeTemplate: "api/{controller}/{gradeComponentId}",
                 defaults: new { },
-                constraints: new { gradeComponentId = new ApiRouteConstraints() },
+                constraints: new { controller = "GradeComponents", gradeComponentId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
-            );*/
+            );
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
