@@ -1,10 +1,10 @@
 ﻿namespace GraderDataAccessLayer.Interfaces
 {
+    using Models;
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
-    using GraderDataAccessLayer.Models;
 
 
     public interface ICourseRepository : IDisposable

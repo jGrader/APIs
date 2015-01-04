@@ -1,31 +1,37 @@
 ﻿namespace GraderDataAccessLayer.Interfaces
 {
-    using GraderDataAccessLayer.Models;
+    using Models;
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     public interface ISubmissionRepository
     {
-        IEnumerable<SubmissionModel> GetAll();
-        IEnumerable<SubmissionModel> GetByEntityId(int id);
-        IEnumerable<SubmissionModel> GetByUserId(int id);
-        IEnumerable<SubmissionModel> GetBefore(DateTime timestamp);
-        IEnumerable<SubmissionModel> GetAfter(DateTime timestamp);
-        IEnumerable<SubmissionModel> GetByUserIdAndEntityId(int userId, int entityId);
+        Task<SubmissionModel> Get(int id);
+        Task<IEnumerable<SubmissionModel>> GetAllByEntityId(int id);
+        Task<IEnumerable<SubmissionModel>> GetAllByUserId(int id);
+        Task<IEnumerable<SubmissionModel>> GetAllBefore(DateTime timestamp);
+        Task<IEnumerable<SubmissionModel>> GetAllAfter(DateTime timestamp);
+        Task<IEnumerable<SubmissionModel>> GetAllByUserIdAndEntityId(int userId, int entityId);
 
-        IEnumerable<FileModel> GetAllFiles();
-        IEnumerable<FileModel> GetFileByEntityId(int id);
-        IEnumerable<FileModel> GetFilesBefore(DateTime timestamp);
-        IEnumerable<FileModel> GetFilesAfter(DateTime timestamp);
-        IEnumerable<FileModel> GetFilesByUserIdAndEntityId(int userId, int entityId);
+        Task<IEnumerable<SubmissionModel>> GetAll();
 
-        SubmissionModel Get(int id);
-        bool Add(SubmissionModel item);
-        bool AddFile(FileModel file);
-        bool Remove(int id);
-        bool RemoveFile(FileModel file);
-        bool Update(SubmissionModel item);
-        bool UpdateFile(FileModel file);
+        Task<SubmissionModel> Add(SubmissionModel item);
+        Task<SubmissionModel> Update(SubmissionModel item);
+        Task<bool> DeleteSubmission(int sumbmissionId);
+
+
+        Task<FileModel> GetFile(int id);
+        Task<IEnumerable<FileModel>> GetAllFiles();
+        Task<IEnumerable<FileModel>> GetAllFilesByEntityId(int id);
+        Task<IEnumerable<FileModel>> GetAllFilesBefore(DateTime timestamp);
+        Task<IEnumerable<FileModel>> GetAllFilesAfter(DateTime timestamp);
+        Task<IEnumerable<FileModel>> GetAllFilesByUserIdAndEntityId(int userId, int entityId);
+
+        Task<bool> Add(FileModel item);
+        Task<bool> Update(FileModel item);
+        Task<bool> DeleteFile(int fileId);
+ 
 
         /* Why do these exist?
         int GetUserId(int id);

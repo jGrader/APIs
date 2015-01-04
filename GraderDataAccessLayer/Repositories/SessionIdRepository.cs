@@ -2,7 +2,9 @@
 {
     using Models;
     using Interfaces;
+
     using System;
+    using System.Collections.Generic;
     using System.Data.Common;
     using System.Data.Entity;
     using System.Threading.Tasks;
@@ -13,17 +15,22 @@
         DatabaseContext _db = new DatabaseContext();
 
 
-        public async Task<SessionIdModel> GetBySesionId(Guid sessionId)
+        public async Task<IEnumerable<SessionIdModel>> GetAll()
         {
-            var searchResult = await _db.SessionId.FirstOrDefaultAsync(s => s.SessionId == sessionId);
-            return searchResult;
+            return await Task.Run(() => _db.SessionId);
         }
+
         public async Task<SessionIdModel> Get(int userId)
         {
             var searchResult = await _db.SessionId.FirstOrDefaultAsync(s => s.UserId == userId);
             return searchResult;
         }
-
+        public async Task<SessionIdModel> GetBySesionId(Guid sessionId)
+        {
+            var searchResult = await _db.SessionId.FirstOrDefaultAsync(s => s.SessionId == sessionId);
+            return searchResult;
+        }
+        
         public async Task<bool> IsAuthorized(SessionIdModel sessionIdModel)
         {
             if (sessionIdModel == null)

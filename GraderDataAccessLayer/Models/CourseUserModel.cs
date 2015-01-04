@@ -1,23 +1,10 @@
 ﻿namespace GraderDataAccessLayer.Models
 {
-    using System;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-
-    public enum PermissionOptions
-    {
-        CanGrade  = 1,
-        CanCreateEntities = 2
-    }
-
     public class CourseUserModel
     {
-        public CourseUserModel()
-        {
-            
-        }
-
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }

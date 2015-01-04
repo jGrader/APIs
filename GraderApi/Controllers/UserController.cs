@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using Grader.JsonSerializer;
@@ -22,12 +23,12 @@ namespace GraderApi.Controllers
             _courseUserRepository = courseUserRepository;
         }
 
-        public HttpResponseMessage GetAllUsers()
+        public async Task<HttpResponseMessage> GetAllUsers()
         {
             throw new NotImplementedException();
         }
 
-        public HttpResponseMessage GetAllCourses()
+        public async Task<HttpResponseMessage> GetAllCourses()
         {
             var currentUser = HttpContext.Current.User as UserPrincipal;
             if (currentUser == null)
@@ -38,7 +39,8 @@ namespace GraderApi.Controllers
             {
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, Messages.UserNotFound);
             }
-            var courses = _courseUserRepository.GetByUser(currentUser.User.Id);
+
+            var courses = await _courseUserRepository.GetAllByUser(currentUser.User.Id);
             return Request.CreateResponse(HttpStatusCode.Accepted, courses.ToJson());
         }
     }

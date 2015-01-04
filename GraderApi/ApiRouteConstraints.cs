@@ -61,16 +61,20 @@ namespace GraderApi.Constraints
 
         public void Dispose()
         {
-            DisposeCourseRepository(true);
-            DisposeGradeComponentRepository(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
-        private void DisposeCourseRepository(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposing)
             {
                 return;
             }
+            DisposeCourseRepository();
+            DisposeGradeComponentRepository();
+        }
+        private void DisposeCourseRepository()
+        {
             if (_courseRepository == null)
             {
                 return;
@@ -79,12 +83,8 @@ namespace GraderApi.Constraints
             _courseRepository.Dispose();
             _courseRepository = null;
         }
-        private void DisposeGradeComponentRepository(bool disposing)
+        private void DisposeGradeComponentRepository()
         {
-            if (!disposing)
-            {
-                return;
-            }
             if (_gradeComponentRepository == null)
             {
                 return;

@@ -127,7 +127,7 @@ namespace GraderApi.Handlers
             }
 
             // If we reached this point, the user is either not an admin / superUser or doesn't own the course; treat as a regular user no matter what
-            var courseUser = _courseUserRepository.GetByLambda(cu => (cu.UserId == curUser.User.Id) && (cu.CourseId == courseId)).FirstOrDefault();
+            var courseUser = (await _courseUserRepository.GetAllByLambda(cu => (cu.UserId == curUser.User.Id) && (cu.CourseId == courseId))).FirstOrDefault();
             if (courseUser == null) { //The user is not registered for this course         
                 return await CreateTask(request, HttpStatusCode.Forbidden, Messages.InvalidRequest);
             }

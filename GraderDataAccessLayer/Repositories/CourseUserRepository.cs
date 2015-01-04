@@ -1,69 +1,122 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.Core;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using GraderDataAccessLayer.Interfaces;
-using GraderDataAccessLayer.Models;
-
-namespace GraderDataAccessLayer.Repositories
+﻿namespace GraderDataAccessLayer.Repositories
 {
+    using Interfaces;
+    using Models;
+
+    using System;
+    using System.Collections.Generic;
+    using System.Data.Common;
+    using System.Data.Entity;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Threading.Tasks;
+
+
     public class CourseUserRepository : ICourseUserRepository
     {
-        private DatabaseContext _context = new DatabaseContext();
+        private DatabaseContext _db = new DatabaseContext();
 
-        public IEnumerable<CourseUserModel> GetAll()
+
+        public async Task<CourseUserModel> Get(int id)
         {
-            var result = _context.CourseUser.Where(c => c.Id > 0);
-            return result;
+            var searchResult = await _db.CourseUser.FirstOrDefaultAsync(cu => cu.Id == id);
+            return searchResult;
+        }
+       
+        public async Task<IEnumerable<CourseUserModel>> GetAll()
+        {
+            return await Task.Run(() => _db.CourseUser);
+        }
+        public async Task<IEnumerable<CourseUserModel>> GetAllByCourseId(int courseId)
+        {
+            var searchResult = await Task.Run(() => _db.CourseUser.Where(w => w.CourseId == courseId));
+            return searchResult;
+        }
+        public async Task<IEnumerable<CourseUserModel>> GetAllByUser(int userId)
+        {
+            var searchResult = await Task.Run(() => _db.CourseUser.Where(w => w.UserId == userId));
+            return searchResult;
+        }
+        public async Task<IEnumerable<CourseUserModel>> GetAllByExtensionLimit(int extLimit)
+        {
+            var searchResult = await Task.Run(() => _db.CourseUser.Where(w => w.ExtensionLimit == extLimit));
+            return searchResult;
+        }
+        public async Task<IEnumerable<CourseUserModel>> GetAllByExcuseLimit(int excLimit)
+        {
+            var searchResult = await Task.Run(() => _db.CourseUser.Where(w => w.ExcuseLimit == excLimit));
+            return searchResult;
+        }
+        public async Task<IEnumerable<CourseUserModel>> GetAllByPermissions(int permissions)
+        {
+            var searchResult = await Task.Run(() => _db.CourseUser.Where(w => w.Permissions == permissions));
+            return searchResult;
+        }
+        public async Task<IEnumerable<CourseUserModel>> GetAllByLambda(Expression<Func<CourseUserModel, bool>> exp)
+        {
+            var searchResult = await Task.Run(() => _db.CourseUser.Where(exp));
+            return searchResult;
         }
 
-        public CourseUserModel Get(int id)
+        public async Task<CourseUserModel> Add(CourseUserModel item)
         {
-            var result = _context.CourseUser.FirstOrDefault(cu => cu.Id == id);
-            if (result == null)
+            if (item == null)
             {
-                throw new NotImplementedException();
+                throw new ArgumentNullException("item");
             }
-            return result;
-        }
 
-        public IEnumerable<CourseUserModel> GetByCourseId(int courseId)
-        {
-            var result = _context.CourseUser.Where(cu => cu.CourseId == courseId);
-            return result;
-        }
+            try
+            {
+                _db.CourseUser.Add(item);
+                await _db.SaveChangesAsync();
 
-        public IEnumerable<CourseUserModel> GetByUser(int userId)
-        {
-            var result = _context.CourseUser.Where(cu => cu.UserId == userId);
-            return result;
+                //Load virtual properties and return object
+                _db.Entry(item).Reference(c => c.User).Load();
+                _db.Entry(item).Reference(c => c.Course).Load();
+                return item;
+            }
+            catch (DbException)
+            {
+                return null;
+            }
         }
-
-        public IEnumerable<CourseUserModel> GetByExtensionLimit(int extLimit)
+        public async Task<CourseUserModel> Update(CourseUserModel item)
         {
-            var result = _context.CourseUser.Where(cu => cu.ExtensionLimit == extLimit);
-            return result;
+            var dbItem = await _db.CourseUser.FirstOrDefaultAsync(c => c.Id == item.Id);
+            if (dbItem == null)
+            {
+                throw new ArgumentNullException("item");
+            }
+
+            try
+            {
+                _db.Entry(dbItem).CurrentValues.SetValues(item);
+                await _db.SaveChangesAsync();
+                return await Get(item.Id);
+            }
+            catch (DbException)
+            {
+                return null;
+            }
         }
-
-        public IEnumerable<CourseUserModel> GetByExcuseLimit(int excLimit)
+        public async Task<bool> Delete(int id)
         {
-            var result = _context.CourseUser.Where(cu => cu.ExcuseLimit == excLimit);
-            return result;
-        }
+            var item = await _db.CourseUser.FirstOrDefaultAsync(c => c.Id == id);
+            if (item == null)
+            {
+                throw new ArgumentNullException("id");
+            }
 
-        public IEnumerable<CourseUserModel> GetByPermissions(int permissions)
-        {
-            var result = _context.CourseUser.Where(cu => cu.Permissions == permissions);
-            return result;
-        }
-
-        public IEnumerable<CourseUserModel> GetByLambda(Expression<Func<CourseUserModel, bool>> exp)
-        {
-            var result = _context.CourseUser.Where(exp);
-            return result;
+            try
+            {
+                _db.CourseUser.Remove(item);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (DbException)
+            {
+                return false;
+            }
         }
 
         public void Dispose()
@@ -77,13 +130,13 @@ namespace GraderDataAccessLayer.Repositories
             {
                 return;
             }
-            if (_context == null)
+            if (_db == null)
             {
                 return;
             }
 
-            _context.Dispose();
-            _context = null;
-        }      
+            _db.Dispose();
+            _db = null;
+        }
     }
 }

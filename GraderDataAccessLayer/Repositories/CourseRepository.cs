@@ -1,5 +1,8 @@
 ﻿namespace GraderDataAccessLayer.Repositories
 {
+    using Interfaces;
+    using Models;
+
     using System;
     using System.Collections.Generic;
     using System.Data.Common;
@@ -7,8 +10,6 @@
     using System.Linq;
     using System.Threading.Tasks;
     using System.Linq.Expressions;
-    using GraderDataAccessLayer.Interfaces;
-    using GraderDataAccessLayer.Models;
 
 
     public class CourseRepository : ICourseRepository
@@ -92,7 +93,7 @@
         }
         public async Task<CourseModel> Update(CourseModel item)
         {
-            var dbItem = _db.Course.FirstOrDefault(c => c.Id == item.Id);
+            var dbItem = await _db.Course.FirstOrDefaultAsync(c => c.Id == item.Id);
             if (dbItem == null) {
                 throw new ArgumentNullException("item");
             }

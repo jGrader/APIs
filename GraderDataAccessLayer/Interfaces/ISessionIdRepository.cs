@@ -2,13 +2,15 @@
 {
     using Models;
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
 
     public interface ISessionIdRepository : IDisposable
     {
-        Task<SessionIdModel> GetBySesionId(Guid sessionId);
         Task<SessionIdModel> Get(int userId);
+        Task<SessionIdModel> GetBySesionId(Guid sessionId);
+        Task<IEnumerable<SessionIdModel>> GetAll();
 
         Task<bool> IsAuthorized(SessionIdModel sessionIdModel);
 
