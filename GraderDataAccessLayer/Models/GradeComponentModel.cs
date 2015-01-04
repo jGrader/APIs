@@ -1,5 +1,6 @@
 ﻿namespace GraderDataAccessLayer.Models
 {
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -23,5 +24,7 @@
         
         [ForeignKey("CourseId")]
         public virtual CourseModel Course { get; set; }
+
+        public virtual ICollection<TaskModel> Tasks { get; set; }
     }
 }
