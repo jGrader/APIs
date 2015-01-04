@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CannotConnectToLdap" xml:space="preserve">
+    <value>The server was unable to establish a connection to LDAP</value>
+  </data>
   <data name="ExpiredSessionId" xml:space="preserve">
     <value>The provided session ID has expired. Please log in again.</value>
   </data>

@@ -21,6 +21,8 @@ using System.Web.Security;
 
 namespace GraderApi.Handlers
 {
+    using System.Configuration;
+
     public class AuthorizeHandler : DelegatingHandler
     {
         private readonly IUserRepository _userRepository;
@@ -43,7 +45,7 @@ namespace GraderApi.Handlers
             {
                 //This means that the request contains a SessionId which has to be checked first
                 var sessionId = request.Headers.GetValues(HeaderConstants.SessionIdHeader).FirstOrDefault();
-                if (sessionId == null)
+                if (sessionId == null || String.IsNullOrEmpty(sessionId))
                 {
                     return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidSessionId);
                 }
@@ -93,95 +95,101 @@ namespace GraderApi.Handlers
                 {
                     return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCredentials);
                 }
-
-                //Check with the LDAP server that the user's credentials are valid
-                if (Membership.ValidateUser(credentials.Username, credentials.Password))
+                try
                 {
-                    //If they are, take his data from the server
-                    var serverUser = ActiveDirectoryRoleProvider.GetUserEntry(credentials.Username);
-                    if (serverUser == null)
-                    {
-                        return CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
-                    }
+	                //Check with the LDAP server that the user's credentials are valid
+	                if (Membership.ValidateUser(credentials.Username, credentials.Password))
+	                {
+	                    //If they are, take his data from the server
+	                    var serverUser = ActiveDirectoryRoleProvider.GetUserEntry(credentials.Username);
+	                    if (serverUser == null)
+	                    {
+	                        return CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
+	                    }
 
-                    var userId = -1;
-                    try
-                    {
-                        //Now check if they are logging in for the first time or not
-                        var foundUser = _userRepository.GetByUsername(credentials.Username);
+	                    var userId = -1;
+	                    try
+	                    {
+	                        //Now check if they are logging in for the first time or not
+	                        var foundUser = _userRepository.GetByUsername(credentials.Username);
 
-                        //If we reached this point, it's not the first time -- make sure the info is updated and move on
-                        foundUser.Email = serverUser.Properties[LdapFields.Email].Value.ToString();
-                        foundUser.GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString();
+	                        //If we reached this point, it's not the first time -- make sure the info is updated and move on
+	                        foundUser.Email = serverUser.Properties[LdapFields.Email].Value.ToString();
+	                        foundUser.GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString();
 
-                        var result = _userRepository.Update(foundUser);
-                        if (!result)
-                        {
-                            return CreateTask(request, HttpStatusCode.InternalServerError,
-                                Messages.InternalDatabaseError);
-                        }
+	                        var result = _userRepository.Update(foundUser);
+	                        if (!result)
+	                        {
+	                            return CreateTask(request, HttpStatusCode.InternalServerError,
+	                                Messages.InternalDatabaseError);
+	                        }
 
-                        userId = foundUser.Id;
-                    }
-                    catch (ObjectNotFoundException)
-                    {
-                        //If we reached this point, it is the first time that the user logs in on this website, create a password-less local account 
-                        var user = new UserModel
-                        {
-                            UserName = credentials.Username,
-                            Name = serverUser.Properties[LdapFields.Name].Value.ToString(),
-                            Surname = serverUser.Properties[LdapFields.Surname].Value.ToString(),
-                            Email = serverUser.Properties[LdapFields.Email].Value.ToString(),
-                            GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString()
-                        };
+	                        userId = foundUser.Id;
+	                    }
+	                    catch (ObjectNotFoundException)
+	                    {
+	                        //If we reached this point, it is the first time that the user logs in on this website, create a password-less local account 
+	                        var user = new UserModel
+	                        {
+	                            UserName = credentials.Username,
+	                            Name = serverUser.Properties[LdapFields.Name].Value.ToString(),
+	                            Surname = serverUser.Properties[LdapFields.Surname].Value.ToString(),
+	                            Email = serverUser.Properties[LdapFields.Email].Value.ToString(),
+	                            GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString()
+	                        };
 
-                        var result = _userRepository.Add(user);
-                        if (!result)
-                        {
-                            return CreateTask(request, HttpStatusCode.InternalServerError,
-                                Messages.InternalDatabaseError);
-                        }
+	                        var result = _userRepository.Add(user);
+	                        if (!result)
+	                        {
+	                            return CreateTask(request, HttpStatusCode.InternalServerError,
+	                                Messages.InternalDatabaseError);
+	                        }
 
-                        //The Id gets set by the database, so the 'user' variable does not know it
-                        userId = _userRepository.GetByUsername(credentials.Username).Id;
-                    }
+	                        //The Id gets set by the database, so the 'user' variable does not know it
+	                        userId = _userRepository.GetByUsername(credentials.Username).Id;
+	                    }
 
-                    if (userId == -1) //If the userId is -1, then something still went wrong; but what?
-                    {
-                        return CreateTask(request, HttpStatusCode.InternalServerError,
-                            Messages.InternalDatabaseError);
-                    }
+	                    if (userId == -1) //If the userId is -1, then something still went wrong; but what?
+	                    {
+	                        return CreateTask(request, HttpStatusCode.InternalServerError,
+	                            Messages.InternalDatabaseError);
+	                    }
 
-                    //At this point, the user certainly has a local account and his credentials check out
-                    var newSessionId = _sessionIdRepository.Add(userId);
-                    if (newSessionId == Guid.Empty)
-                    {
-                        return CreateTask(request, HttpStatusCode.InternalServerError,
-                            Messages.InternalDatabaseError);
-                    }
+	                    //At this point, the user certainly has a local account and his credentials check out
+	                    var newSessionId = _sessionIdRepository.Add(userId);
+	                    if (newSessionId == Guid.Empty)
+	                    {
+	                        return CreateTask(request, HttpStatusCode.InternalServerError,
+	                            Messages.InternalDatabaseError);
+	                    }
 
-                    try
-                    {
-                        var user = _userRepository.Get(userId);
-                        var principal = new UserPrincipal(new GenericIdentity(user.UserName), new string[] { }, user);
+	                    try
+	                    {
+	                        var user = _userRepository.Get(userId);
+	                        var principal = new UserPrincipal(new GenericIdentity(user.UserName), new string[] { }, user);
 
-                        Thread.CurrentPrincipal = principal;
-                        if (HttpContext.Current != null)
-                        {
-                            HttpContext.Current.User = principal;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        return CreateTask(request, HttpStatusCode.Unauthorized, Messages.UserNotFound);
-                    }
+	                        Thread.CurrentPrincipal = principal;
+	                        if (HttpContext.Current != null)
+	                        {
+	                            HttpContext.Current.User = principal;
+	                        }
+	                    }
+	                    catch (Exception)
+	                    {
+	                        return CreateTask(request, HttpStatusCode.Unauthorized, Messages.UserNotFound);
+	                    }
 
-                    //Everythin is fine; Hallelujah! Send the client the active sessionId so that it can use it in future requests
-                    return CreateTask(request, HttpStatusCode.Accepted, newSessionId);
+	                    //Everythin is fine; Hallelujah! Send the client the active sessionId so that it can use it in future requests
+	                    return CreateTask(request, HttpStatusCode.Accepted, newSessionId);
+	                }
+
+                    //If we reach this point, the user's credentials were invalid. Let him know about that!
+                    return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCredentials);
                 }
-
-                //If we reach this point, the user's credentials were invalid. Let him know about that!
-                return CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCredentials);
+                catch(ConfigurationErrorsException)
+                {
+                    return CreateTask(request, HttpStatusCode.ServiceUnavailable, Messages.CannotConnectToLdap);
+                }
             }
             else
             {

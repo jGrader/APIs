@@ -24,6 +24,11 @@
                     success: function (data) {
                         sessionId = data;
                         $("#loginStatus").text("Logged in");
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        // $("#loginStatus").text("NOT LOGGED IN");
+                        $("#resultDiv").empty();
+                        $("#resultDiv").append('<h3>' + jqXhr.status + ': ' + errorThrown + '</h3>');
                     }
                 });
             });
@@ -114,8 +119,10 @@
                         $("#resultDiv").empty();
                         $("#resultDiv").append(formatData(data));
                     },
-                    error: function() {
-                        $("#loginStatus").text("NOT LOGGED IN");
+                    error: function(jqXhr, textStatus, errorThrown) {
+                        // $("#loginStatus").text("NOT LOGGED IN");
+                        $("#resultDiv").empty();
+                        $("#resultDiv").append('<h3>' + jqXhr.status + ': ' + errorThrown + '</h3>');
                     }
                 });
             });
