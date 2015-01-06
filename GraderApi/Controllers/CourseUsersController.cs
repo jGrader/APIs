@@ -65,7 +65,7 @@
         // PUT: api/CourseUsers/5
         [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> Add(int courseUserId, [FromBody]CourseUserModel courseUser)
+        public async Task<IHttpActionResult> Update(int courseUserId, [FromBody]CourseUserModel courseUser)
         {
             if (!ModelState.IsValid)
             {

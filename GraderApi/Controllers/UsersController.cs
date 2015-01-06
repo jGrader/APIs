@@ -24,6 +24,7 @@
             _courseUserRepository = courseUserRepository;
         }
 
+        // POST: /api/Users/Authentication
         // Dummy action for Basic Authentication to call and let the Handler validate
         [HttpPost]
         [ResponseType(typeof (void))]
@@ -31,7 +32,9 @@
         {
             return StatusCode(HttpStatusCode.NoContent);
         }
-
+        
+        /*
+        No one(!) should have the permissions for this.
         // GET: api/Users/All
         [HttpGet]
         [ResponseType(typeof(IEnumerable<UserModel>))]
@@ -41,8 +44,7 @@
             return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
-        /*
-        No one(!) should have the permissions for this.
+        
         // GET: api/Users/GetUser/5
         [HttpGet]
         [ResponseType(typeof(UserModel))]
@@ -109,7 +111,7 @@
         // PUT: api/Users/5
         [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> Add(int userId,[FromBody] UserModel user)
+        public async Task<IHttpActionResult> Update(int userId,[FromBody] UserModel user)
         {
             if (!ModelState.IsValid)
             {

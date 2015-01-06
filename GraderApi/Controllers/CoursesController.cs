@@ -66,7 +66,7 @@
         [HttpPut]
         [ResponseType(typeof(void))]
         [PermissionsAuthorize(AdminPermissions.CanUpdateCourse)]
-        public async Task<IHttpActionResult> Add(int courseId, [FromBody] CourseModel course)
+        public async Task<IHttpActionResult> Update(int courseId, [FromBody] CourseModel course)
         {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
@@ -88,7 +88,7 @@
         [HttpDelete]
         [ResponseType(typeof(void))]
         [PermissionsAuthorize(AdminPermissions.CanDeleteCourse)]
-        public async Task<IHttpActionResult> Remove(int courseId)
+        public async Task<IHttpActionResult> Delete(int courseId)
         {
             var result = await _courseRepository.Delete(courseId);
             return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
