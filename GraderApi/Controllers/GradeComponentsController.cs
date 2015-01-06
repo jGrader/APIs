@@ -21,17 +21,19 @@
         }
 
         // GET: api/GradeComponents
+        [HttpGet]
         [ResponseType(typeof(IEnumerable<GradeComponentModel>))]
-        public async Task<HttpResponseMessage> GetGradeComponent()
+        public async Task<HttpResponseMessage> All()
         {
             var result = await _gradeComponentRepository.GetAll();
             return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // GET: api/GradeComponents/5
+        [HttpGet]
         [ResponseType(typeof(GradeComponentModel))]
         [PermissionsAuthorize(CoursePermissions.CanSeeGrades)]
-        public async Task<HttpResponseMessage> GetGradeComponent(int gradeComponentId)
+        public async Task<HttpResponseMessage> Get(int gradeComponentId)
         {
             var gradeComponent = await _gradeComponentRepository.Get(gradeComponentId);
             if (gradeComponent == null)
@@ -43,9 +45,10 @@
         }
 
         // POST: api/GradeComponents
+        [HttpPost]
         [ResponseType(typeof(GradeComponentModel))]
         [PermissionsAuthorize(AdminPermissions.CanCreateGradedPart)]
-        public async Task<IHttpActionResult> PostGradeComponent(GradeComponentModel gradeComponentModel)
+        public async Task<IHttpActionResult> Add(GradeComponentModel gradeComponentModel)
         {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
@@ -60,9 +63,10 @@
         }
 
         // PUT: api/GradeComponents/5
+        [HttpPut]
         [ResponseType(typeof(void))]
         [PermissionsAuthorize(AdminPermissions.CanUpdateGradedPart)]
-        public async Task<IHttpActionResult> PutGradeComponent(int gradeComponentId, GradeComponentModel gradeComponentModel)
+        public async Task<IHttpActionResult> Add(int gradeComponentId, [FromBody]GradeComponentModel gradeComponentModel)
         {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
@@ -81,9 +85,10 @@
         }
 
         // DELETE: api/GradeComponents/5
+        [HttpDelete]
         [ResponseType(typeof(GradeComponentModel))]
         [PermissionsAuthorize(AdminPermissions.CanDeleteGradedPart)]
-        public async Task<IHttpActionResult> DeleteGradeComponent(int gradeComponentId)
+        public async Task<IHttpActionResult> Delete(int gradeComponentId)
         {
             var result = await _gradeComponentRepository.Delete(gradeComponentId);
             return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);

@@ -21,16 +21,18 @@
         }
 
         // GET: api/Tasks
+        [HttpGet]
         [ResponseType(typeof(IEnumerable<TaskModel>))]
-        public async Task<HttpResponseMessage> GetTask()
+        public async Task<HttpResponseMessage> All()
         {
             var result = await _taskRepository.GetAll();
             return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // GET: api/Tasks/5
+        [HttpGet]
         [ResponseType(typeof(TaskModel))]
-        public async Task<HttpResponseMessage> GetTask(int taskId)
+        public async Task<HttpResponseMessage> Get(int taskId)
         {
             var task = await _taskRepository.Get(taskId);
             if (task == null)
@@ -42,8 +44,9 @@
         }
 
         // POST: api/Tasks
+        [HttpPost]
         [ResponseType(typeof(TaskModel))]
-        public async Task<IHttpActionResult> PostTask(TaskModel task)
+        public async Task<IHttpActionResult> Add([FromBody]TaskModel task)
         {
             if (!ModelState.IsValid)
             {
@@ -60,8 +63,9 @@
         }
 
         // PUT: api/Tasks/5
+        [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutTask(int taskId, TaskModel task)
+        public async Task<IHttpActionResult> Add(int taskId, [FromBody]TaskModel task)
         {
             if (!ModelState.IsValid)
             {
@@ -83,8 +87,9 @@
         }
 
         // DELETE: api/Tasks/5
+        [HttpDelete]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> DeleteTask(int taskId)
+        public async Task<IHttpActionResult> Delete(int taskId)
         {
             var result = await _taskRepository.Delete(taskId);
             return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);

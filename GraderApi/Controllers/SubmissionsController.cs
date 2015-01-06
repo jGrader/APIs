@@ -21,16 +21,18 @@
         }
 
         // GET: api/Submissions
+        [HttpGet]
         [ResponseType(typeof(IEnumerable<SubmissionModel>))]
-        public async Task<HttpResponseMessage> GetSubmission()
+        public async Task<HttpResponseMessage> All()
         {
             var result = await _submissionRepository.GetAll();
             return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // GET: api/Submissions/5
+        [HttpGet]
         [ResponseType(typeof(SubmissionModel))]
-        public async Task<HttpResponseMessage> GetSubmission(int submissionId)
+        public async Task<HttpResponseMessage> Get(int submissionId)
         {
             var submission = await _submissionRepository.Get(submissionId);
             if (submission == null)
@@ -42,8 +44,9 @@
         }
 
         // POST: api/Submissions
+        [HttpPost]
         [ResponseType(typeof(SubmissionModel))]
-        public async Task<IHttpActionResult> PostSubmission(SubmissionModel submission)
+        public async Task<IHttpActionResult> Add([FromBody]SubmissionModel submission)
         {
             if (!ModelState.IsValid)
             {
@@ -60,8 +63,9 @@
         }
 
         // PUT: api/Submissions/5
+        [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutSubmissionModel(int submissionId, SubmissionModel submission)
+        public async Task<IHttpActionResult> Add(int submissionId, [FromBody]SubmissionModel submission)
         {
             if (!ModelState.IsValid)
             {
@@ -83,8 +87,9 @@
         }
 
         // DELETE: api/Submissions/5
+        [HttpDelete]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> DeleteSubmissionModel(int submissionId)
+        public async Task<IHttpActionResult> Delete(int submissionId)
         {
             var result = await _submissionRepository.DeleteSubmission(submissionId);
             return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);

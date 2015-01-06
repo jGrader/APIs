@@ -1,14 +1,14 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Grader.JsonSerializer;
+    using GraderDataAccessLayer.Models;
+    using GraderDataAccessLayer.Repositories;
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Repositories;
 
 
     public class CoursesController : ApiController
@@ -23,17 +23,18 @@
         }
 
         // GET: api/Courses
+        [HttpGet]
         [ResponseType(typeof(IEnumerable<CourseModel>))]
-        public async Task<HttpResponseMessage> GetCourse()
+        public async Task<HttpResponseMessage> All()
         {
             var result = await _courseRepository.GetAll();
             return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // GET: api/Courses/5
+        [HttpGet]
         [ResponseType(typeof(CourseModel))]
-        [PermissionsAuthorize(CoursePermissions.CanSeeGrades)]
-        public async Task<HttpResponseMessage> GetCourse(int courseId)
+        public async Task<HttpResponseMessage> Get(int courseId)
         {
             var course = await _courseRepository.Get(courseId);
             if (course == null) {
@@ -44,9 +45,10 @@
         }
 
         // POST: api/Courses
+        [HttpPost]
         [ResponseType(typeof(CourseModel))]
         [PermissionsAuthorize(AdminPermissions.CanCreateCourse)]
-        public async Task<IHttpActionResult> PostCourseModel(CourseModel course)
+        public async Task<IHttpActionResult> Add([FromBody] CourseModel course)
         {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
@@ -61,9 +63,10 @@
         }
 
         // PUT: api/Courses/5
+        [HttpPut]
         [ResponseType(typeof(void))]
         [PermissionsAuthorize(AdminPermissions.CanUpdateCourse)]
-        public async Task<IHttpActionResult> PutCourse(int courseId, CourseModel course)
+        public async Task<IHttpActionResult> Add(int courseId, [FromBody] CourseModel course)
         {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
@@ -82,9 +85,10 @@
         }
 
         // DELETE: api/Courses/5
+        [HttpDelete]
         [ResponseType(typeof(void))]
         [PermissionsAuthorize(AdminPermissions.CanDeleteCourse)]
-        public async Task<IHttpActionResult> DeleteCourseModel(int courseId)
+        public async Task<IHttpActionResult> Remove(int courseId)
         {
             var result = await _courseRepository.Delete(courseId);
             return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);

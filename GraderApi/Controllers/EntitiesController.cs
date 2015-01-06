@@ -21,16 +21,18 @@
         }
 
         // GET: api/Entities
+        [HttpGet]
         [ResponseType(typeof(IEnumerable<EntityModel>))]
-        public async Task<HttpResponseMessage> GetEntity()
+        public async Task<HttpResponseMessage> All()
         {
             var result = await _entityRepository.GetAll();
             return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
-        // GET: api/Entities/5
+        // GET: api/Entities/Get/5
+        [HttpGet]
         [ResponseType(typeof(EntityModel))]
-        public async Task<HttpResponseMessage> GetEntity(int entityId)
+        public async Task<HttpResponseMessage> Get(int entityId)
         {
             var entity = await _entityRepository.Get(entityId);
             if (entity == null)
@@ -42,8 +44,9 @@
         }
 
         // POST: api/Entities
+        [HttpPost]
         [ResponseType(typeof(EntityModel))]
-        public async Task<IHttpActionResult> PostEntity(EntityModel entity)
+        public async Task<IHttpActionResult> Add([FromBody]EntityModel entity)
         {
             if (!ModelState.IsValid)
             {
@@ -60,8 +63,9 @@
         }
 
         // PUT: api/Entities/5
+        [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutEntity(int entityId, EntityModel entity)
+        public async Task<IHttpActionResult> Add(int entityId, [FromBody]EntityModel entity)
         {
             if (!ModelState.IsValid)
             {
@@ -83,8 +87,9 @@
         }
 
         // DELETE: api/Entities/5
+        [HttpDelete]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> DeleteEntityModel(int entityId)
+        public async Task<IHttpActionResult> Delete(int entityId)
         {
             var result = await _entityRepository.Delete(entityId);
             return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);

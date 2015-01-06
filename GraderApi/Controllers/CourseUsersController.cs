@@ -21,16 +21,18 @@
         }
 
         // GET: api/CourseUsers
+        [HttpGet]
         [ResponseType(typeof(IEnumerable<CourseUserModel>))]
-        public async Task<HttpResponseMessage> GetCourseUser()
+        public async Task<HttpResponseMessage> All()
         {
             var result = await _courseUserRepository.GetAll();
             return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // GET: api/CourseUsers/5
+        [HttpGet]
         [ResponseType(typeof(CourseUserModel))]
-        public async Task<HttpResponseMessage> GetCourseUser(int courseUserId)
+        public async Task<HttpResponseMessage> Get(int courseUserId)
         {
             var courseUser = await _courseUserRepository.Get(courseUserId);
             if (courseUser == null)
@@ -42,8 +44,9 @@
         }
 
         // POST: api/CourseUsers
+        [HttpPost]
         [ResponseType(typeof(CourseUserModel))]
-        public async Task<IHttpActionResult> PostCourseUser(CourseUserModel courseUser)
+        public async Task<IHttpActionResult> Add([FromBody]CourseUserModel courseUser)
         {
             if (!ModelState.IsValid)
             {
@@ -60,8 +63,9 @@
         }
 
         // PUT: api/CourseUsers/5
+        [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutCourseUser(int courseUserId, CourseUserModel courseUser)
+        public async Task<IHttpActionResult> Add(int courseUserId, [FromBody]CourseUserModel courseUser)
         {
             if (!ModelState.IsValid)
             {
@@ -83,8 +87,9 @@
         }
 
         // DELETE: api/CourseUsers/5
+        [HttpDelete]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> DeleteCourseUser(int courseUserId)
+        public async Task<IHttpActionResult> Delete(int courseUserId)
         {
             var result = await _courseUserRepository.Delete(courseUserId);
             return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);

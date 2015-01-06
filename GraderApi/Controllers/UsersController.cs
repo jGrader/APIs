@@ -1,5 +1,9 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Grader.JsonSerializer;
+    using GraderDataAccessLayer.Models;
+    using GraderDataAccessLayer.Repositories;
+    using Principals;
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
@@ -7,10 +11,6 @@
     using System.Web;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using Grader.JsonSerializer;
-    using GraderApi.Principals;
-    using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Repositories;
 
 
     public class UsersController : ApiController
@@ -25,15 +25,19 @@
         }
 
 
-        // GET: api/Users
+        // GET: api/Users/All
+        [HttpGet]
         [ResponseType(typeof(IEnumerable<UserModel>))]
-        public async Task<HttpResponseMessage> GetUser()
+        public async Task<HttpResponseMessage> All()
         {
             var result = await _userRepository.GetAll();
             return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
-        // GET: api/Users/5
+        /*
+        No one(!) should have the permissions for this.
+        // GET: api/Users/GetUser/5
+        [HttpGet]
         [ResponseType(typeof(UserModel))]
         public async Task<HttpResponseMessage> GetUser(int userId)
         {
@@ -44,11 +48,12 @@
             }
 
             return Request.CreateResponse(HttpStatusCode.Accepted, user.ToJson());
-        }
+        }*/
 
-        // GET: api/Users/GetAllCoursesForCurrentUser
+        // GET: api/Users/Courses
+        [HttpGet]
         [ResponseType(typeof(IEnumerable<CourseModel>))]
-        public async Task<HttpResponseMessage> GetAllCoursesForCurrentUser()
+        public async Task<HttpResponseMessage> Courses()
         {
             var currentUser = HttpContext.Current.User as UserPrincipal;
             if (currentUser == null || currentUser.User == null)
@@ -60,7 +65,8 @@
             return Request.CreateResponse(HttpStatusCode.Accepted, courses.ToJson());
         }
 
-        // GET: api/Users/GetAllCoursesForCurrentUser/5
+        /*
+        Same here. This controller is for the logged in user ONLY!
         [ResponseType(typeof(IEnumerable<CourseModel>))]
         public async Task<HttpResponseMessage> GetAllCoursesForCurrentUser(int userId)
         {
@@ -72,11 +78,12 @@
 
             var courses = await _courseUserRepository.GetAllByUser(userId);
             return Request.CreateResponse(HttpStatusCode.Accepted, courses.ToJson());
-        }
+        }*/
 
         // POST: api/Users
+        [HttpPost]
         [ResponseType(typeof(UserModel))]
-        public async Task<IHttpActionResult> PostUserModel(UserModel user)
+        public async Task<IHttpActionResult> Add([FromBody] UserModel user)
         {
             if (!ModelState.IsValid)
             {
@@ -93,8 +100,9 @@
         }
 
         // PUT: api/Users/5
+        [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutUser(int userId, UserModel user)
+        public async Task<IHttpActionResult> Add(int userId,[FromBody] UserModel user)
         {
             if (!ModelState.IsValid)
             {
@@ -116,8 +124,9 @@
         }
 
         // DELETE: api/Users/5
+        [HttpDelete]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> DeleteUserModel(int userId)
+        public async Task<IHttpActionResult> Delete(int userId)
         {
             var result = await _userRepository.Delete(userId);
             return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
