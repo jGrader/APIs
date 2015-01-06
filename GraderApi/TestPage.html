@@ -14,12 +14,13 @@
             var sessionId = "";
 
             $("button#login").click(function() {
-                var url = "api/Courses/All";
+                var url = "api/Users/Authentication";
                 var headers = new Array();
                 headers["Authorization"] = "Basic" + " " + btoa($("input#username").val() + ":" + $("#password").val()); //Base64 encoding
 
                 $.ajax({
                     url: url,
+                    type: "POST",
                     headers: headers,
                     success: function (data) {
                         sessionId = data;

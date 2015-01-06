@@ -24,6 +24,13 @@
             _courseUserRepository = courseUserRepository;
         }
 
+        // Dummy action for Basic Authentication to call and let the Handler validate
+        [HttpPost]
+        [ResponseType(typeof (void))]
+        public async Task<IHttpActionResult> Authentication()
+        {
+            return StatusCode(HttpStatusCode.NoContent);
+        }
 
         // GET: api/Users/All
         [HttpGet]
