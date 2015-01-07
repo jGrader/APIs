@@ -1,14 +1,14 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Grader.JsonSerializer;
+    using GraderDataAccessLayer.Models;
+    using GraderDataAccessLayer.Repositories;
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Repositories;
 
 
     public class EntitiesController : ApiController
@@ -46,53 +46,53 @@
         // POST: api/Entities
         [HttpPost]
         [ResponseType(typeof(EntityModel))]
-        public async Task<IHttpActionResult> Add([FromBody]EntityModel entity)
+        public async Task<HttpResponseMessage> Add([FromBody]EntityModel entity)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             var result = await _entityRepository.Add(entity);
             if (result == null)
             {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return CreatedAtRoute("EntityRoute", new { entityId = result.Id }, result.ToJson());
+            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // PUT: api/Entities/5
         [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> Add(int entityId, [FromBody]EntityModel entity)
+        public async Task<HttpResponseMessage> Add(int entityId, [FromBody]EntityModel entity)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             if (entityId != entity.Id)
             {
-                return BadRequest();
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
             var result = await _entityRepository.Update(entity);
             if (result == null)
             {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return StatusCode(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         // DELETE: api/Entities/5
         [HttpDelete]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> Delete(int entityId)
+        public async Task<HttpResponseMessage> Delete(int entityId)
         {
             var result = await _entityRepository.Delete(entityId);
-            return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
+            return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
         }
 
         protected override void Dispose(bool disposing)

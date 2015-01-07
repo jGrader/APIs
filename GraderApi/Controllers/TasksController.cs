@@ -1,14 +1,14 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Grader.JsonSerializer;
+    using GraderDataAccessLayer.Models;
+    using GraderDataAccessLayer.Repositories;
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Repositories;
 
 
     public class TasksController : ApiController
@@ -46,53 +46,53 @@
         // POST: api/Tasks
         [HttpPost]
         [ResponseType(typeof(TaskModel))]
-        public async Task<IHttpActionResult> Add([FromBody]TaskModel task)
+        public async Task<HttpResponseMessage> Add([FromBody]TaskModel task)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             var result = await _taskRepository.Add(task);
             if (result == null)
             {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return CreatedAtRoute("TaskRoute", new { taskId = result.Id }, result.ToJson());
+            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // PUT: api/Tasks/5
         [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> Add(int taskId, [FromBody]TaskModel task)
+        public async Task<HttpResponseMessage> Add(int taskId, [FromBody]TaskModel task)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             if (taskId != task.Id)
             {
-                return BadRequest();
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
             var result = await _taskRepository.Update(task);
             if (result == null)
             {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return StatusCode(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         // DELETE: api/Tasks/5
         [HttpDelete]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> Delete(int taskId)
+        public async Task<HttpResponseMessage> Delete(int taskId)
         {
             var result = await _taskRepository.Delete(taskId);
-            return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
+            return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
         }
 
         protected override void Dispose(bool disposing)

@@ -11,8 +11,12 @@
     <script type="text/javascript">
 
         $(document).ready(function () {
-            var sessionId = "";
-
+            var sessionId = localStorage.getItem("sessionId");
+            if (sessionId == null) {
+                sessionId = "";
+            } else {
+                $("#loginStatus").text("Logged in");
+            }
             $("button#login").click(function() {
                 var url = "api/Users/Authentication";
                 var headers = new Array();
@@ -23,7 +27,7 @@
                     type: "POST",
                     headers: headers,
                     success: function (data) {
-                        sessionId = data;
+                        localStorage.setItem("sessionId", data);
                         $("#loginStatus").text("Logged in");
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
@@ -112,10 +116,15 @@
                 }
 
                 headers["SessionId"] = sessionId;
+                headers["contentType"] = 'application/json; charset=utf-8';
+
+                var data = jQuery.parseJSON($("#requestContent").val());
 
                 $.ajax({
+                    type: $("#type").val(),
                     url: url,
                     headers: headers,
+                    data: data,
                     success: function (data) {
                         $("#resultDiv").empty();
                         $("#resultDiv").append(formatData(data));
@@ -199,7 +208,8 @@
     </div>
     <div>
         <h2>URL</h2>
-        <input type="text" width="20" id="url" value="api/Courses"/>
+        <input type="text" width="20" id="url" value="api/Courses/All"/>
+        <input type="text" width="20" id="type" value="GET"/>
     </div>
 
     <div id='HeaderGroup'>
@@ -216,9 +226,16 @@
     <div>
         <input type='button' value='Add Button' id='addCookie'>
         <input type='button' value='Remove Button' id='removeCookie'>
+    </div>
+    <div>
         <p>
-        <input type="button" value="Send Request" id="sendButton" style="height:200px; width:1000px" />
-        <h2>RESULTS</h2>
+            <textarea id='requestContent' rows='4' cols='50'></textarea>
+        </p>
+    </div>
+    <div>
+        <p>
+            <input type="button" value="Send Request" id="sendButton" style="height:200px; width:1000px" />
+            <h2>RESULTS</h2>
         </p>
     </div>
     <div id="resultDiv">

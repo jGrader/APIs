@@ -28,9 +28,9 @@
         // Dummy action for Basic Authentication to call and let the Handler validate
         [HttpPost]
         [ResponseType(typeof (void))]
-        public async Task<IHttpActionResult> Authentication()
+        public async Task<HttpResponseMessage> Authentication()
         {
-            return StatusCode(HttpStatusCode.NoContent);
+            return Request.CreateResponse(HttpStatusCode.NoContent);
         }
         
         /*
@@ -92,53 +92,55 @@
         // POST: api/Users
         [HttpPost]
         [ResponseType(typeof(UserModel))]
-        public async Task<IHttpActionResult> Add([FromBody] UserModel user)
+        public async Task<HttpResponseMessage> Add([FromBody] UserModel user)
         {
+            //UserModel user = userToken.ToObject<UserModel>();
+            //UserModel user = userParameter as UserModel;
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             var result = await _userRepository.Add(user);
             if (result == null)
             {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return CreatedAtRoute("UserRoute", new { userId = result.Id }, result.ToJson());
+            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // PUT: api/Users/5
         [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> Update(int userId,[FromBody] UserModel user)
+        public async Task<HttpResponseMessage> Update(int userId,[FromBody] UserModel user)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest,ModelState);
             }
 
             if (userId != user.Id)
             {
-                return BadRequest();
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
             var result = await _userRepository.Update(user);
             if (result == null)
             {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return StatusCode(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         // DELETE: api/Users/5
         [HttpDelete]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> Delete(int userId)
+        public async Task<HttpResponseMessage> Delete(int userId)
         {
             var result = await _userRepository.Delete(userId);
-            return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
+            return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
         }
 
         protected override void Dispose(bool disposing)

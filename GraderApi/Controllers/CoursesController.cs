@@ -48,50 +48,50 @@
         [HttpPost]
         [ResponseType(typeof(CourseModel))]
         [PermissionsAuthorize(AdminPermissions.CanCreateCourse)]
-        public async Task<IHttpActionResult> Add([FromBody] CourseModel course)
+        public async Task<HttpResponseMessage> Add([FromBody] CourseModel course)
         {
             if (!ModelState.IsValid) {
-                return BadRequest(ModelState);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             var result = await _courseRepository.Add(course);
             if (result == null) {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return CreatedAtRoute("CourseRoute", new { courseId = result.Id }, result.ToJson());
+            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // PUT: api/Courses/5
         [HttpPut]
         [ResponseType(typeof(void))]
         [PermissionsAuthorize(AdminPermissions.CanUpdateCourse)]
-        public async Task<IHttpActionResult> Update(int courseId, [FromBody] CourseModel course)
+        public async Task<HttpResponseMessage> Update(int courseId, [FromBody] CourseModel course)
         {
             if (!ModelState.IsValid) {
-                return BadRequest(ModelState);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             if (courseId != course.Id) {
-                return BadRequest();
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
             var result = await _courseRepository.Update(course);
             if (result == null) {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return StatusCode(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         // DELETE: api/Courses/5
         [HttpDelete]
         [ResponseType(typeof(void))]
         [PermissionsAuthorize(AdminPermissions.CanDeleteCourse)]
-        public async Task<IHttpActionResult> Delete(int courseId)
+        public async Task<HttpResponseMessage> Delete(int courseId)
         {
             var result = await _courseRepository.Delete(courseId);
-            return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
+            return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
         }
 
 

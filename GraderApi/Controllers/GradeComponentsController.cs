@@ -1,14 +1,14 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Grader.JsonSerializer;
+    using GraderDataAccessLayer.Models;
+    using GraderDataAccessLayer.Repositories;
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Repositories;
 
 
     public class GradeComponentsController : ApiController
@@ -48,50 +48,50 @@
         [HttpPost]
         [ResponseType(typeof(GradeComponentModel))]
         [PermissionsAuthorize(AdminPermissions.CanCreateGradedPart)]
-        public async Task<IHttpActionResult> Add(GradeComponentModel gradeComponentModel)
+        public async Task<HttpResponseMessage> Add(GradeComponentModel gradeComponentModel)
         {
             if (!ModelState.IsValid) {
-                return BadRequest(ModelState);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             var result = await _gradeComponentRepository.Add(gradeComponentModel);
             if (result == null) {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return CreatedAtRoute("GradeComponentRoute", new { gradeComponentId = result.Id }, result.ToJson());
+            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // PUT: api/GradeComponents/5
         [HttpPut]
         [ResponseType(typeof(void))]
         [PermissionsAuthorize(AdminPermissions.CanUpdateGradedPart)]
-        public async Task<IHttpActionResult> Add(int gradeComponentId, [FromBody]GradeComponentModel gradeComponentModel)
+        public async Task<HttpResponseMessage> Add(int gradeComponentId, [FromBody]GradeComponentModel gradeComponentModel)
         {
             if (!ModelState.IsValid) {
-                return BadRequest(ModelState);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             if (gradeComponentId != gradeComponentModel.Id) {
-                return BadRequest();
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
             var result = await _gradeComponentRepository.Update(gradeComponentModel);
             if (result == null) {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return StatusCode(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         // DELETE: api/GradeComponents/5
         [HttpDelete]
         [ResponseType(typeof(GradeComponentModel))]
         [PermissionsAuthorize(AdminPermissions.CanDeleteGradedPart)]
-        public async Task<IHttpActionResult> Delete(int gradeComponentId)
+        public async Task<HttpResponseMessage> Delete(int gradeComponentId)
         {
             var result = await _gradeComponentRepository.Delete(gradeComponentId);
-            return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
+            return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
         }
 
         protected override void Dispose(bool disposing)

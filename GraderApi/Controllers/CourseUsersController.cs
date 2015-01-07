@@ -1,14 +1,14 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Grader.JsonSerializer;
+    using GraderDataAccessLayer.Models;
+    using GraderDataAccessLayer.Repositories;
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Web.Http.Description;
-    using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Repositories;
 
 
     public class CourseUsersController : ApiController
@@ -46,53 +46,53 @@
         // POST: api/CourseUsers
         [HttpPost]
         [ResponseType(typeof(CourseUserModel))]
-        public async Task<IHttpActionResult> Add([FromBody]CourseUserModel courseUser)
+        public async Task<HttpResponseMessage> Add([FromBody]CourseUserModel courseUser)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             var result = await _courseUserRepository.Add(courseUser);
             if (result == null)
             {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return CreatedAtRoute("CourseUserRoute", new { courseUserId = result.Id }, result.ToJson());
+            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
         // PUT: api/CourseUsers/5
         [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> Update(int courseUserId, [FromBody]CourseUserModel courseUser)
+        public async Task<HttpResponseMessage> Update(int courseUserId, [FromBody]CourseUserModel courseUser)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             if (courseUserId != courseUser.Id)
             {
-                return BadRequest();
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
             var result = await _courseUserRepository.Update(courseUser);
             if (result == null)
             {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
 
-            return StatusCode(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         // DELETE: api/CourseUsers/5
         [HttpDelete]
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> Delete(int courseUserId)
+        public async Task<HttpResponseMessage> Delete(int courseUserId)
         {
             var result = await _courseUserRepository.Delete(courseUserId);
-            return StatusCode(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
+            return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
         }
 
         protected override void Dispose(bool disposing)

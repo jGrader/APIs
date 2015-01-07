@@ -1,10 +1,9 @@
-﻿using GraderApi.Handlers;
-using System.Net.Http.Headers;
-using System.Web.Http;
-
-
-namespace GraderApi
+﻿namespace GraderApi
 {
+    using Handlers;
+    using System.Net.Http.Headers;
+    using System.Web.Http;
+
     public static class WebApiConfig
     {
         public static void Register(HttpConfiguration config)
@@ -13,7 +12,10 @@ namespace GraderApi
             // config.MessageHandlers.Add(new PermissionsHandler());
             // Web API configuration and services
             config.SuppressDefaultHostAuthentication();
+            config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html")); //to return JSON instead of XML in Chrome
+            config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/json"));
+            
 
             // Web API routes
             config.MapHttpAttributeRoutes();
