@@ -12,7 +12,7 @@ namespace GraderDataAccessLayer.Repositories
     using System.Threading.Tasks;
 
 
-    public class TaskRepository : ITaskRepositoy
+    public class TaskRepository : ITaskRepository
     {
         private DatabaseContext _db = new DatabaseContext();
     

@@ -6,7 +6,7 @@
     using System.Threading.Tasks;
 
 
-    public interface ITaskRepositoy : IDisposable
+    public interface ITaskRepository : IDisposable
     {
         Task<TaskModel> Get(int id);
         

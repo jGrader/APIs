@@ -1,6 +1,7 @@
 ﻿namespace GraderApi.Controllers
 {
     using Grader.JsonSerializer;
+    using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
     using GraderDataAccessLayer.Repositories;
     using System;
@@ -14,8 +15,8 @@
 
     public class EntitiesController : ApiController
     {
-        private readonly EntityRepository _entityRepository;
-        public EntitiesController(EntityRepository entityRepository)
+        private readonly IEntityRepository _entityRepository;
+        public EntitiesController(IEntityRepository entityRepository)
         {
             _entityRepository = entityRepository;
         }
@@ -143,16 +144,6 @@
             {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
-        }
-
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _entityRepository.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }

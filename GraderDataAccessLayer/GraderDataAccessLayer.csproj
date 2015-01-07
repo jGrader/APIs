@@ -84,7 +84,7 @@
     <Compile Include="Repositories\GradeComponentRepository.cs" />
     <Compile Include="Interfaces\ICourseRepository.cs" />
     <Compile Include="Interfaces\IGradeComponentRepository.cs" />
-    <Compile Include="Interfaces\ITaskRepositoy.cs" />
+    <Compile Include="Interfaces\ITaskRepository.cs" />
     <Compile Include="Repositories\SessionIdRepository.cs" />
     <Compile Include="Repositories\SubmissionRepository.cs" />
     <Compile Include="Repositories\TaskRepository.cs" />

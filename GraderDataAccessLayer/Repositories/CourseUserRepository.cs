@@ -18,7 +18,6 @@ namespace GraderDataAccessLayer.Repositories
     {
         private DatabaseContext _db = new DatabaseContext();
 
-
         public async Task<CourseUserModel> Get(int id)
         {
             var searchResult = await _db.CourseUser.FirstOrDefaultAsync(cu => cu.Id == id);

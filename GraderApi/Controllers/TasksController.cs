@@ -1,6 +1,7 @@
 ﻿namespace GraderApi.Controllers
 {
     using Grader.JsonSerializer;
+    using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
     using GraderDataAccessLayer.Repositories;
     using System;
@@ -14,8 +15,8 @@
 
     public class TasksController : ApiController
     {
-        private readonly TaskRepository _taskRepository;
-        public TasksController(TaskRepository taskRepository)
+        private readonly ITaskRepository _taskRepository;
+        public TasksController(ITaskRepository taskRepository)
         {
             _taskRepository = taskRepository;
         }
@@ -163,16 +164,6 @@
             {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
-        }
-
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _taskRepository.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }

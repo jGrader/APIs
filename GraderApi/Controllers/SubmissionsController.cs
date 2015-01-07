@@ -1,6 +1,7 @@
 ﻿namespace GraderApi.Controllers
 {
     using Grader.JsonSerializer;
+    using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
     using GraderDataAccessLayer.Repositories;
     using System;
@@ -14,8 +15,8 @@
 
     public class SubmissionsController : ApiController
     {
-        private readonly SubmissionRepository _submissionRepository = new SubmissionRepository();
-        public SubmissionsController(SubmissionRepository submissionRepository)
+        private readonly ISubmissionRepository _submissionRepository;
+        public SubmissionsController(ISubmissionRepository submissionRepository)
         {
             _submissionRepository = submissionRepository;
         }
@@ -146,16 +147,6 @@
             {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
-        }
-
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _submissionRepository.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }

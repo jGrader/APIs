@@ -1,6 +1,7 @@
 ﻿namespace GraderApi.Controllers
 {
     using Grader.JsonSerializer;
+    using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
     using GraderDataAccessLayer.Repositories;
     using System;
@@ -14,8 +15,8 @@
 
     public class CourseUsersController : ApiController
     {
-        private readonly CourseUserRepository _courseUserRepository;
-        public CourseUsersController(CourseUserRepository courseUserRepository)
+        private readonly ICourseUserRepository _courseUserRepository;
+        public CourseUsersController(ICourseUserRepository courseUserRepository)
         {
             _courseUserRepository = courseUserRepository;
         }
@@ -122,16 +123,6 @@
             {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
-        }
-
- 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _courseUserRepository.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }
