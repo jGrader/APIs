@@ -186,7 +186,7 @@
                     item.Filename = name + i.ToString(CultureInfo.InvariantCulture) + extension;
                 }
                 // File.Create(file.Filename);
-                File.WriteAllText(item.Filename, item.Contents);
+                await Task.Run(() => File.WriteAllText(item.Filename, item.Contents));
                 return true;
             }
             catch (Exception)

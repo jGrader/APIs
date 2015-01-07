@@ -95,6 +95,24 @@
             return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
         }
 
+        [HttpPost]
+        [ResponseType(typeof (void))]
+        public async Task<HttpResponseMessage> UploadFile(int courseId, int entityId, [FromBody] FileModel file)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
+            }
+
+            var result = await _submissionRepository.Add(file);
+            if (!result)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

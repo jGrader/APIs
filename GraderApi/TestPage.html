@@ -11,7 +11,7 @@
     <script type="text/javascript">
 
         $(document).ready(function () {
-            var sessionId = localStorage.getItem("sessionId");
+            var sessionId = sessionStorage.getItem("sessionId");
             if (sessionId == null) {
                 sessionId = "";
             } else {
@@ -27,7 +27,8 @@
                     type: "POST",
                     headers: headers,
                     success: function (data) {
-                        localStorage.setItem("sessionId", data);
+                        sessionStorage.setItem("sessionId", data);
+                        sessionId = data;
                         $("#loginStatus").text("Logged in");
                     },
                     error: function (jqXhr, textStatus, errorThrown) {
@@ -118,8 +119,12 @@
                 headers["SessionId"] = sessionId;
                 headers["contentType"] = 'application/json; charset=utf-8';
 
-                var data = jQuery.parseJSON($("#requestContent").val());
-
+                var contents = $("#requestContent").val();
+                var data = null;
+                if (contents != "") {
+                    data = jQuery.parseJSON(contents);
+                }
+                
                 $.ajax({
                     type: $("#type").val(),
                     url: url,

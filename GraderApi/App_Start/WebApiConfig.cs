@@ -72,6 +72,14 @@
             );
 
             config.Routes.MapHttpRoute(
+                name: "SubmitFile",
+                routeTemplate: "api/{controller}/{action}/{courseId}/{entityId}",
+                defaults: new { },
+                constraints: new { controller = "Submissions", courseId = new ApiRouteConstraints(), entityId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
+            );
+
+            config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{action}",
                 defaults: new { id = RouteParameter.Optional }
