@@ -24,14 +24,16 @@
         public DateTime TimeStamp { get; set; }
 
         //Navigation property
-        public int UserId { get; set; }
         [Required]
+        public int UserId { get; set; }
+        
         [ForeignKey("UserId")]
         public virtual UserModel User { get; set; }
 
         //Navigation property
-        public int EntityId { get; set; }
         [Required]
+        public int EntityId { get; set; }
+        
         [ForeignKey("EntityId")]
         public virtual EntityModel Entity { get; set; }
     }

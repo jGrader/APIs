@@ -43,6 +43,34 @@
             return Request.CreateResponse(HttpStatusCode.Accepted, task.ToJson());
         }
 
+        // GET: api/Tasks/GetGradeComponent/3
+        [HttpGet]
+        [ResponseType(typeof (GradeComponentModel))]
+        public async Task<HttpResponseMessage> GetGradeComponent(int taskId)
+        {
+            var task = await _taskRepository.Get(taskId);
+            if (task == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, task.GradeComponent.ToJson());
+        }
+
+        // GET: api/Tasks/GetCourse/3
+        [HttpGet]
+        [ResponseType(typeof(CourseModel))]
+        public async Task<HttpResponseMessage> GetCourse(int taskId)
+        {
+            var task = await _taskRepository.Get(taskId);
+            if (task == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, task.Course.ToJson());
+        }
+
         // POST: api/Tasks
         [HttpPost]
         [ResponseType(typeof(TaskModel))]
@@ -65,7 +93,7 @@
         // PUT: api/Tasks/5
         [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<HttpResponseMessage> Add(int taskId, [FromBody]TaskModel task)
+        public async Task<HttpResponseMessage> Update(int taskId, [FromBody]TaskModel task)
         {
             if (!ModelState.IsValid)
             {

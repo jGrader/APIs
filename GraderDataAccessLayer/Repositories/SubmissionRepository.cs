@@ -166,7 +166,7 @@
             throw new NotImplementedException();
         }
         
-        public async Task<bool> Add(FileModel item)
+        public async Task<string> Add(FileModel item)
         {
             if (item == null)
             {
@@ -187,11 +187,11 @@
                 }
                 // File.Create(file.Filename);
                 await Task.Run(() => File.WriteAllText(item.Filename, item.Contents));
-                return true;
+                return item.Filename;
             }
             catch (Exception)
             {
-                return false;
+                return String.Empty;
             }
         }
         public async Task<bool> Update(FileModel item)

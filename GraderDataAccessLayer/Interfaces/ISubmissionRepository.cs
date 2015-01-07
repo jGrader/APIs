@@ -28,7 +28,7 @@
         Task<IEnumerable<FileModel>> GetAllFilesAfter(DateTime timestamp);
         Task<IEnumerable<FileModel>> GetAllFilesByUserIdAndEntityId(int userId, int entityId);
 
-        Task<bool> Add(FileModel item);
+        Task<string> Add(FileModel item);
         Task<bool> Update(FileModel item);
         Task<bool> DeleteFile(int fileId);
  

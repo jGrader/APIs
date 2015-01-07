@@ -43,6 +43,20 @@
             return Request.CreateResponse(HttpStatusCode.Accepted, entity.ToJson());
         }
 
+        // GET: /api/Entities/GetTask/3
+        [HttpGet]
+        [ResponseType(typeof (TaskModel))]
+        public async Task<HttpResponseMessage> GetTask(int entityId)
+        {
+            var entity = await _entityRepository.Get(entityId);
+            if (entity == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, entity.Task.ToJson());
+        }
+
         // POST: api/Entities
         [HttpPost]
         [ResponseType(typeof(EntityModel))]
@@ -65,7 +79,7 @@
         // PUT: api/Entities/5
         [HttpPut]
         [ResponseType(typeof(void))]
-        public async Task<HttpResponseMessage> Add(int entityId, [FromBody]EntityModel entity)
+        public async Task<HttpResponseMessage> Update(int entityId, [FromBody]EntityModel entity)
         {
             if (!ModelState.IsValid)
             {

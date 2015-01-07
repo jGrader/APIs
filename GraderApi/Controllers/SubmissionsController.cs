@@ -1,4 +1,6 @@
-﻿namespace GraderApi.Controllers
+﻿using System;
+
+namespace GraderApi.Controllers
 {
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Models;
@@ -62,6 +64,25 @@
             return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
         }
 
+        // POST: api/Submissions/UploadFile
+        [HttpPost]
+        [ResponseType(typeof(string))]
+        public async Task<HttpResponseMessage> UploadFile(int courseId, int entityId, [FromBody] FileModel file)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
+            }
+
+            var result = await _submissionRepository.Add(file);
+            if (String.IsNullOrEmpty(result))
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
         // PUT: api/Submissions/5
         [HttpPut]
         [ResponseType(typeof(void))]
@@ -93,24 +114,6 @@
         {
             var result = await _submissionRepository.DeleteSubmission(submissionId);
             return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
-        }
-
-        [HttpPost]
-        [ResponseType(typeof (void))]
-        public async Task<HttpResponseMessage> UploadFile(int courseId, int entityId, [FromBody] FileModel file)
-        {
-            if (!ModelState.IsValid)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
-            }
-
-            var result = await _submissionRepository.Add(file);
-            if (!result)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
-            }
-
-            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         protected override void Dispose(bool disposing)
