@@ -41,43 +41,6 @@
             return searchResult == null ? string.Empty : searchResult.Email;
         }
 
-        public async Task<UserModel> Add(UserModel item)
-        {
-            if (item == null)
-            {
-                throw new ArgumentNullException("item");
-            }
-
-            try
-            {
-                _db.User.Add(item);
-                await _db.SaveChangesAsync();
-                return item;
-            }
-            catch (DbException)
-            {
-                return null;
-            }
-        }
-        public async Task<UserModel> Update(UserModel item)
-        {
-            var dbItem = _db.User.FirstOrDefault(c => c.Id == item.Id);
-            if (dbItem == null)
-            {
-                throw new ArgumentNullException("item");
-            }
-
-            try
-            {
-                _db.Entry(dbItem).CurrentValues.SetValues(item);
-                await _db.SaveChangesAsync();
-                return await Get(item.Id);
-            }
-            catch (DbException)
-            {
-                return null;
-            }
-        }
         public async Task<bool> Delete(int userId)
         {
             var item = await _db.User.FirstOrDefaultAsync(c => c.Id == userId);

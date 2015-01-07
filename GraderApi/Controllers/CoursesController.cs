@@ -3,6 +3,7 @@
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Models;
     using GraderDataAccessLayer.Repositories;
+    using System;
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
@@ -14,12 +15,9 @@
     public class CoursesController : ApiController
     {
         private readonly CourseRepository _courseRepository;
-        private readonly CourseUserRepository _courseUserRepository;
-
-        public CoursesController(CourseRepository courseRepository, CourseUserRepository courseUserRepository)
+        public CoursesController(CourseRepository courseRepository)
         {
             _courseRepository = courseRepository;
-            _courseUserRepository = courseUserRepository;
         }
 
         // GET: api/Courses
@@ -27,8 +25,15 @@
         [ResponseType(typeof(IEnumerable<CourseModel>))]
         public async Task<HttpResponseMessage> All()
         {
-            var result = await _courseRepository.GetAll();
-            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            try
+            {
+                var result = await _courseRepository.GetAll();
+                return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // GET: api/Courses/5
@@ -36,12 +41,17 @@
         [ResponseType(typeof(CourseModel))]
         public async Task<HttpResponseMessage> Get(int courseId)
         {
-            var course = await _courseRepository.Get(courseId);
-            if (course == null) {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
+            try
+            {
+                var course = await _courseRepository.Get(courseId);
 
-            return Request.CreateResponse(HttpStatusCode.Accepted, course.ToJson());
+                return (course != null) ? Request.CreateResponse(HttpStatusCode.OK, course.ToJson()) : 
+                    Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // POST: api/Courses
@@ -50,38 +60,51 @@
         [PermissionsAuthorize(AdminPermissions.CanCreateCourse)]
         public async Task<HttpResponseMessage> Add([FromBody] CourseModel course)
         {
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid) 
+            {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
-            var result = await _courseRepository.Add(course);
-            if (result == null) {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
-            }
+            try
+            {
+                var result = await _courseRepository.Add(course);
 
-            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+                return result != null ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson()) : 
+                    Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // PUT: api/Courses/5
         [HttpPut]
-        [ResponseType(typeof(void))]
+        [ResponseType(typeof(CourseModel))]
         [PermissionsAuthorize(AdminPermissions.CanUpdateCourse)]
         public async Task<HttpResponseMessage> Update(int courseId, [FromBody] CourseModel course)
         {
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid) 
+            {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
-            if (courseId != course.Id) {
+            if (courseId != course.Id) 
+            {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            var result = await _courseRepository.Update(course);
-            if (result == null) {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
-            }
+            try
+            {
+                var result = await _courseRepository.Update(course);
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+                return result != null ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson()) : 
+                    Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // DELETE: api/Courses/5
@@ -90,8 +113,15 @@
         [PermissionsAuthorize(AdminPermissions.CanDeleteCourse)]
         public async Task<HttpResponseMessage> Delete(int courseId)
         {
-            var result = await _courseRepository.Delete(courseId);
-            return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
+            try
+            {
+                var result = await _courseRepository.Delete(courseId);
+                return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
 
@@ -100,7 +130,6 @@
             if (disposing)
             {
                 _courseRepository.Dispose();
-                _courseUserRepository.Dispose();
             }
             base.Dispose(disposing);
         }

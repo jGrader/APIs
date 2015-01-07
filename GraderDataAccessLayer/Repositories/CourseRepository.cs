@@ -2,11 +2,11 @@
 {
     using Interfaces;
     using Models;
-
     using System;
     using System.Collections.Generic;
     using System.Data.Common;
     using System.Data.Entity;
+    using System.Data.Entity.Core;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Linq.Expressions;
@@ -74,7 +74,8 @@
 
         public async Task<CourseModel> Add(CourseModel item)
         {
-            if (item == null) {
+            if (item == null) 
+            {
                 throw new ArgumentNullException("item");
             }
 
@@ -87,15 +88,22 @@
                 _db.Entry(item).Reference(c => c.Owner).Load();
                 return item;
             }
-            catch (DbException) {
+            catch (DbException) 
+            {
                 return null;
             }
         }
         public async Task<CourseModel> Update(CourseModel item)
         {
-            var dbItem = await _db.Course.FirstOrDefaultAsync(c => c.Id == item.Id);
-            if (dbItem == null) {
+            if (item == null)
+            {
                 throw new ArgumentNullException("item");
+            }
+
+            var dbItem = await _db.Course.FirstOrDefaultAsync(c => c.Id == item.Id);
+            if (dbItem == null) 
+            {
+                throw new ObjectNotFoundException();
             }
 
             try
@@ -104,15 +112,17 @@
                 await _db.SaveChangesAsync();
                 return await Get(item.Id);
             }
-            catch (DbException) {
+            catch (DbException) 
+            {
                 return null;
             }
         }
         public async Task<bool> Delete(int id)
         {
             var item = await _db.Course.FirstOrDefaultAsync(c => c.Id == id);
-            if (item == null) {
-                throw new ArgumentNullException("id");
+            if (item == null) 
+            {
+                throw new ObjectNotFoundException();
             }
 
             try
@@ -121,7 +131,8 @@
                 await _db.SaveChangesAsync();
                 return true;
             }
-            catch (DbException) {
+            catch (DbException)
+            {
                 return false;
             }
         }

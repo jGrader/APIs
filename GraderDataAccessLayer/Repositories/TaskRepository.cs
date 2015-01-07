@@ -1,4 +1,6 @@
-﻿namespace GraderDataAccessLayer.Repositories
+﻿using System.Data.Entity.Core;
+
+namespace GraderDataAccessLayer.Repositories
 {
     using Interfaces;
     using Models;
@@ -71,10 +73,15 @@
         }
         public async Task<TaskModel> Update(TaskModel item)
         {
+            if (item == null)
+            {
+                throw new ArgumentNullException("item");
+            }
+
             var dbItem = await _db.Task.FirstOrDefaultAsync(c => c.Id == item.Id);
             if (dbItem == null)
             {
-                throw new ArgumentNullException("item");
+                throw new ObjectNotFoundException();
             }
 
             try
@@ -93,7 +100,7 @@
             var item = await _db.Task.FirstOrDefaultAsync(c => c.Id == id);
             if (item == null)
             {
-                throw new ArgumentNullException("id");
+                throw new ObjectNotFoundException();
             }
 
             try

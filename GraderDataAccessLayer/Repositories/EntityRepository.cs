@@ -6,6 +6,7 @@
     using System.Collections.Generic;
     using System.Data.Common;
     using System.Data.Entity;
+    using System.Data.Entity.Core;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -75,10 +76,15 @@
         }
         public async Task<EntityModel> Update(EntityModel item)
         {
+            if (item == null)
+            {
+                throw new ArgumentNullException("item");
+            }
+
             var dbItem = await _db.Entity.FirstOrDefaultAsync(c => c.Id == item.Id);
             if (dbItem == null)
             {
-                throw new ArgumentNullException("item");
+                throw new ObjectNotFoundException();
             }
 
             try
@@ -97,7 +103,7 @@
             var item = await _db.Entity.FirstOrDefaultAsync(c => c.Id == id);
             if (item == null)
             {
-                throw new ArgumentNullException("id");
+                throw new ObjectNotFoundException();
             }
 
             try

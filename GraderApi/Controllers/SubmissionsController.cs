@@ -1,10 +1,9 @@
-﻿using System;
-
-namespace GraderApi.Controllers
+﻿namespace GraderApi.Controllers
 {
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Models;
     using GraderDataAccessLayer.Repositories;
+    using System;
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
@@ -16,7 +15,6 @@ namespace GraderApi.Controllers
     public class SubmissionsController : ApiController
     {
         private readonly SubmissionRepository _submissionRepository = new SubmissionRepository();
-
         public SubmissionsController(SubmissionRepository submissionRepository)
         {
             _submissionRepository = submissionRepository;
@@ -27,8 +25,15 @@ namespace GraderApi.Controllers
         [ResponseType(typeof(IEnumerable<SubmissionModel>))]
         public async Task<HttpResponseMessage> All()
         {
-            var result = await _submissionRepository.GetAll();
-            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            try
+            {
+                var result = await _submissionRepository.GetAll();
+                return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // GET: api/Submissions/5
@@ -36,13 +41,18 @@ namespace GraderApi.Controllers
         [ResponseType(typeof(SubmissionModel))]
         public async Task<HttpResponseMessage> Get(int submissionId)
         {
-            var submission = await _submissionRepository.Get(submissionId);
-            if (submission == null)
+            try
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
+                var submission = await _submissionRepository.Get(submissionId);
 
-            return Request.CreateResponse(HttpStatusCode.Accepted, submission.ToJson());
+                return submission != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, submission.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // POST: api/Submissions
@@ -55,16 +65,21 @@ namespace GraderApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
-            var result = await _submissionRepository.Add(submission);
-            if (result == null)
+            try
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
-            }
+                var result = await _submissionRepository.Add(submission);
 
-            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+                return result != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
-        // POST: api/Submissions/UploadFile
+        // POST: api/Submissions/UploadFile/3/5
         [HttpPost]
         [ResponseType(typeof(string))]
         public async Task<HttpResponseMessage> UploadFile(int courseId, int entityId, [FromBody] FileModel file)
@@ -74,18 +89,23 @@ namespace GraderApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
-            var result = await _submissionRepository.Add(file);
-            if (String.IsNullOrEmpty(result))
+            try
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
-            }
+                var result = await _submissionRepository.Add(file);
 
-            return Request.CreateResponse(HttpStatusCode.OK, result);
+                return !String.IsNullOrEmpty(result)
+                    ? Request.CreateResponse(HttpStatusCode.OK, result)
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // PUT: api/Submissions/5
         [HttpPut]
-        [ResponseType(typeof(void))]
+        [ResponseType(typeof(SubmissionModel))]
         public async Task<HttpResponseMessage> Add(int submissionId, [FromBody]SubmissionModel submission)
         {
             if (!ModelState.IsValid)
@@ -98,13 +118,18 @@ namespace GraderApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            var result = await _submissionRepository.Update(submission);
-            if (result == null)
+            try
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
-            }
+                var result = await _submissionRepository.Update(submission);
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+                return result != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // DELETE: api/Submissions/5
@@ -112,9 +137,17 @@ namespace GraderApi.Controllers
         [ResponseType(typeof(void))]
         public async Task<HttpResponseMessage> Delete(int submissionId)
         {
-            var result = await _submissionRepository.DeleteSubmission(submissionId);
-            return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
+            try
+            {
+                var result = await _submissionRepository.DeleteSubmission(submissionId);
+                return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
+
 
         protected override void Dispose(bool disposing)
         {

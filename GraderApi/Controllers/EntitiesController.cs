@@ -3,6 +3,7 @@
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Models;
     using GraderDataAccessLayer.Repositories;
+    using System;
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
@@ -14,7 +15,6 @@
     public class EntitiesController : ApiController
     {
         private readonly EntityRepository _entityRepository;
-
         public EntitiesController(EntityRepository entityRepository)
         {
             _entityRepository = entityRepository;
@@ -25,8 +25,15 @@
         [ResponseType(typeof(IEnumerable<EntityModel>))]
         public async Task<HttpResponseMessage> All()
         {
-            var result = await _entityRepository.GetAll();
-            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            try
+            {
+                var result = await _entityRepository.GetAll();
+                return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // GET: api/Entities/Get/5
@@ -34,13 +41,18 @@
         [ResponseType(typeof(EntityModel))]
         public async Task<HttpResponseMessage> Get(int entityId)
         {
-            var entity = await _entityRepository.Get(entityId);
-            if (entity == null)
+            try
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
+                var entity = await _entityRepository.Get(entityId);
 
-            return Request.CreateResponse(HttpStatusCode.Accepted, entity.ToJson());
+                return entity != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, entity.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // GET: /api/Entities/GetTask/3
@@ -48,38 +60,49 @@
         [ResponseType(typeof (TaskModel))]
         public async Task<HttpResponseMessage> GetTask(int entityId)
         {
-            var entity = await _entityRepository.Get(entityId);
-            if (entity == null)
+            try
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                var entity = await _entityRepository.Get(entityId);
+                return entity != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, entity.Task.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.NotFound);
             }
-
-            return Request.CreateResponse(HttpStatusCode.OK, entity.Task.ToJson());
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // POST: api/Entities
         [HttpPost]
         [ResponseType(typeof(EntityModel))]
-        public async Task<HttpResponseMessage> Add([FromBody]EntityModel entity)
+        [PermissionsAuthorize(CoursePermissions.CanCreateEntities)]
+        public async Task<HttpResponseMessage> Add([FromBody] EntityModel entity)
         {
             if (!ModelState.IsValid)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
-            var result = await _entityRepository.Add(entity);
-            if (result == null)
+            try
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
-            }
+                var result = await _entityRepository.Add(entity);
 
-            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+                return result != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // PUT: api/Entities/5
         [HttpPut]
-        [ResponseType(typeof(void))]
-        public async Task<HttpResponseMessage> Update(int entityId, [FromBody]EntityModel entity)
+        [ResponseType(typeof(EntityModel))]
+        [PermissionsAuthorize(CoursePermissions.CanUpdateEntities)]
+        public async Task<HttpResponseMessage> Update(int entityId, [FromBody] EntityModel entity)
         {
             if (!ModelState.IsValid)
             {
@@ -91,23 +114,37 @@
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            var result = await _entityRepository.Update(entity);
-            if (result == null)
+            try
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
-            }
+                var result = await _entityRepository.Update(entity);
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+                return result != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // DELETE: api/Entities/5
         [HttpDelete]
         [ResponseType(typeof(void))]
+        [PermissionsAuthorize(CoursePermissions.CanDeleteEntities)]
         public async Task<HttpResponseMessage> Delete(int entityId)
         {
-            var result = await _entityRepository.Delete(entityId);
-            return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
+            try
+            {
+                var result = await _entityRepository.Delete(entityId);
+                return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
+
 
         protected override void Dispose(bool disposing)
         {

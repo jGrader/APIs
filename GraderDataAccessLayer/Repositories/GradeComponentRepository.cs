@@ -1,4 +1,6 @@
-﻿namespace GraderDataAccessLayer.Repositories
+﻿using System.Data.Entity.Core;
+
+namespace GraderDataAccessLayer.Repositories
 {
     using Interfaces;
     using Models;
@@ -32,7 +34,8 @@
 
         public async Task<GradeComponentModel> Add(GradeComponentModel item)
         {
-            if (item == null) {
+            if (item == null) 
+            {
                 throw new ArgumentNullException("item");
             }
 
@@ -45,15 +48,22 @@
                 _db.Entry(item).Reference(r => r.Course).Load();
                 return item;
             }
-            catch (DbException) {
+            catch (DbException) 
+            {
                 return null;
             }
         }
         public async Task<GradeComponentModel> Update(GradeComponentModel item)
         {
-            var dbItem = _db.GradeComponent.FirstOrDefault(c => c.Id == item.Id);
-            if (dbItem == null) {
+            if (item == null)
+            {
                 throw new ArgumentNullException("item");
+            }
+
+            var dbItem = _db.GradeComponent.FirstOrDefault(c => c.Id == item.Id);
+            if (dbItem == null) 
+            {
+                throw new ObjectNotFoundException();
             }
 
             try
@@ -62,15 +72,17 @@
                 await _db.SaveChangesAsync();
                 return await Get(item.Id);
             }
-            catch (DbException) {
+            catch (DbException) 
+            {
                 return null;
             }
         }
         public async Task<bool> Delete(int id)
         {
             var item = _db.GradeComponent.FirstOrDefault(c => c.Id == id);
-            if (item == null) {
-                throw new ArgumentNullException("id");
+            if (item == null) 
+            {
+                throw new ObjectNotFoundException();
             }
 
             try
@@ -79,7 +91,8 @@
                 await _db.SaveChangesAsync();
                 return true;
             }
-            catch (DbException) {
+            catch (DbException) 
+            {
                 return false;
             }
         }

@@ -1,13 +1,13 @@
 ﻿namespace GraderDataAccessLayer.Repositories
 {
     using System.Configuration;
-    using System.Runtime.InteropServices;
     using Interfaces;
     using Models;
     using System;
     using System.Collections.Generic;
     using System.Data.Common;
     using System.Data.Entity;
+    using System.Data.Entity.Core;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -79,10 +79,15 @@
         }
         public async Task<SubmissionModel> Update(SubmissionModel item)
         {
+            if (item == null)
+            {
+                throw new ArgumentNullException("item");
+            }
+
             var dbItem = await _db.Submission.FirstOrDefaultAsync(c => c.Id == item.Id);
             if (dbItem == null)
             {
-                throw new ArgumentNullException("item");
+                throw new ObjectNotFoundException();
             }
 
             try
@@ -101,7 +106,7 @@
             var item = await _db.Submission.FirstOrDefaultAsync(c => c.Id == sumbmissionId);
             if (item == null)
             {
-                throw new ArgumentNullException("sumbmissionId");
+                throw new ObjectNotFoundException();
             }
 
             try
@@ -170,8 +175,9 @@
         {
             if (item == null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("item");
             }
+
             try
             {
                 if (File.Exists(item.Filename))

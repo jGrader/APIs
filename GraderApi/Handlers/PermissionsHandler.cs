@@ -101,11 +101,12 @@ namespace GraderApi.Handlers
 
             
             var adminUser = await _adminRepository.GetByUserId(curUser.User.Id);
+            var adminRoles = new string[] { };
             if (adminUser != null) //This means that the user is an admin
             {
                 if (adminUser.IsSuperUser) // SuperUser which can do ANYTHING; just add that and exit
                 {
-                    var superUserPermission = GetOwnerPermissions();
+                    var superUserPermission = GetSuperUserPermissions();
                     UpdatePrincipal(curUser, superUserPermission);
 
                     return await base.SendAsync(request, cancellationToken);
@@ -124,6 +125,9 @@ namespace GraderApi.Handlers
 
                     return await base.SendAsync(request, cancellationToken);
                 }
+
+                // Load admin roles anyway
+                adminRoles = GetAdminPermissions();
             }
 
             // If we reached this point, the user is either not an admin / superUser or doesn't own the course; treat as a regular user no matter what
@@ -133,6 +137,8 @@ namespace GraderApi.Handlers
             }
 
             var permissions = GetUserPermissions(courseUser.Permissions);
+            permissions.Concat(adminRoles); //In case the user is also an admin, add those roles also
+
             UpdatePrincipal(curUser, permissions);
               
             return await base.SendAsync(request, cancellationToken);
@@ -158,6 +164,27 @@ namespace GraderApi.Handlers
         }
 
         // This has to be a string[] instead of IEnumerable because of the constructor in the GenericPrincipal
+        private static string[] GetSuperUserPermissions()
+        {
+            var res = Enum.GetNames(typeof(AdminPermissions)).ToList();
+            res.AddRange(GetOwnerPermissions());
+
+            return res.ToArray();
+        }
+        private static string[] GetOwnerPermissions()
+        {
+            var res = Enum.GetNames(typeof(CourseOwnerPermissions)).ToList(); 
+            res.AddRange(Enum.GetNames(typeof(CoursePermissions)));
+            res.AddRange(GetAdminPermissions()); 
+
+            return res.ToArray();
+        }
+        private static string[] GetAdminPermissions()
+        {
+            var res = Enum.GetNames(typeof(AdminPermissions)).ToList();
+            
+            return res.ToArray();
+        }
         private static string[] GetUserPermissions(int permissions)
         {
             var res = new List<string>();
@@ -179,13 +206,6 @@ namespace GraderApi.Handlers
                 res.Add(Enum.GetName(typeof (CoursePermissions), 0));
             }
             return res.ToArray();
-        }
-        private static string[] GetOwnerPermissions()
-        {
-            var res = Enum.GetNames(typeof (CoursePermissions)).ToList(); //Add all regular CoursePermissions
-            res.AddRange(Enum.GetNames(typeof (AdminPermissions))); //Add all AdminPermissions
-
-            return res.ToArray();
-        }
+        } 
     }
 }

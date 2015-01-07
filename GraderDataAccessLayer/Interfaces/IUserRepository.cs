@@ -15,8 +15,6 @@
         
         Task<string> GetEmail(int id);
 
-        Task<UserModel> Add(UserModel item);
-        Task<UserModel> Update(UserModel item);
         Task<bool> Delete(int userId);
     }
 }

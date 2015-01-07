@@ -3,6 +3,7 @@
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Models;
     using GraderDataAccessLayer.Repositories;
+    using System;
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
@@ -14,7 +15,6 @@
     public class GradeComponentsController : ApiController
     {
         private readonly GradeComponentRepository _gradeComponentRepository;
-
         public GradeComponentsController(GradeComponentRepository gradeComponentRepository)
         {
             _gradeComponentRepository = gradeComponentRepository;
@@ -25,8 +25,15 @@
         [ResponseType(typeof(IEnumerable<GradeComponentModel>))]
         public async Task<HttpResponseMessage> All()
         {
-            var result = await _gradeComponentRepository.GetAll();
-            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            try
+            {
+                var result = await _gradeComponentRepository.GetAll();
+                return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // GET: api/GradeComponents/5
@@ -35,92 +42,131 @@
         [PermissionsAuthorize(CoursePermissions.CanSeeGrades)]
         public async Task<HttpResponseMessage> Get(int gradeComponentId)
         {
-            var gradeComponent = await _gradeComponentRepository.Get(gradeComponentId);
-            if (gradeComponent == null)
+            try
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
+                var gradeComponent = await _gradeComponentRepository.Get(gradeComponentId);
 
-            return Request.CreateResponse(HttpStatusCode.OK, gradeComponent.ToJson());
+                return gradeComponent != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, gradeComponent.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // GET: /api/GradeComponents/GetCourse/3
         [HttpGet]
         [ResponseType(typeof (CourseModel))]
+        [PermissionsAuthorize(CoursePermissions.CanSeeGrades)]
         public async Task<HttpResponseMessage> GetCourse(int gradeComponentId)
         {
-            var gradeComponent = await _gradeComponentRepository.Get(gradeComponentId);
-            if (gradeComponent == null)
+            try
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
+                var gradeComponent = await _gradeComponentRepository.Get(gradeComponentId);
 
-            return Request.CreateResponse(HttpStatusCode.OK, gradeComponent.Course.ToJson());
+                return gradeComponent != null 
+                    ? Request.CreateResponse(HttpStatusCode.OK, gradeComponent.Course.ToJson()) 
+                    : Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // GET: /api/GradeComponents/GetForCourse/3
         [HttpGet]
         [ResponseType(typeof (IEnumerable<GradeComponentModel>))]
+        [PermissionsAuthorize(CoursePermissions.CanSeeGrades)]
         public async Task<HttpResponseMessage> GetForCourse(int courseId)
         {
-            var gradeComponents = await _gradeComponentRepository.GetAllByCourse(courseId);
-            if (gradeComponents == null)
+            try
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
+                var gradeComponents = await _gradeComponentRepository.GetAllByCourse(courseId);
 
-            return Request.CreateResponse(HttpStatusCode.OK, gradeComponents.ToJson());
+                return gradeComponents != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, gradeComponents.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // POST: api/GradeComponents
         [HttpPost]
         [ResponseType(typeof(GradeComponentModel))]
-        [PermissionsAuthorize(AdminPermissions.CanCreateGradedPart)]
-        public async Task<HttpResponseMessage> Add(GradeComponentModel gradeComponent)
+        [PermissionsAuthorize(CourseOwnerPermissions.CanCreateGradedPart)]
+        public async Task<HttpResponseMessage> Add([FromBody] GradeComponentModel gradeComponent)
         {
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid) 
+            {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
-            var result = await _gradeComponentRepository.Add(gradeComponent);
-            if (result == null) {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+            try
+            {
+                var result = await _gradeComponentRepository.Add(gradeComponent);
+                return result != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
-
-            return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // PUT: api/GradeComponents/5
         [HttpPut]
-        [ResponseType(typeof(void))]
-        [PermissionsAuthorize(AdminPermissions.CanUpdateGradedPart)]
-        public async Task<HttpResponseMessage> Update(int gradeComponentId, [FromBody]GradeComponentModel gradeComponent)
+        [ResponseType(typeof(GradeComponentModel))]
+        [PermissionsAuthorize(CourseOwnerPermissions.CanUpdateGradedPart)]
+        public async Task<HttpResponseMessage> Update(int gradeComponentId, [FromBody] GradeComponentModel gradeComponent)
         {
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid) 
+            {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
-            if (gradeComponentId != gradeComponent.Id) {
+            if (gradeComponentId != gradeComponent.Id) 
+            {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            var result = await _gradeComponentRepository.Update(gradeComponent);
-            if (result == null) {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
-            }
+            try
+            {
+                var result = await _gradeComponentRepository.Update(gradeComponent);
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+                return result != null 
+                    ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson()) 
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
 
         // DELETE: api/GradeComponents/5
         [HttpDelete]
-        [ResponseType(typeof(GradeComponentModel))]
-        [PermissionsAuthorize(AdminPermissions.CanDeleteGradedPart)]
+        [ResponseType(typeof(void))]
+        [PermissionsAuthorize(CourseOwnerPermissions.CanDeleteGradedPart)]
         public async Task<HttpResponseMessage> Delete(int gradeComponentId)
         {
-            var result = await _gradeComponentRepository.Delete(gradeComponentId);
-            return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
+            try
+            {
+                var result = await _gradeComponentRepository.Delete(gradeComponentId);
+                return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
         }
+
 
         protected override void Dispose(bool disposing)
         {
