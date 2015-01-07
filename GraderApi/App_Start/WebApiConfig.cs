@@ -9,7 +9,6 @@
         public static void Register(HttpConfiguration config)
         {
             config.MessageHandlers.Add(new AuthorizeHandler());
-            // config.MessageHandlers.Add(new PermissionsHandler());
             // Web API configuration and services
             config.SuppressDefaultHostAuthentication();
             config.Formatters.Remove(config.Formatters.XmlFormatter);
@@ -24,14 +23,15 @@
                 name: "UserRoute",
                 routeTemplate: "api/{controller}/{action}/{userId}",
                 defaults: new { },
-                constraints: new { controller = "Users", userId = new ApiRouteConstraints() }
+                constraints: new { controller = "Users", userId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
             config.Routes.MapHttpRoute(
                 name: "CourseRoute",
                 routeTemplate: "api/{controller}/{action}/{courseId}",
-                defaults: new { },
-                constraints: new { controller = "Courses", courseId = new ApiRouteConstraints() },
+                defaults: new { controller = "Courses" },
+                constraints: new { courseId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
@@ -39,9 +39,10 @@
                 name: "CourseUserRoute",
                 routeTemplate: "api/{controller}/{action}/{courseUserId}",
                 defaults: new { },
-                constraints: new { controller = "CourseUsers", courseUserId = new ApiRouteConstraints() }
+                constraints: new { controller = "CourseUsers", courseUserId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
-            
+
             config.Routes.MapHttpRoute(
                 name: "GradeComponentRoute",
                 routeTemplate: "api/{controller}/{action}/{gradeComponentId}",
@@ -51,24 +52,35 @@
             );
 
             config.Routes.MapHttpRoute(
+                name: "GradeComponentRoute2",
+                routeTemplate: "api/{controller}/{action}/{courseId}",
+                defaults: new { },
+                constraints: new { controller = "GradeComponents", courseId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
+            );
+
+            config.Routes.MapHttpRoute(
                 name: "TaskRoute",
                 routeTemplate: "api/{controller}/{action}/{taskId}",
                 defaults: new { },
-                constraints: new { controller = "Tasks", taskId = new ApiRouteConstraints() }
+                constraints: new { controller = "Tasks", taskId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
             config.Routes.MapHttpRoute(
                 name: "EntityRoute",
                 routeTemplate: "api/{controller}/{action}/{entityId}",
                 defaults: new { },
-                constraints: new { controller = "Entities", entityId = new ApiRouteConstraints() }
+                constraints: new { controller = "Entities", entityId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
             config.Routes.MapHttpRoute(
                 name: "SubmissionRoute",
                 routeTemplate: "api/{controller}/{action}/{submissionId}",
                 defaults: new { },
-                constraints: new { controller = "Submissions", submissionId = new ApiRouteConstraints() }
+                constraints: new { controller = "Submissions", submissionId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
             config.Routes.MapHttpRoute(

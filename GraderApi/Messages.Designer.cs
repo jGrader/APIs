@@ -106,11 +106,47 @@ namespace GraderApi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The courseUserId provided is invalid..
+        /// </summary>
+        internal static string InvalidEnrollment {
+            get {
+                return ResourceManager.GetString("InvalidEnrollment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The entityId provided is invalid.
+        /// </summary>
+        internal static string InvalidEntity {
+            get {
+                return ResourceManager.GetString("InvalidEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The gradeComponentId is invalid..
+        /// </summary>
+        internal static string InvalidGradeComponentId {
+            get {
+                return ResourceManager.GetString("InvalidGradeComponentId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The request is invalid - please make sure that you are using an authorized client..
         /// </summary>
         internal static string InvalidRequest {
             get {
                 return ResourceManager.GetString("InvalidRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are accessing an invalid route. How?.
+        /// </summary>
+        internal static string InvalidRoute {
+            get {
+                return ResourceManager.GetString("InvalidRoute", resourceCulture);
             }
         }
         
@@ -124,11 +160,47 @@ namespace GraderApi {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The submissionId is invalid.
+        /// </summary>
+        internal static string InvalidSubmissionId {
+            get {
+                return ResourceManager.GetString("InvalidSubmissionId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The provided taskId is invalid.
+        /// </summary>
+        internal static string InvalidTaskId {
+            get {
+                return ResourceManager.GetString("InvalidTaskId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to HTTPS is required for accessing this resource.
         /// </summary>
         internal static string NotHttps {
             get {
                 return ResourceManager.GetString("NotHttps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The requested feature is not available. Make a feature request!.
+        /// </summary>
+        internal static string NotImplemented {
+            get {
+                return ResourceManager.GetString("NotImplemented", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You do not have permission to access this resource.
+        /// </summary>
+        internal static string PermissionsInsufficient {
+            get {
+                return ResourceManager.GetString("PermissionsInsufficient", resourceCulture);
             }
         }
         
