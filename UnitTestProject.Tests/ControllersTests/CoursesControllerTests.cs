@@ -1,21 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Cache;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Routing;
-using System.Windows.Markup;
-using GraderApi;
 using GraderApi.Controllers;
-using GraderApi.Handlers;
 using GraderDataAccessLayer;
 using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Models;
@@ -105,9 +96,139 @@ namespace UnitTestProject.Tests.ControllersTests
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
+            // Revert
             var responseJson = await response.Content.ReadAsStringAsync();
             course = JsonConvert.DeserializeObject<CourseModel>(responseJson);
             Assert.IsTrue(await Cr.Delete(course.Id));
+        }
+        [TestMethod]
+        public async Task TestAdd_invalid()
+        {
+            // Arrange
+            _cc.Request = new HttpRequestMessage();
+            _cc.Configuration = new HttpConfiguration();
+
+            // Act
+            var course = new CourseModel()
+            {
+                CourseNumber = "52101",
+                StartDate = new DateTime(2014, 10, 22),
+                EndDate = new DateTime(2014, 11, 23),
+                Semester = 2,
+                ShortName = "GenPro2",
+                Year = 2015,
+                OwnerId = 1
+            };
+            var response = await _cc.Add(course);
+
+            // Assert
+            // We get InternalServerError instead of BadRequest because validation in ModelState 
+            // happens on binding which we skip so it assumes that the model is valid even though it has Name = null
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+        }
+
+
+        [TestMethod]
+        public async Task TestUpdate()
+        {
+            // Arrange
+            _cc.Request = new HttpRequestMessage();
+            _cc.Configuration = new HttpConfiguration();
+
+            // Act
+            var existingItem = await Cr.Get(1);
+            var oldValue = existingItem.Semester;
+            existingItem.Semester = 2500;
+
+            var response = await _cc.Update(existingItem.Id, existingItem);
+
+            // Assert
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var course = JsonConvert.DeserializeObject<CourseModel>(responseJson);
+            Assert.AreEqual(2500, course.Semester);
+
+            // Revert
+            existingItem.Semester = oldValue;
+            var res = await Cr.Update(existingItem);   
+            Assert.IsNotNull(res);
+        }
+        [TestMethod]
+        public async Task TestUpdate_invalid()
+        {
+            // Arrange
+            _cc.Request = new HttpRequestMessage();
+            _cc.Configuration = new HttpConfiguration();
+
+            // Act
+            var existingItem = await Cr.Get(1);
+            existingItem.Name = null;
+
+            var response = await _cc.Update(existingItem.Id, existingItem);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+        }
+        [TestMethod]
+        public async Task TestUpdate_wrongIds()
+        {
+            // Arrange
+            _cc.Request = new HttpRequestMessage();
+            _cc.Configuration = new HttpConfiguration();
+
+            // Act
+            var existingItem = await Cr.Get(1);
+            var response = await _cc.Update(2, existingItem);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+
+        [TestMethod]
+        public async Task TestDelete()
+        {
+            // Arrange
+            _cc.Request = new HttpRequestMessage();
+            _cc.Configuration = new HttpConfiguration();
+
+            // Act
+            var course = new CourseModel()
+            {
+                Name = "General Procrastination 2",
+                CourseNumber = "52101",
+                StartDate = new DateTime(2014, 10, 22),
+                EndDate = new DateTime(2014, 11, 23),
+                Semester = 2,
+                ShortName = "GenPro2",
+                Year = 2015,
+                OwnerId = 1
+            };
+            var response = await Cr.Add(course);
+            Assert.IsNotNull(response);
+
+            var dbItem = await Cr.Get(response.Id);
+            Assert.IsNotNull(dbItem);
+
+            var res = await _cc.Delete(response.Id);
+            
+            // Assert
+            Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
+
+            dbItem = await Cr.Get(response.Id);
+            Assert.IsNull(dbItem);
+        }
+        [TestMethod]
+        public async Task TestDelete_internalError()
+        {
+            // Arrange
+            _cc.Request = new HttpRequestMessage();
+            _cc.Configuration = new HttpConfiguration();
+
+            // Act
+            var res = await _cc.Delete(500);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.InternalServerError, res.StatusCode);
         }
     }
 }
