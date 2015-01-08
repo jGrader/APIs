@@ -110,6 +110,7 @@ namespace UnitTestProject.Tests.RepositoryTests
         {
             var res = await _cr.Add(new CourseModel { Name = "General Procrastination 2", CourseNumber = "52101", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 2, ShortName = "GenPro2", Year = 2015, OwnerId = 1});
             Assert.IsNotNull(res);
+            Assert.IsTrue(await _cr.Delete(res.Id));
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -153,8 +154,8 @@ namespace UnitTestProject.Tests.RepositoryTests
         [TestMethod]
         public async Task TestRemove()
         {
-            var existingObject = await _cr.GetByName("General Procrastination 2");
-            var res = await _cr.Delete(existingObject.First().Id);
+            var existingObject = await _cr.Add(new CourseModel { Name = "General Procrastination 2", CourseNumber = "52101", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 2, ShortName = "GenPro2", Year = 2015, OwnerId = 1 });
+            var res = await _cr.Delete(existingObject.Id);
             Assert.IsTrue(res);
         }
         [TestMethod]

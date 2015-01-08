@@ -90,6 +90,7 @@ namespace UnitTestProject.Tests.RepositoryTests
         {
             var res = await _cur.Add(new CourseUserModel { UserId = 2, CourseId = 1, ExcuseLimit  = 2, ExtensionLimit = 3, Permissions = 1500 });
             Assert.IsNotNull(res);
+            Assert.IsTrue(await _cur.Delete(res.Id));
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -134,8 +135,8 @@ namespace UnitTestProject.Tests.RepositoryTests
         [TestMethod]
         public async Task TestRemove()
         {
-            var existingObject = await _cur.GetAllByPermissions(1500);
-            var res = await _cur.Delete(existingObject.First().Id);
+            var existingObject = await _cur.Add(new CourseUserModel { UserId = 2, CourseId = 1, ExcuseLimit = 2, ExtensionLimit = 3, Permissions = 1500 });
+            var res = await _cur.Delete(existingObject.Id);
             Assert.IsTrue(res);
         }
         [TestMethod]

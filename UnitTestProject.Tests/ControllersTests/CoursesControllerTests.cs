@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Routing;
 using System.Windows.Markup;
 using GraderApi;
 using GraderApi.Controllers;
@@ -53,14 +54,8 @@ namespace UnitTestProject.Tests.ControllersTests
         public async Task TestAll()
         {
             // Arrange
-            _cc.Request = new HttpRequestMessage(HttpMethod.Get, "/api/Courses/All");
-
+            _cc.Request = new HttpRequestMessage();
             _cc.Configuration = new HttpConfiguration();
-            _cc.Configuration.Routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "api/{controller}/{action}",
-                defaults: new { id = RouteParameter.Optional }
-                );
 
             // Act
             var response = await _cc.All();
@@ -77,16 +72,9 @@ namespace UnitTestProject.Tests.ControllersTests
         public async Task TestGet()
         {
             // Arrange
-            _cc.Request = new HttpRequestMessage(HttpMethod.Get, "/api/Courses/Get/1");
-
+            _cc.Request = new HttpRequestMessage();
             _cc.Configuration = new HttpConfiguration();
-            _cc.Configuration.Routes.MapHttpRoute(
-               name: "CourseRoute",
-                routeTemplate: "api/{controller}/{action}/{courseId}",
-                defaults: new { },
-                constraints: new { controller = "Courses", courseId = new ApiRouteConstraints() }
-               );
-
+            
             // Act
             var response = await _cc.Get(1);
 
@@ -102,15 +90,9 @@ namespace UnitTestProject.Tests.ControllersTests
         public async Task TestAdd()
         {
             // Arrange
-            _cc.Request = new HttpRequestMessage(HttpMethod.Post, "/api/Courses/Add");
-
+            _cc.Request = new HttpRequestMessage();
             _cc.Configuration = new HttpConfiguration();
-            _cc.Configuration.Routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "api/{controller}/{action}",
-                defaults: new { id = RouteParameter.Optional }
-                );
-
+            
             // Act
             var course = new CourseModel()
             {
@@ -122,6 +104,10 @@ namespace UnitTestProject.Tests.ControllersTests
 
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+            course = JsonConvert.DeserializeObject<CourseModel>(responseJson);
+            Assert.IsTrue(await Cr.Delete(course.Id));
         }
     }
 }
