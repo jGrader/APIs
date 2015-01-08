@@ -1,11 +1,7 @@
 ﻿namespace Grader.JsonSerializer
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using GraderDataAccessLayer.Models;
 
@@ -13,16 +9,18 @@
     {
         public static JObject ToJson(this CourseModel cm)
         {
-            var result = new JObject();
-
-            result.Add("Id", cm.Id);
-            result.Add("Name", cm.Name);
-            result.Add("ShortName", cm.ShortName);
-            result.Add("CourseNumber", cm.CourseNumber);
-            result.Add("Semester", cm.Semester);
-            result.Add("StartDate", cm.StartDate);
-            result.Add("EndDate", cm.EndDate);
-            result.Add("OwnerId", cm.OwnerId);
+            var result = new JObject
+            {
+                {"Id", cm.Id},
+                {"Name", cm.Name},
+                {"ShortName", cm.ShortName},
+                {"CourseNumber", cm.CourseNumber},
+                {"Semester", cm.Semester},
+                {"Year", cm.Year},
+                {"StartDate", cm.StartDate},
+                {"EndDate", cm.EndDate},
+                {"OwnerId", cm.OwnerId}
+            };
 
             return result;
         }

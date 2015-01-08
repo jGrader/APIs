@@ -3,7 +3,6 @@
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Repositories;
     using System;
     using System.Collections.Generic;
     using System.Net;

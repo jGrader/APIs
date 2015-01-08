@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTestProject.Tests.RepositoryTests
 {
     [TestClass]
-    public class CourseRepositoryTest
+    public class CourseRepositoryTests
     {
         #region Initialization and Cleanup
             readonly ICourseRepository _cr = new CourseRepository();
