@@ -78,7 +78,8 @@ namespace GraderDataAccessLayer
 
             var courseUsers = new List<CourseUserModel>
             {
-                new CourseUserModel {ExcuseLimit = 0, ExtensionLimit = 1, UserId = 1, CourseId = 2, Permissions = 700}
+                new CourseUserModel {ExcuseLimit = 1, ExtensionLimit = 1, UserId = 1, CourseId = 1, Permissions = 700},
+                new CourseUserModel {ExcuseLimit = 1, ExtensionLimit = 1, UserId = 2, CourseId = 1, Permissions = 700}
             };
             
             courseUsers.ForEach(cu => context.CourseUser.Add(cu));

@@ -1,14 +1,12 @@
-﻿using System.Data.Entity.Core;
-
-namespace GraderDataAccessLayer.Repositories
+﻿namespace GraderDataAccessLayer.Repositories
 {
     using Interfaces;
     using Models;
-
     using System;
     using System.Collections.Generic;
     using System.Data.Common;
     using System.Data.Entity;
+    using System.Data.Entity.Core;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
