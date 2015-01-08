@@ -12,54 +12,54 @@ namespace UnitTestProject.Tests
     [TestClass]
     public class CourseUserRepositoryTest
     {
-        CourseUserRepository cur = new CourseUserRepository();
+        readonly CourseUserRepository _cur = new CourseUserRepository();
             
         [TestMethod]
-        public void TestGetAll()
+        public async void TestGetAll()
         {
-            IEnumerable<CourseUserModel> cum = cur.GetAll();
+            var cum = await _cur.GetAll();
             Assert.AreEqual(cum.Count(),1);
         }
 
         [TestMethod]
-        public void TestGet()
+        public async void TestGet()
         {
-            CourseUserModel cum = cur.Get(1);
+            var cum = await _cur.Get(1);
             Assert.IsNotNull(cum);
         }
 
         [TestMethod]
-        public void TestGetByCourseId()
+        public async void TestGetByCourseId()
         {
-            IEnumerable<CourseUserModel> cum = cur.GetByCourseId(2);
+            var cum = await _cur.GetAllByCourseId(2);
             Assert.AreEqual(cum.Count(), 1);
         }
 
         [TestMethod]
-        public void TestGetByUser()
+        public async void TestGetByUser()
         {
-            IEnumerable<CourseUserModel> cum = cur.GetByUser(1);
+            var cum = await _cur.GetAllByUser(1);
             Assert.AreEqual(cum.Count(), 1);
         }
 
         [TestMethod]
-        public void TestGetByExtensionLimit()
+        public async void TestGetByExtensionLimit()
         {
-            IEnumerable<CourseUserModel> cum = cur.GetByExtensionLimit(1);
+            var cum = await _cur.GetAllByExtensionLimit(1);
             Assert.AreEqual(cum.Count(), 1);
         }
 
         [TestMethod]
-        public void TestGetByExcuseLimit()
+        public async void TestGetByExcuseLimit()
         {
-            IEnumerable<CourseUserModel> cum = cur.GetByExcuseLimit(0);
+            var cum = await _cur.GetAllByExcuseLimit(0);
             Assert.AreEqual(cum.Count(), 1);
         }
 
         [TestMethod]
-        public void TestGetByPermissions()
+        public async void TestGetByPermissions()
         {
-            IEnumerable<CourseUserModel> cum = cur.GetByPermissions(700);
+            var cum = await _cur.GetAllByPermissions(700);
             Assert.AreEqual(cum.Count(), 1);
         }
     }

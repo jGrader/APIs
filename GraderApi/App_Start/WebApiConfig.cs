@@ -30,8 +30,8 @@
             config.Routes.MapHttpRoute(
                 name: "CourseRoute",
                 routeTemplate: "api/{controller}/{action}/{courseId}",
-                defaults: new { controller = "Courses" },
-                constraints: new { courseId = new ApiRouteConstraints() },
+                defaults: new { },
+                constraints: new { controller = "Courses", courseId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 

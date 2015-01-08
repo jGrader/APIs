@@ -15,7 +15,7 @@
         private ICourseRepository _courseRepository;
         private ICourseUserRepository _courseUserRepository;
         private IGradeComponentRepository _gradeComponentRepository;
-        private ITaskRepositoy _taskRepository;
+        private ITaskRepository _taskRepository;
         private IEntityRepository _entityRepository;
         private ISubmissionRepository _submissionRepository;
 
