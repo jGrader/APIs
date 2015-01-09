@@ -88,18 +88,12 @@ namespace UnitTestProject.Tests.RepositoryTests
         [TestMethod]
         public async Task TestAdd()
         {
-<<<<<<< HEAD
             var res = await _cur.Add(new CourseUserModel { UserId = 2, CourseId = 1, ExcuseLimit = 2, ExtensionLimit = 3, Permissions = 1500 });
             Assert.IsNotNull(res, "#CUR09");
             Assert.IsTrue(res.Id > 0, "#CUR10");
 
             var query = await _cur.Get(res.Id);
             Assert.IsNotNull(query, "#CUR11");
-=======
-            var res = await _cur.Add(new CourseUserModel { UserId = 2, CourseId = 1, ExcuseLimit  = 2, ExtensionLimit = 3, Permissions = 1500 });
-            Assert.IsNotNull(res);
-            Assert.IsTrue(await _cur.Delete(res.Id));
->>>>>>> 5eefaf5f4de963a3ba49483443e4523b10ecb45f
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -144,17 +138,11 @@ namespace UnitTestProject.Tests.RepositoryTests
         [TestMethod]
         public async Task TestRemove()
         {
-<<<<<<< HEAD
             var existingObject = (await _cur.GetAllByPermissions(1500)).ToList();
             Assert.IsNotNull(existingObject, "#CUR15");
             Assert.IsTrue(existingObject.Any(), "#CUR16");
             var res = await _cur.Delete(existingObject.First().Id);
             Assert.IsTrue(res, "#CUR14");
-=======
-            var existingObject = await _cur.Add(new CourseUserModel { UserId = 2, CourseId = 1, ExcuseLimit = 2, ExtensionLimit = 3, Permissions = 1500 });
-            var res = await _cur.Delete(existingObject.Id);
-            Assert.IsTrue(res);
->>>>>>> 5eefaf5f4de963a3ba49483443e4523b10ecb45f
         }
         [TestMethod]
         [ExpectedException(typeof(ObjectNotFoundException))]

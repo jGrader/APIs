@@ -82,12 +82,7 @@ namespace UnitTestProject.Tests.RepositoryTests
         public async Task TestAdd()
         {
             var res = await _cr.Add(new CourseModel { Name = "General Procrastination 2", CourseNumber = "52101", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 2, ShortName = "GenPro2", Year = 2015, OwnerId = 1});
-<<<<<<< HEAD
             Assert.IsNotNull(res, "#CR08");
-=======
-            Assert.IsNotNull(res);
-            Assert.IsTrue(await _cr.Delete(res.Id));
->>>>>>> 5eefaf5f4de963a3ba49483443e4523b10ecb45f
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -131,15 +126,9 @@ namespace UnitTestProject.Tests.RepositoryTests
         [TestMethod]
         public async Task TestRemove()
         {
-<<<<<<< HEAD
             var existingObject = await _cr.GetByName("General Procrastination 2");
             var res = await _cr.Delete(existingObject.First().Id);
             Assert.IsTrue(res, "#CR11");
-=======
-            var existingObject = await _cr.Add(new CourseModel { Name = "General Procrastination 2", CourseNumber = "52101", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 2, ShortName = "GenPro2", Year = 2015, OwnerId = 1 });
-            var res = await _cr.Delete(existingObject.Id);
-            Assert.IsTrue(res);
->>>>>>> 5eefaf5f4de963a3ba49483443e4523b10ecb45f
         }
         [TestMethod]
         [ExpectedException(typeof (ObjectNotFoundException))]
