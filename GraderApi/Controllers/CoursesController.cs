@@ -11,7 +11,6 @@
     using System.Web.Http;
     using System.Web.Http.Description;
 
-
     public class CoursesController : ApiController
     {
         private readonly ICourseRepository _courseRepository;
@@ -36,7 +35,7 @@
             }
         }
 
-        // GET: api/Courses/5
+        // GET: api/Courses/{courseId}
         [HttpGet]
         [ResponseType(typeof(CourseModel))]
         public async Task<HttpResponseMessage> Get(int courseId)
@@ -78,7 +77,7 @@
             }
         }
 
-        // PUT: api/Courses/5
+        // PUT: api/Courses/{courseId}
         [HttpPut]
         [ResponseType(typeof(CourseModel))]
         [PermissionsAuthorize(AdminPermissions.CanUpdateCourse)]
@@ -107,7 +106,7 @@
             }
         }
 
-        // DELETE: api/Courses/5
+        // DELETE: api/Courses/{courseId}
         [HttpDelete]
         [ResponseType(typeof(void))]
         [PermissionsAuthorize(AdminPermissions.CanDeleteCourse)]

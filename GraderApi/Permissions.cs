@@ -2,7 +2,12 @@
 {
     public enum SuperUserPermissions
     {
-        CanDeleteUser = 1    
+        CanDeleteUser = 1,
+        CanSeeAllUsers = 1 << 2,
+        CanSeeAllCourseUsers = 1 << 3,
+        CanSeeAllGradedParts = 1 << 4,
+        CanSeeAllTasks = 1 << 5,
+        CanSeeAllEntities = 1 << 6
     }
 
     public enum AdminPermissions
@@ -17,20 +22,24 @@
         CanCreateGradedPart = 1,
         CanUpdateGradedPart = 1 << 2,
         CanDeleteGradedPart = 1 << 3,
-        CanAddEnrollment = 1 << 4,
-        CanUpdateEnrollment = 1 << 5,
-        CanDeleteEnrollment = 1 << 6,
+        CanSeeEnrollment = 1 << 4,
+        CanAddEnrollment = 1 << 5,
+        CanUpdateEnrollment = 1 << 6,
+        CanDeleteEnrollment = 1 << 7,
     }
 
     public enum CoursePermissions
     {
         Nothing = 0,
         CanSeeGrades = 1,
-        CanCreateTasks = 1<<1,
-        CanUpdateTasks = 1 << 2,
-        CanDeleteTasks = 1 << 3,
-        CanCreateEntities = 1 << 4,
-        CanUpdateEntities = 1 << 5,
-        CanDeleteEntities = 1 << 6,
+        CanSeeGradedParts = 1 << 1,
+        CanSeeTasks = 1 << 2,
+        CanCreateTasks = 1 << 3,
+        CanUpdateTasks = 1 << 4,
+        CanDeleteTasks = 1 << 5,
+        CanSeeEntities = 1 << 6,
+        CanCreateEntities = 1 << 7,
+        CanUpdateEntities = 1 << 8,
+        CanDeleteEntities = 1 << 9,
     }
 }

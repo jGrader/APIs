@@ -3,6 +3,7 @@
     using Handlers;
     using System.Net.Http.Headers;
     using System.Web.Http;
+    using System.Web.Mvc;
 
     public static class WebApiConfig
     {
@@ -22,7 +23,7 @@
             config.Routes.MapHttpRoute(
                 name: "UserRoute",
                 routeTemplate: "api/{controller}/{action}/{userId}",
-                defaults: new { },
+                defaults: new { userId = UrlParameter.Optional },
                 constraints: new { controller = "Users", userId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
@@ -30,71 +31,66 @@
             config.Routes.MapHttpRoute(
                 name: "CourseRoute",
                 routeTemplate: "api/{controller}/{action}/{courseId}",
-                defaults: new { },
+                defaults: new { courseId = UrlParameter.Optional },
                 constraints: new { controller = "Courses", courseId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
             config.Routes.MapHttpRoute(
                 name: "CourseUserRoute",
-                routeTemplate: "api/{controller}/{action}/{courseUserId}",
-                defaults: new { },
-                constraints: new { controller = "CourseUsers", courseUserId = new ApiRouteConstraints() },
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{courseUserId}",
+                defaults: new { courseUserId = UrlParameter.Optional },
+                constraints: new { controller = "CourseUsers", courseId = new ApiRouteConstraints(), courseUserId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
             config.Routes.MapHttpRoute(
                 name: "GradeComponentRoute",
-                routeTemplate: "api/{controller}/{action}/{gradeComponentId}",
-                defaults: new { },
-                constraints: new { controller = "GradeComponents", gradeComponentId = new ApiRouteConstraints() },
-                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
-            );
-
-            config.Routes.MapHttpRoute(
-                name: "GradeComponentRoute2",
-                routeTemplate: "api/{controller}/{action}/{courseId}",
-                defaults: new { },
-                constraints: new { controller = "GradeComponents", courseId = new ApiRouteConstraints() },
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{gradeComponentId}",
+                defaults: new { gradeComponentId = UrlParameter.Optional },
+                constraints: new { controller = "GradeComponents", courseId = new ApiRouteConstraints(), gradeComponentId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
             config.Routes.MapHttpRoute(
                 name: "TaskRoute",
-                routeTemplate: "api/{controller}/{action}/{taskId}",
-                defaults: new { },
-                constraints: new { controller = "Tasks", taskId = new ApiRouteConstraints() },
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{taskId}",
+                defaults: new { taskId = UrlParameter.Optional },
+                constraints: new { controller = "Tasks", courseId = new ApiRouteConstraints(), taskId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
             config.Routes.MapHttpRoute(
                 name: "EntityRoute",
-                routeTemplate: "api/{controller}/{action}/{entityId}",
-                defaults: new { },
-                constraints: new { controller = "Entities", entityId = new ApiRouteConstraints() },
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{entityId}",
+                defaults: new { entityId = UrlParameter.Optional },
+                constraints: new { controller = "Entities", courseId = new ApiRouteConstraints(), entityId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
             config.Routes.MapHttpRoute(
                 name: "SubmissionRoute",
-                routeTemplate: "api/{controller}/{action}/{submissionId}",
-                defaults: new { },
-                constraints: new { controller = "Submissions", submissionId = new ApiRouteConstraints() },
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{submissionId}",
+                defaults: new { submissionId = UrlParameter.Optional },
+                constraints: new { controller = "Submissions", courseId = new ApiRouteConstraints(), submissionId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
+            // SEE IF YOU CAN'T GET RID OF THIS ONE
             config.Routes.MapHttpRoute(
                 name: "SubmitFile",
-                routeTemplate: "api/{controller}/{action}/{courseId}/{entityId}",
-                defaults: new { },
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{entityId}",
+                defaults: new {  },
                 constraints: new { controller = "Submissions", courseId = new ApiRouteConstraints(), entityId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{action}",
-                defaults: new { id = RouteParameter.Optional }
+                routeTemplate: "api/{controller}/{action}/{id}",
+                defaults: new { id = RouteParameter.Optional },
+                constraints: new { },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
         }
     }

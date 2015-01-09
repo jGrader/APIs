@@ -193,7 +193,6 @@
 
             result.Add("Filename", fm.Filename);
             result.Add("Contents", fm.Contents);
-            result.Add("Username", fm.Username);
 
             return result;
         }

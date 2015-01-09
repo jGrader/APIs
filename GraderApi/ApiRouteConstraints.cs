@@ -39,6 +39,13 @@
             }
 
             var stringValue = values[parameterName] as string;
+            if (stringValue == null)
+            {
+                // There is nothing to be checked about the parameters;
+                // move forward
+                return true;
+            }
+
             switch (parameterName)
             {
                 case "userId":

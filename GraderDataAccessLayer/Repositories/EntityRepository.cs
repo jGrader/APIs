@@ -36,6 +36,11 @@
             var searchResult = await Task.Run(() => _db.Entity.Where(e => e.Name == name));
             return searchResult;
         }
+        public async Task<IEnumerable<EntityModel>> GetAllByCourseId(int courseId)
+        {
+            var searchResult = await Task.Run(() => _db.Entity.Where(e => e.CourseId == courseId));
+            return searchResult;
+        }
         public async Task<IEnumerable<EntityModel>> GetAllByOpenDate(DateTime openTime)
         {
             var searchResult = await Task.Run(() => _db.Entity.Where(e => e.OpenTime == openTime));

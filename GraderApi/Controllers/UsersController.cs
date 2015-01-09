@@ -3,7 +3,6 @@
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Repositories;
     using Principals;
     using System;
     using System.Collections.Generic;
@@ -13,7 +12,6 @@
     using System.Web;
     using System.Web.Http;
     using System.Web.Http.Description;
-
 
     public class UsersController : ApiController
     {
@@ -25,7 +23,24 @@
             _courseUserRepository = courseUserRepository;
         }
 
-        // POST: /api/Users/Authentication
+        //GET: api/Users/All
+        [HttpGet]
+        [ResponseType(typeof (IEnumerable<UserModel>))]
+        [PermissionsAuthorize(SuperUserPermissions.CanSeeAllUsers)]
+        public async Task<HttpResponseMessage> All()
+        {
+            try
+            {
+                var result = await _userRepository.GetAll();
+                return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
+        }
+
+        // POST: api/Users/Authentication
         // Dummy action for Basic Authentication to call and let the Handler validate
         [HttpPost]
         [ResponseType(typeof (void))]
@@ -35,6 +50,7 @@
         }
         
         // GET: api/Users/Courses
+        // No permissions needed because it only gets the courses of the currently logged in user
         [HttpGet]
         [ResponseType(typeof(IEnumerable<CourseModel>))]
         public async Task<HttpResponseMessage> Courses()
@@ -56,7 +72,7 @@
             }
         }
 
-        // DELETE: api/Users/5
+        // DELETE: api/Users/{userId}
         [HttpDelete]
         [ResponseType(typeof(void))]
         [PermissionsAuthorize(SuperUserPermissions.CanDeleteUser)]

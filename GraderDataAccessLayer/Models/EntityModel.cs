@@ -38,6 +38,12 @@ namespace GraderDataAccessLayer.Models
         [ForeignKey("TaskId")]
         public virtual TaskModel Task { get; set; }
 
+        [Required]
+        public int CourseId { get; set; }
+
+        [ForeignKey("CourseId")]
+        public virtual CourseModel Course { get; set; }
+
         public virtual ICollection<SubmissionModel> Submissions { get; set; }
     }
 }

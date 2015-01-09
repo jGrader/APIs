@@ -13,6 +13,7 @@
         Task<IEnumerable<EntityModel>> GetAll();
         Task<IEnumerable<EntityModel>> GetAllForTask(int taskId);
         Task<IEnumerable<EntityModel>> GetAllByName(string name);
+        Task<IEnumerable<EntityModel>> GetAllByCourseId(int courseId);
         Task<IEnumerable<EntityModel>> GetAllByOpenDate(DateTime openTime);
         Task<IEnumerable<EntityModel>> GetAllByCloseDate(DateTime closeTime);
         Task<IEnumerable<EntityModel>> GetAllActiveBetweenDates(DateTime time1, DateTime time2);

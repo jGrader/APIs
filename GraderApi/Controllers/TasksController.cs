@@ -3,7 +3,6 @@
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Repositories;
     using System;
     using System.Collections.Generic;
     using System.Net;
@@ -21,9 +20,10 @@
             _taskRepository = taskRepository;
         }
 
-        // GET: api/Tasks
+        // GET: api/Tasks/All
         [HttpGet]
         [ResponseType(typeof(IEnumerable<TaskModel>))]
+        [PermissionsAuthorize(SuperUserPermissions.CanSeeAllTasks)]
         public async Task<HttpResponseMessage> All()
         {
             try
@@ -37,9 +37,27 @@
             }
         }
 
-        // GET: api/Tasks/5
+        // GET: api/Courses/{courseId}/Tasks
+        [HttpGet]
+        [ResponseType(typeof(IEnumerable<TaskModel>))]
+        [PermissionsAuthorize(CoursePermissions.CanSeeTasks)]
+        public async Task<HttpResponseMessage> All(int courseId)
+        {
+            try
+            {
+                var result = await _taskRepository.GetAllByCourse(courseId);
+                return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
+        }
+
+        // GET: api/Courses/{courseId}/Tasks/{taskId}
         [HttpGet]
         [ResponseType(typeof(TaskModel))]
+        [PermissionsAuthorize(CoursePermissions.CanSeeTasks)]
         public async Task<HttpResponseMessage> Get(int taskId)
         {
             try
@@ -56,18 +74,23 @@
             }
         }
 
-        // GET: api/Tasks/GetGradeComponent/3
+        // GET: api/Courses/{courseId}/Tasks/GetGradeComponent/{taskId}
         [HttpGet]
         [ResponseType(typeof (GradeComponentModel))]
-        public async Task<HttpResponseMessage> GetGradeComponent(int taskId)
+        [PermissionsAuthorize(CoursePermissions.CanSeeGradedParts)]
+        public async Task<HttpResponseMessage> GetGradeComponent(int courseId, int taskId)
         {
             try
             {
                 var task = await _taskRepository.Get(taskId);
+                if (task == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                }
 
-                return task != null
-                    ? Request.CreateResponse(HttpStatusCode.OK, task.GradeComponent.ToJson())
-                    : Request.CreateResponse(HttpStatusCode.NotFound);
+                return task.GradeComponent.CourseId != courseId 
+                    ? Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse) 
+                    : Request.CreateResponse(HttpStatusCode.OK, task.GradeComponent.ToJson());
             }
             catch (Exception e)
             {
@@ -75,34 +98,19 @@
             }
         }
 
-        // GET: api/Tasks/GetCourse/3
-        [HttpGet]
-        [ResponseType(typeof(CourseModel))]
-        public async Task<HttpResponseMessage> GetCourse(int taskId)
-        {
-            try
-            {
-                var task = await _taskRepository.Get(taskId);
-
-                return task != null
-                    ? Request.CreateResponse(HttpStatusCode.OK, task.Course.ToJson())
-                    : Request.CreateResponse(HttpStatusCode.NotFound);
-            }
-            catch (Exception e)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
-            }
-        }
-
-        // POST: api/Tasks
+        // POST: api/Courses/{courseId}/Tasks
         [HttpPost]
         [ResponseType(typeof(TaskModel))]
         [PermissionsAuthorize(CoursePermissions.CanCreateTasks)]
-        public async Task<HttpResponseMessage> Add([FromBody] TaskModel task)
+        public async Task<HttpResponseMessage> Add(int courseId, [FromBody] TaskModel task)
         {
             if (!ModelState.IsValid)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
+            }
+            if (courseId != task.CourseId)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
 
             try
@@ -119,20 +127,23 @@
             }
         }
 
-        // PUT: api/Tasks/5
+        // PUT: api/Courses/{courseId}/Tasks/{taskId}
         [HttpPut]
         [ResponseType(typeof(TaskModel))]
         [PermissionsAuthorize(CoursePermissions.CanUpdateTasks)]
-        public async Task<HttpResponseMessage> Update(int taskId, [FromBody] TaskModel task)
+        public async Task<HttpResponseMessage> Update(int courseId, int taskId, [FromBody] TaskModel task)
         {
             if (!ModelState.IsValid)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
             }
-
             if (taskId != task.Id)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidTaskId);
+            }
+            if (courseId != task.CourseId)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
 
             try
@@ -149,14 +160,24 @@
             }
         }
 
-        // DELETE: api/Tasks/5
+        // DELETE: api/Courses/{courseId}/Tasks/{taskId}
         [HttpDelete]
         [ResponseType(typeof(void))]
         [PermissionsAuthorize(CoursePermissions.CanDeleteTasks)]
-        public async Task<HttpResponseMessage> Delete(int taskId)
+        public async Task<HttpResponseMessage> Delete(int courseId, int taskId)
         {
             try
             {
+                var existingTask = await _taskRepository.Get(taskId);
+                if (existingTask == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                }
+                if (existingTask.CourseId != courseId)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
+                }
+
                 var result = await _taskRepository.Delete(taskId);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
