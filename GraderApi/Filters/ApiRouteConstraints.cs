@@ -17,6 +17,7 @@
         private IGradeComponentRepository _gradeComponentRepository;
         private ITaskRepository _taskRepository;
         private IEntityRepository _entityRepository;
+        private IFileRepository _fileRepository;
         private ISubmissionRepository _submissionRepository;
 
         public ApiRouteConstraints()
@@ -27,6 +28,7 @@
             _gradeComponentRepository = new GradeComponentRepository();
             _taskRepository = new TaskRepository();
             _entityRepository = new EntityRepository();
+            _fileRepository = new FileRepository();
             _submissionRepository = new SubmissionRepository();
         }
         
@@ -143,11 +145,25 @@
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
+                case "fileId":
+                {
+                    int fileId;
+                    if (!int.TryParse(stringValue, out fileId))
+                    {
+                        return false;
+                    }
+
+                    //
+                    var result = Task.Run(() => _fileRepository.Get(fileId));
+                    Task.WaitAll(result);
+                    return (result.Result != null);
+                }
             }
 
             return false;
         }
 
+        #region Dispose
         public void Dispose()
         {
             Dispose(true);
@@ -165,6 +181,7 @@
             DisposeGradeComponentRepository();
             DisposeTaskRepository();
             DisposeEntityRepository();
+            DisposeFileRepository();
             DisposeSubmissionRepository();
         }
         private void DisposeUserRepository()
@@ -227,6 +244,16 @@
             _entityRepository.Dispose();
             _entityRepository = null;
         }
+        private void DisposeFileRepository()
+        {
+            if (_fileRepository == null)
+            {
+                return;
+            }
+
+            _fileRepository.Dispose();
+            _fileRepository = null;
+        }
         private void DisposeSubmissionRepository()
         {
             if (_submissionRepository == null)
@@ -237,5 +264,6 @@
             _submissionRepository.Dispose();
             _submissionRepository = null;
         }
+        #endregion
     }
 }

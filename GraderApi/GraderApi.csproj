@@ -228,6 +228,7 @@
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\CourseUsersController.cs" />
     <Compile Include="Controllers\EntitiesController.cs" />
+    <Compile Include="Controllers\FilesController.cs" />
     <Compile Include="Controllers\GradeComponentsController.cs" />
     <Compile Include="Filters\ApiRouteConstraints.cs" />
     <Compile Include="Controllers\SubmissionsController.cs" />

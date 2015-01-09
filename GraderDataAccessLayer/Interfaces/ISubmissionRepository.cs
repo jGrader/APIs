@@ -8,11 +8,9 @@
     public interface ISubmissionRepository : IDisposable
     {
         Task<SubmissionModel> Get(int id);
-        Task<IEnumerable<SubmissionModel>> GetAllByEntityId(int id);
         Task<IEnumerable<SubmissionModel>> GetAllByUserId(int id);
         Task<IEnumerable<SubmissionModel>> GetAllBefore(DateTime timestamp);
         Task<IEnumerable<SubmissionModel>> GetAllAfter(DateTime timestamp);
-        Task<IEnumerable<SubmissionModel>> GetAllByUserIdAndEntityId(int userId, int entityId);
 
         Task<IEnumerable<SubmissionModel>> GetAll();
 

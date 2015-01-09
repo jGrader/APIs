@@ -7,7 +7,8 @@
         CanSeeAllCourseUsers = 1 << 3,
         CanSeeAllGradedParts = 1 << 4,
         CanSeeAllTasks = 1 << 5,
-        CanSeeAllEntities = 1 << 6
+        CanSeeAllEntities = 1 << 6,
+        CanSeeAllFiles = 1 << 7,
     }
 
     public enum AdminPermissions
@@ -41,5 +42,9 @@
         CanCreateEntities = 1 << 7,
         CanUpdateEntities = 1 << 8,
         CanDeleteEntities = 1 << 9,
+        CanSeeFiles = 1 << 10,
+        CanCreateFiles = 1 << 11,
+        CanUpdateFiles = 1 << 12,
+        CanDeleteFiles = 1 << 13
     }
 }

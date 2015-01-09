@@ -13,10 +13,6 @@
 
         [Required]
         [DataType(DataType.Text)]
-        public string FileName { get; set; }
-
-        [Required]
-        [DataType(DataType.Text)]
         public string FilePath { get; set; }
 
         [Required]
@@ -32,9 +28,9 @@
 
         //Navigation property
         [Required]
-        public int EntityId { get; set; }
+        public int FileId { get; set; }
         
-        [ForeignKey("EntityId")]
-        public virtual EntityModel Entity { get; set; }
+        [ForeignKey("FileId")]
+        public virtual FileModel File { get; set; }
     }
 }

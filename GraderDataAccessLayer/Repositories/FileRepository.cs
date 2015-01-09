@@ -10,54 +10,33 @@
     using System.Linq;
     using System.Threading.Tasks;
 
-
-    public class EntityRepository : IEntityRepository
+    public class FileRepository : IFileRepository
     {
         private DatabaseContext _db = new DatabaseContext();
 
 
-        public async Task<EntityModel> Get(int id)
+        public async Task<FileModel> Get(int id)
         {
-            var searchResult = await _db.Entity.FirstOrDefaultAsync(e => e.Id == id);
+            var searchResult = await _db.File.FirstOrDefaultAsync(f => f.Id == id);
             return searchResult;
         }
 
-        public async Task<IEnumerable<EntityModel>> GetAll()
+        public async Task<IEnumerable<FileModel>> GetAll()
         {
-            return await Task.Run(() => _db.Entity);
+            return await Task.Run(() => _db.File);
         }
-        public async Task<IEnumerable<EntityModel>> GetAllForTask(int taskId)
+        public async Task<IEnumerable<FileModel>> GetAllByCourseId(int courseId)
         {
-            var searchResult = await Task.Run(() => _db.Entity.Where(e => e.TaskId == taskId));
+            var searchResult = await Task.Run(() => _db.File.Where(f => f.Entity.Task.CourseId == courseId));
             return searchResult;
         }
-        public async Task<IEnumerable<EntityModel>> GetAllByName(string name)
+        public async Task<IEnumerable<FileModel>> GetAllByEntityId(int entityId)
         {
-            var searchResult = await Task.Run(() => _db.Entity.Where(e => e.Name == name));
+            var searchResult = await Task.Run(() => _db.File.Where(f => f.EntityId == entityId));
             return searchResult;
-        }
-        public async Task<IEnumerable<EntityModel>> GetAllByCourseId(int courseId)
-        {
-            var searchResult = await Task.Run(() => _db.Entity.Where(e => e.Task.CourseId == courseId));
-            return searchResult;
-        }
-        public async Task<IEnumerable<EntityModel>> GetAllByOpenDate(DateTime openTime)
-        {
-            var searchResult = await Task.Run(() => _db.Entity.Where(e => e.OpenTime == openTime));
-            return searchResult;
-        }
-        public async Task<IEnumerable<EntityModel>> GetAllByCloseDate(DateTime closeTime)
-        {
-            var searchResult = await Task.Run(() => _db.Entity.Where(e => e.CloseTime == closeTime));
-            return searchResult;
-        }
-        public async Task<IEnumerable<EntityModel>> GetAllActiveBetweenDates(DateTime time1, DateTime time2)
-        {
-            var searchResult = await Task.Run(() => _db.Entity.Where(e => e.OpenTime > time1 && e.CloseTime < time2));
-            return searchResult;
-        }
+        }  
 
-        public async Task<EntityModel> Add(EntityModel item)
+        public async Task<FileModel> Add(FileModel item)
         {
             if (item == null)
             {
@@ -66,12 +45,11 @@
 
             try
             {
-                _db.Entity.Add(item);
+                _db.File.Add(item);
                 await _db.SaveChangesAsync();
 
                 //Load virtual properties and return object
-                _db.Entry(item).Reference(c => c.Task).Load();
-                _db.Entry(item).Reference(c => c.Files).Load();
+                _db.Entry(item).Reference(c => c.Entity).Load();
                 return item;
             }
             catch (DbException)
@@ -79,14 +57,14 @@
                 return null;
             }
         }
-        public async Task<EntityModel> Update(EntityModel item)
+        public async Task<FileModel> Update(FileModel item)
         {
             if (item == null)
             {
                 throw new ArgumentNullException("item");
             }
 
-            var dbItem = await _db.Entity.FirstOrDefaultAsync(c => c.Id == item.Id);
+            var dbItem = await _db.File.FirstOrDefaultAsync(c => c.Id == item.Id);
             if (dbItem == null)
             {
                 throw new ObjectNotFoundException();
@@ -105,7 +83,7 @@
         }
         public async Task<bool> Delete(int id)
         {
-            var item = await _db.Entity.FirstOrDefaultAsync(c => c.Id == id);
+            var item = await _db.File.FirstOrDefaultAsync(c => c.Id == id);
             if (item == null)
             {
                 throw new ObjectNotFoundException();
@@ -113,7 +91,7 @@
 
             try
             {
-                _db.Entity.Remove(item);
+                _db.File.Remove(item);
                 await _db.SaveChangesAsync();
                 return true;
             }
@@ -142,6 +120,6 @@
 
             _db.Dispose();
             _db = null;
-        }      
+        }
     }
 }

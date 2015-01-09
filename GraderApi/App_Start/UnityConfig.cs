@@ -19,6 +19,7 @@ namespace GraderApi
             container.RegisterType<ISubmissionRepository, SubmissionRepository>(new ContainerControlledLifetimeManager());
             container.RegisterType<ITaskRepository, TaskRepository>(new ContainerControlledLifetimeManager());
             container.RegisterType<IUserRepository, UserRepository>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IFileRepository, FileRepository>(new ContainerControlledLifetimeManager());
 
             var courseRepository = new CourseRepository();
             container.RegisterInstance<ICourseRepository>(courseRepository);
@@ -46,6 +47,9 @@ namespace GraderApi
 
             var userRepository = new UserRepository();
             container.RegisterInstance<IUserRepository>(userRepository);
+
+            var fileRepository = new FileRepository();
+            container.RegisterInstance<IFileRepository>(fileRepository);
 
             GlobalConfiguration.Configuration.DependencyResolver = new UnityResolver(container);
         }

@@ -11,7 +11,6 @@
     using System.Threading.Tasks;
     using System.Linq.Expressions;
 
-
     public class CourseRepository : ICourseRepository
     {
         private DatabaseContext _db = new DatabaseContext();
@@ -28,48 +27,48 @@
 
         public async Task<IEnumerable<CourseModel>> GetByName(string name)
         {
-            var searchResult = _db.Course.Where(c => c.Name == name);
-            return await searchResult.ToListAsync();
+            var searchResult = await Task.Run(() => _db.Course.Where(c => c.Name == name));
+            return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByShortName(string shortName)
         {
-            var searchResult = _db.Course.Where(c => c.ShortName == shortName);
-            return await searchResult.ToListAsync();
+            var searchResult = await Task.Run(() => _db.Course.Where(c => c.ShortName == shortName));
+            return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByCourseNumber(string courseNumber)
         {
-            var searchResult = _db.Course.Where(c => c.CourseNumber == courseNumber);
-            return await searchResult.ToListAsync();
+            var searchResult = await Task.Run(() => _db.Course.Where(c => c.CourseNumber == courseNumber));
+            return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetBySemester(int semester)
         {
-            var searchResult = _db.Course.Where(c => c.Semester == semester);
-            return await searchResult.ToListAsync();
+            var searchResult = await Task.Run(() => _db.Course.Where(c => c.Semester == semester));
+            return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByYear(int year)
         {
-            var searchResult = _db.Course.Where(c => c.Year == year);
-            return await searchResult.ToListAsync();
+            var searchResult = await Task.Run(() => _db.Course.Where(c => c.Year == year));
+            return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByStartDate(DateTime startDate)
         {
-            var searchResult = _db.Course.Where(c => c.StartDate == startDate);
-            return await searchResult.ToListAsync();
+            var searchResult = await Task.Run(() => _db.Course.Where(c => c.StartDate == startDate));
+            return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByEndDate(DateTime endDate)
         {
-            var searchResult = _db.Course.Where(c => c.EndDate == endDate);
-            return await searchResult.ToListAsync();
+            var searchResult = await Task.Run(() => _db.Course.Where(c => c.EndDate == endDate));
+            return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByOwnerId(int ownerId)
         {
-            var searchResult = _db.Course.Where(c => c.OwnerId == ownerId);
-            return await searchResult.ToListAsync();
+            var searchResult = await Task.Run(() => _db.Course.Where(c => c.OwnerId == ownerId));
+            return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByLambda(Expression<Func<CourseModel, bool>> e)
         {
-            var searchResult = _db.Course.Where(e);
-            return await searchResult.ToListAsync();
+            var searchResult = await Task.Run(() => _db.Course.Where(e));
+            return searchResult;
         }
 
         public async Task<CourseModel> Add(CourseModel item)

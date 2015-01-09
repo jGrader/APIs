@@ -29,11 +29,6 @@
         {
             return await Task.Run(() => _db.Submission);
         }
-        public async Task<IEnumerable<SubmissionModel>> GetAllByEntityId(int id)
-        {
-            var searchResult = await Task.Run(() => _db.Submission.Where(s => s.EntityId == id));
-            return searchResult;
-        }
         public async Task<IEnumerable<SubmissionModel>> GetAllByUserId(int id)
         {
             var searchResult = await Task.Run(() => _db.Submission.Where(s => s.UserId == id));
@@ -47,11 +42,6 @@
         public async Task<IEnumerable<SubmissionModel>> GetAllAfter(DateTime timestamp)
         {
             var searchResult = await Task.Run(() => _db.Submission.Where(s => s.TimeStamp > timestamp));
-            return searchResult;
-        }
-        public async Task<IEnumerable<SubmissionModel>> GetAllByUserIdAndEntityId(int userId, int entityId)
-        {
-            var searchResult = await Task.Run(() => _db.Submission.Where(s => s.UserId == userId && s.EntityId == entityId));
             return searchResult;
         }
 
@@ -69,7 +59,6 @@
 
                 //Load virtual properties and return object
                 _db.Entry(item).Reference(c => c.User).Load();
-                _db.Entry(item).Reference(c => c.Entity).Load();
                 return item;
             }
             catch (DbException)
@@ -132,7 +121,7 @@
                 return null;
             }
             var text = await Task.Run(() => File.ReadAllText(file));
-            var result = new FileModel { Filename = file, Username = username, Contents = text };
+            var result = new FileModel { FileName = file };
             return result;
         }
 
@@ -149,7 +138,7 @@
             {
                 var sr = fileInfo.OpenText();
                 var s = await sr.ReadToEndAsync();
-                result.Add(new FileModel { Filename = fileInfo.FullName, Contents = s, Username = String.Empty });
+                result.Add(new FileModel { FileName = fileInfo.FullName });
             }
 
             return result;
@@ -180,20 +169,20 @@
 
             try
             {
-                if (File.Exists(item.Filename))
+                if (File.Exists(item.FileName))
                 {
-                    var extension = Path.GetExtension(item.Filename);
-                    var name = Path.ChangeExtension(item.Filename, null);
+                    var extension = Path.GetExtension(item.FileName);
+                    var name = Path.ChangeExtension(item.FileName, null);
                     var i = 1;
                     while (File.Exists(name + i.ToString(CultureInfo.InvariantCulture) + extension))
                     {
                         i++;
                     }
-                    item.Filename = name + i.ToString(CultureInfo.InvariantCulture) + extension;
+                    item.FileName = name + i.ToString(CultureInfo.InvariantCulture) + extension;
                 }
                 // File.Create(file.Filename);
-                await Task.Run(() => File.WriteAllText(item.Filename, item.Contents));
-                return item.Filename;
+                await Task.Run(() => File.WriteAllText(item.FileName, String.Empty));
+                return item.FileName;
             }
             catch (Exception)
             {

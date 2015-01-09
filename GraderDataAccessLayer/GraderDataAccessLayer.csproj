@@ -55,6 +55,7 @@
     <Compile Include="Interfaces\IAdminRepository.cs" />
     <Compile Include="Interfaces\ICourseUserRepository.cs" />
     <Compile Include="Interfaces\IEntityRepository.cs" />
+    <Compile Include="Interfaces\IFileRepository.cs" />
     <Compile Include="Interfaces\ISessionIdRepository.cs" />
     <Compile Include="Interfaces\ISshKeyRepository.cs" />
     <Compile Include="Interfaces\ISubmissionRepository.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Repositories\AdminRepository.cs" />
     <Compile Include="Repositories\CourseUserRepository.cs" />
     <Compile Include="Repositories\EntityRepository.cs" />
+    <Compile Include="Repositories\FileRepository.cs" />
     <Compile Include="Repositories\GradeComponentRepository.cs" />
     <Compile Include="Interfaces\ICourseRepository.cs" />
     <Compile Include="Interfaces\IGradeComponentRepository.cs" />

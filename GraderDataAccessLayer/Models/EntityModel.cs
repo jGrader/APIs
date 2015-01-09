@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace GraderDataAccessLayer.Models
+﻿namespace GraderDataAccessLayer.Models
 {
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
@@ -38,12 +37,6 @@ namespace GraderDataAccessLayer.Models
         [ForeignKey("TaskId")]
         public virtual TaskModel Task { get; set; }
 
-        [Required]
-        public int CourseId { get; set; }
-
-        [ForeignKey("CourseId")]
-        public virtual CourseModel Course { get; set; }
-
-        public virtual ICollection<SubmissionModel> Submissions { get; set; }
+        public virtual ICollection<FileModel> Files { get; set; }
     }
 }

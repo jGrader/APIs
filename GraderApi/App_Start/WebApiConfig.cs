@@ -69,6 +69,14 @@ namespace GraderApi
             );
 
             config.Routes.MapHttpRoute(
+                name: "FileRoute",
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{fileId}",
+                defaults: new { entityId = UrlParameter.Optional },
+                constraints: new { controller = "Files", courseId = new ApiRouteConstraints(), fileId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
+            );
+
+            config.Routes.MapHttpRoute(
                 name: "SubmissionRoute",
                 routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{submissionId}",
                 defaults: new { submissionId = UrlParameter.Optional },

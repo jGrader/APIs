@@ -131,8 +131,7 @@
 
             result.Add("Id", sm.Id);
             result.Add("UserId", sm.UserId);
-            result.Add("EntityId", sm.EntityId);
-            result.Add("FileName", sm.FileName);
+            result.Add("FileId", sm.FileId);
             result.Add("FilePath", sm.FilePath);
             result.Add("TimeStamp", sm.TimeStamp);
 
@@ -191,8 +190,10 @@
         {
             var result = new JObject();
 
-            result.Add("Filename", fm.Filename);
-            result.Add("Contents", fm.Contents);
+            result.Add("Id", fm.Id);
+            result.Add("FileName", fm.FileName);
+            result.Add("Extension", fm.Extension);
+            result.Add("EntityId", fm.EntityId);
 
             return result;
         }

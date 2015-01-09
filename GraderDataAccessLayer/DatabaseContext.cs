@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Claims;
-using System.Security.Principal;
 using GraderDataAccessLayer.Models;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
-
 
 namespace GraderDataAccessLayer
 {
@@ -21,6 +18,7 @@ namespace GraderDataAccessLayer
         public DbSet<CourseUserModel> CourseUser { get; set; }
         public DbSet<EntityModel> Entity { get; set; }
         public DbSet<ExtensionModel> Extension { get; set; }
+        public DbSet<FileModel> File { get; set; }
         public DbSet<GradeComponentModel> GradeComponent { get; set; }
         public DbSet<GradeModel> Grade { get; set; }
         public DbSet<SshKeyModel> SSHKey { get; set; }
