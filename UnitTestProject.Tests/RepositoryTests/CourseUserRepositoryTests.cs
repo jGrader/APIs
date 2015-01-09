@@ -107,6 +107,10 @@ namespace UnitTestProject.Tests.RepositoryTests
 
             var query = await _cur.Get(res.Id);
             Assert.IsNotNull(query, "#CUR11");
+
+            // Revert
+            var isDeleted = await _cur.Delete(query.Id);
+            Assert.IsTrue(isDeleted, "#CUR12");
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -124,12 +128,12 @@ namespace UnitTestProject.Tests.RepositoryTests
             oldCourseUser.Permissions = 2500;
 
             var res = await _cur.Update(oldCourseUser);
-            Assert.AreEqual(res.Permissions, 2500, "#CUR12");
+            Assert.AreEqual(res.Permissions, 2500, "#CUR13");
 
             // Revert to original value
             oldCourseUser.Permissions = oldValue;
             res = await _cur.Update(oldCourseUser);
-            Assert.AreEqual(res.Permissions, oldValue, "#CUR13");
+            Assert.AreEqual(res.Permissions, oldValue, "#CUR14");
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -151,11 +155,18 @@ namespace UnitTestProject.Tests.RepositoryTests
         [TestMethod]
         public async Task TestRemove()
         {
+            // Arrange
+            var res = await _cur.Add(new CourseUserModel { UserId = 2, CourseId = 1, ExcuseLimit = 2, ExtensionLimit = 3, Permissions = 1500 });
+            Assert.IsNotNull(res, "#CUR09");
+            Assert.IsTrue(res.Id > 0, "#CUR10");
+
             var existingObject = (await _cur.GetAllByPermissions(1500)).ToList();
             Assert.IsNotNull(existingObject, "#CUR15");
             Assert.IsTrue(existingObject.Any(), "#CUR16");
-            var res = await _cur.Delete(existingObject.First().Id);
-            Assert.IsTrue(res, "#CUR14");
+
+            // Act
+            var query = await _cur.Delete(existingObject.First().Id);
+            Assert.IsTrue(query, "#CUR14");
         }
         [TestMethod]
         [ExpectedException(typeof(ObjectNotFoundException))]

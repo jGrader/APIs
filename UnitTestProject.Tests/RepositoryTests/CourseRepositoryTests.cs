@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Core;
 using System.Linq;
@@ -96,6 +97,10 @@ namespace UnitTestProject.Tests.RepositoryTests
         {
             var res = await _cr.Add(new CourseModel { Name = "General Procrastination 2", CourseNumber = "52101", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 2, ShortName = "GenPro2", Year = 2015, OwnerId = 1});
             Assert.IsNotNull(res, "#CR08");
+
+            //Revert
+            var isDeleted = await _cr.Delete(res.Id);
+            Assert.IsTrue(isDeleted, "#CR09");
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -113,12 +118,12 @@ namespace UnitTestProject.Tests.RepositoryTests
             oldCourse.Semester = 2500;
 
             var res = await _cr.Update(oldCourse);
-            Assert.AreEqual(res.Semester, 2500, "#CR09");
+            Assert.AreEqual(res.Semester, 2500, "#CR10");
 
             // Revert to original value
             oldCourse.Semester = oldValue;
             res = await _cr.Update(oldCourse);
-            Assert.AreEqual(res.Semester, oldValue, "#CR10");
+            Assert.AreEqual(res.Semester, oldValue, "#CR11");
         }
         [TestMethod]
         [ExpectedException(typeof (ArgumentNullException))]
@@ -139,9 +144,20 @@ namespace UnitTestProject.Tests.RepositoryTests
         [TestMethod]
         public async Task TestRemove()
         {
+            // Arrange 
+            var res = await _cr.Add(new CourseModel { Name = "General Procrastination 2", CourseNumber = "52101", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 2, ShortName = "GenPro2", Year = 2015, OwnerId = 1 });
+            Assert.IsNotNull(res, "#CR08");
+
             var existingObject = await _cr.GetByName("General Procrastination 2");
-            var res = await _cr.Delete(existingObject.First().Id);
-            Assert.IsTrue(res, "#CR11");
+            Assert.IsNotNull(existingObject, "#CR03");
+            var courseModels = existingObject as IList<CourseModel> ?? existingObject.ToList();
+            Assert.AreNotEqual(0, courseModels.Count());
+
+            // Act
+            var query = await _cr.Delete(courseModels.First().Id);
+
+            // Assert
+            Assert.IsTrue(query, "#CR12");
         }
         [TestMethod]
         [ExpectedException(typeof (ObjectNotFoundException))]
