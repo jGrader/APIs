@@ -37,13 +37,13 @@ namespace UnitTestProject.Tests.RepositoryTests
         public async Task TestGet()
         {
             var cum = await _cur.Get(1);
-            Assert.IsNotNull(cum);
+            Assert.IsNotNull(cum, "#CUR01");
         }
         [TestMethod]
         public async Task TestGet_null()
         {
             var res = await _cur.Get(1000);
-            Assert.IsNull(res);
+            Assert.IsNull(res, "#CUR02");
         }
 
 
@@ -51,45 +51,49 @@ namespace UnitTestProject.Tests.RepositoryTests
         public async Task TestGetAll()
         {
             var res = await _cur.GetAll();
-            Assert.AreEqual(2, res.Count());
+            Assert.AreEqual(2, res.Count(), "#CUR03");
         }
         [TestMethod]
         public async Task TestGetByCourseId()
         {
             var res = await _cur.GetAllByCourseId(1);
-            Assert.AreEqual(2, res.Count());
+            Assert.AreEqual(2, res.Count(), "#CUR04");
         }
         [TestMethod]
         public async Task TestGetByUser()
         {
             var res = await _cur.GetAllByUser(1);
-            Assert.AreEqual(1, res.Count());
+            Assert.AreEqual(1, res.Count(), "#CUR05");
         }
         [TestMethod]
         public async Task TestGetByExtensionLimit()
         {
             var res = await _cur.GetAllByExtensionLimit(1);
-            Assert.AreEqual(2, res.Count());
+            Assert.AreEqual(2, res.Count(), "#CUR06");
         }
         [TestMethod]
         public async Task TestGetByExcuseLimit()
         {
             var res = await _cur.GetAllByExcuseLimit(1);
-            Assert.AreEqual(2, res.Count());
+            Assert.AreEqual(2, res.Count(), "#CUR07");
         }
         [TestMethod]
         public async Task TestGetByPermissions()
         {
             var res = await _cur.GetAllByPermissions(700);
-            Assert.AreEqual(2, res.Count());
+            Assert.AreEqual(2, res.Count(), "#CUR08");
         }
 
 
         [TestMethod]
         public async Task TestAdd()
         {
-            var res = await _cur.Add(new CourseUserModel { UserId = 2, CourseId = 1, ExcuseLimit  = 2, ExtensionLimit = 3, Permissions = 1500 });
-            Assert.IsNotNull(res);
+            var res = await _cur.Add(new CourseUserModel { UserId = 2, CourseId = 1, ExcuseLimit = 2, ExtensionLimit = 3, Permissions = 1500 });
+            Assert.IsNotNull(res, "#CUR09");
+            Assert.IsTrue(res.Id > 0, "#CUR10");
+
+            var query = await _cur.Get(res.Id);
+            Assert.IsNotNull(query, "#CUR11");
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -107,12 +111,12 @@ namespace UnitTestProject.Tests.RepositoryTests
             oldCourseUser.Permissions = 2500;
 
             var res = await _cur.Update(oldCourseUser);
-            Assert.AreEqual(res.Permissions, 2500);
+            Assert.AreEqual(res.Permissions, 2500, "#CUR12");
 
             // Revert to original value
             oldCourseUser.Permissions = oldValue;
             res = await _cur.Update(oldCourseUser);
-            Assert.AreEqual(res.Permissions, oldValue);
+            Assert.AreEqual(res.Permissions, oldValue, "#CUR13");
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -134,15 +138,17 @@ namespace UnitTestProject.Tests.RepositoryTests
         [TestMethod]
         public async Task TestRemove()
         {
-            var existingObject = await _cur.GetAllByPermissions(1500);
+            var existingObject = (await _cur.GetAllByPermissions(1500)).ToList();
+            Assert.IsNotNull(existingObject, "#CUR15");
+            Assert.IsTrue(existingObject.Any(), "#CUR16");
             var res = await _cur.Delete(existingObject.First().Id);
-            Assert.IsTrue(res);
+            Assert.IsTrue(res, "#CUR14");
         }
         [TestMethod]
         [ExpectedException(typeof(ObjectNotFoundException))]
         public async Task TestRemove_notFound()
         {
             await _cur.Delete(3000);
-        }    
+        }
     }
 }

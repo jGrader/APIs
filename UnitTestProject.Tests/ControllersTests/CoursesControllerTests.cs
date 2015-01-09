@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Cache;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Http;
-using System.Windows.Markup;
-using GraderApi;
+﻿using GraderApi;
 using GraderApi.Controllers;
-using GraderApi.Handlers;
 using GraderDataAccessLayer;
 using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Models;
 using GraderDataAccessLayer.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace UnitTestProject.Tests.ControllersTests
 {
@@ -66,11 +59,13 @@ namespace UnitTestProject.Tests.ControllersTests
             var response = await _cc.All();
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "#CC01");
 
             var responseJson = await response.Content.ReadAsStringAsync();
-            var courses = JsonConvert.DeserializeObject<IEnumerable<CourseModel>>(responseJson); 
-            Assert.AreEqual(2, courses.Count());
+            var courses = JsonConvert.DeserializeObject<IEnumerable<CourseModel>>(responseJson);
+
+            var all = (await Cr.GetAll()).Count();
+            Assert.AreEqual(all, courses.Count(), "#CC02");
         }
 
         [TestMethod]
@@ -91,11 +86,11 @@ namespace UnitTestProject.Tests.ControllersTests
             var response = await _cc.Get(1);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "#CC03");
 
             var responseJson = await response.Content.ReadAsStringAsync();
             var course = JsonConvert.DeserializeObject<CourseModel>(responseJson);
-            Assert.AreEqual(1, course.Id);
+            Assert.AreEqual(1, course.Id, "#CC04");
         }
 
         [TestMethod]
@@ -121,7 +116,7 @@ namespace UnitTestProject.Tests.ControllersTests
             var response = await _cc.Add(course);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "#CC05");
         }
     }
 }

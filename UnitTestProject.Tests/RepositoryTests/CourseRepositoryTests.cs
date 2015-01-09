@@ -33,25 +33,18 @@ namespace UnitTestProject.Tests.RepositoryTests
             }
         #endregion
 
-        
-        [TestMethod]
-        public async Task TestGetAll()
-        {
-            var res = await _cr.GetAll();
-            Assert.AreEqual(2, res.Count());
-        }
 
         [TestMethod]
         public async Task TestGet()
         {
             var res = await _cr.Get(1);
-            Assert.IsNotNull(res);
+            Assert.IsNotNull(res, "#CR01");
         }
         [TestMethod]
         public async Task TestGet_null()
         {
             var res = await _cr.Get(100);
-            Assert.IsNull(res);
+            Assert.IsNull(res, "#CR02");
         }
 
 
@@ -59,57 +52,37 @@ namespace UnitTestProject.Tests.RepositoryTests
         public async Task TestGetByName()
         {
             var res = await _cr.GetByName("General Procrastination");
-            Assert.AreEqual(res.Count(), 1);
+            Assert.AreEqual(res.Count(), 1, "#CR03");
         }
         [TestMethod]
         public async Task TestGetByShortName()
         {
             var res = await _cr.GetByShortName("GenPro");
-            Assert.AreEqual(res.Count(), 1);
+            Assert.AreEqual(res.Count(), 1, "#CR04");
         }
         [TestMethod]
         public async Task TestGetByCourseNumber()
         {
             var res = await _cr.GetByCourseNumber("52001");
-            Assert.AreEqual(res.Count(), 1);
+            Assert.AreEqual(res.Count(), 1, "#CR05");
         }
         [TestMethod]
         public async Task TestGetBySemester()
         {
             var res = await _cr.GetBySemester(1);
-            Assert.AreEqual(res.Count(), 1);
+            Assert.AreEqual(res.Count(), 1, "#CR06");
         }
         [TestMethod]
         public async Task TestGetByYear()
         {
             var res = await _cr.GetByYear(2014);
-            Assert.AreEqual(res.Count(), 2); 
+            Assert.AreEqual(res.Count(), 2, "#CR07"); 
         }
-        [TestMethod]
-        public async Task TestGetByStartDate()
-        {
-            var res = await _cr.GetByStartDate(new DateTime(2014, 10, 22));
-            Assert.AreEqual(res.Count(), 1); 
-        }
-        [TestMethod]
-        public async Task TestGetByEndDate()
-        {
-            var res = await _cr.GetByEndDate(new DateTime(2014, 11, 23));
-            Assert.AreEqual(res.Count(), 1); 
-        }
-        [TestMethod]
-        public async Task TestGetByOwnerId()
-        {
-            var res = await _cr.GetByOwnerId(1);
-            Assert.AreEqual(res.Count(), 1); 
-        }
-
-
         [TestMethod]
         public async Task TestAdd()
         {
             var res = await _cr.Add(new CourseModel { Name = "General Procrastination 2", CourseNumber = "52101", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 2, ShortName = "GenPro2", Year = 2015, OwnerId = 1});
-            Assert.IsNotNull(res);
+            Assert.IsNotNull(res, "#CR08");
         }
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
@@ -127,12 +100,12 @@ namespace UnitTestProject.Tests.RepositoryTests
             oldCourse.Semester = 2500;
 
             var res = await _cr.Update(oldCourse);
-            Assert.AreEqual(res.Semester, 2500);
+            Assert.AreEqual(res.Semester, 2500, "#CR09");
 
             // Revert to original value
             oldCourse.Semester = oldValue;
             res = await _cr.Update(oldCourse);
-            Assert.AreEqual(res.Semester, oldValue);
+            Assert.AreEqual(res.Semester, oldValue, "#CR10");
         }
         [TestMethod]
         [ExpectedException(typeof (ArgumentNullException))]
@@ -155,7 +128,7 @@ namespace UnitTestProject.Tests.RepositoryTests
         {
             var existingObject = await _cr.GetByName("General Procrastination 2");
             var res = await _cr.Delete(existingObject.First().Id);
-            Assert.IsTrue(res);
+            Assert.IsTrue(res, "#CR11");
         }
         [TestMethod]
         [ExpectedException(typeof (ObjectNotFoundException))]
