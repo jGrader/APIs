@@ -15,7 +15,8 @@ namespace UnitTestProject.Tests.RepositoryTests
     public class CourseUserRepositoryTests
     {
         #region Initialization and Cleanup
-        readonly ICourseUserRepository _cur = new CourseUserRepository();
+
+        private ICourseUserRepository _cur;
 
         [ClassInitialize]
         public static void TestInitialize(TestContext ctx)
@@ -27,9 +28,21 @@ namespace UnitTestProject.Tests.RepositoryTests
         }
 
         [ClassCleanup]
-        public static void Cleanup()
+        public static void TestCleanup()
         {
             Database.Delete("DefaultConnection");
+        }
+
+        [TestInitialize]
+        public void Initialize()
+        {
+            _cur = new CourseUserRepository();
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            _cur.Dispose();
         }
         #endregion
 
