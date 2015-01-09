@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace GraderApi {
+namespace GraderApi.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace GraderApi {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GraderApi.LdapFields", typeof(LdapFields).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GraderApi.Resources.LdapFields", typeof(LdapFields).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

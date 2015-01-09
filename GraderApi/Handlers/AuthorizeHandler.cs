@@ -2,6 +2,7 @@
 using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Models;
 using GraderDataAccessLayer.Repositories;
+using GraderApi.Resources;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices;

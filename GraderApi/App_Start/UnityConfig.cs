@@ -1,14 +1,10 @@
-using Unity.WebApi;
 using System.Web.Http;
 using Microsoft.Practices.Unity;
 using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Repositories;
 
-
 namespace GraderApi
 {
-    using Microsoft.AspNet.Identity;
-
     public static class UnityConfig
     {
         public static void RegisterComponents()
@@ -19,8 +15,7 @@ namespace GraderApi
             container.RegisterType<IAdminRepository, AdminRepository>(new ContainerControlledLifetimeManager());
             container.RegisterType<ICourseUserRepository, CourseUserRepository>(new ContainerControlledLifetimeManager());
             container.RegisterType<IEntityRepository, EntityRepository>(new ContainerControlledLifetimeManager());
-            container.RegisterType<IGradeComponentRepository, GradeComponentRepository>(
-                new ContainerControlledLifetimeManager());
+            container.RegisterType<IGradeComponentRepository, GradeComponentRepository>(new ContainerControlledLifetimeManager());
             container.RegisterType<ISubmissionRepository, SubmissionRepository>(new ContainerControlledLifetimeManager());
             container.RegisterType<ITaskRepository, TaskRepository>(new ContainerControlledLifetimeManager());
             container.RegisterType<IUserRepository, UserRepository>(new ContainerControlledLifetimeManager());

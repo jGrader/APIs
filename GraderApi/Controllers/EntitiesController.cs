@@ -1,15 +1,15 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Filters;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
+    using Resources;
     using System;
-    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using System.Web.Http.Description;
 
 
     public class EntitiesController : ApiController
@@ -22,7 +22,6 @@
 
         // GET: api/Entities/All
         [HttpGet]
-        [ResponseType(typeof(IEnumerable<EntityModel>))]
         [PermissionsAuthorize(SuperUserPermissions.CanSeeAllEntities)]
         public async Task<HttpResponseMessage> All()
         {
@@ -39,7 +38,7 @@
 
         // GET: api/Courses/{courseId}/Entities
         [HttpGet]
-        [ResponseType(typeof(IEnumerable<EntityModel>))]
+        [ValidateModelState]
         public async Task<HttpResponseMessage> All(int courseId)
         {
             try
@@ -55,7 +54,7 @@
 
         // GET: api/Courses/{courseId}/Entities/Get/{entityId}
         [HttpGet]
-        [ResponseType(typeof(EntityModel))]
+        [ValidateModelState]
         public async Task<HttpResponseMessage> Get(int courseId, int entityId)
         {
             try
@@ -78,7 +77,7 @@
 
         // GET: /api/Courses/{courseId}/Entities/GetTask/{entityId}
         [HttpGet]
-        [ResponseType(typeof (TaskModel))]
+        [ValidateModelState]
         public async Task<HttpResponseMessage> GetTask(int courseId, int entityId)
         {
             try
@@ -101,14 +100,10 @@
 
         // POST: api/Courses/{courseId}/Entities
         [HttpPost]
-        [ResponseType(typeof(EntityModel))]
+        [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanCreateEntities)]
         public async Task<HttpResponseMessage> Add(int courseId, [FromBody] EntityModel entity)
         {
-            if (!ModelState.IsValid)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
-            }
             if (courseId != entity.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -130,14 +125,10 @@
 
         // PUT: api/Courses/{courseId}/Entities/{entityId}
         [HttpPut]
-        [ResponseType(typeof(EntityModel))]
+        [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanUpdateEntities)]
         public async Task<HttpResponseMessage> Update(int courseId, int entityId, [FromBody] EntityModel entity)
         {
-            if (!ModelState.IsValid)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
-            }
             if (entityId != entity.Id)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -163,7 +154,7 @@
 
         // DELETE: api/Courses/{courseId}/Entities/{entityId}
         [HttpDelete]
-        [ResponseType(typeof(void))]
+        [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanDeleteEntities)]
         public async Task<HttpResponseMessage> Delete(int courseId, int entityId)
         {

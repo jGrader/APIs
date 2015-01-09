@@ -1,15 +1,14 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Filters;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
     using System;
-    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using System.Web.Http.Description;
 
     public class CoursesController : ApiController
     {
@@ -21,7 +20,6 @@
 
         // GET: api/Courses
         [HttpGet]
-        [ResponseType(typeof(IEnumerable<CourseModel>))]
         public async Task<HttpResponseMessage> All()
         {
             try
@@ -37,7 +35,7 @@
 
         // GET: api/Courses/{courseId}
         [HttpGet]
-        [ResponseType(typeof(CourseModel))]
+        [ValidateModelState]
         public async Task<HttpResponseMessage> Get(int courseId)
         {
             try
@@ -55,15 +53,10 @@
 
         // POST: api/Courses
         [HttpPost]
-        [ResponseType(typeof(CourseModel))]
+        [ValidateModelState]
         [PermissionsAuthorize(AdminPermissions.CanCreateCourse)]
         public async Task<HttpResponseMessage> Add([FromBody] CourseModel course)
         {
-            if (!ModelState.IsValid) 
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
-            }
-
             try
             {
                 var result = await _courseRepository.Add(course);
@@ -79,15 +72,10 @@
 
         // PUT: api/Courses/{courseId}
         [HttpPut]
-        [ResponseType(typeof(CourseModel))]
+        [ValidateModelState]
         [PermissionsAuthorize(AdminPermissions.CanUpdateCourse)]
         public async Task<HttpResponseMessage> Update(int courseId, [FromBody] CourseModel course)
         {
-            if (!ModelState.IsValid) 
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
-            }
-
             if (courseId != course.Id) 
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
@@ -108,7 +96,7 @@
 
         // DELETE: api/Courses/{courseId}
         [HttpDelete]
-        [ResponseType(typeof(void))]
+        [ValidateModelState]
         [PermissionsAuthorize(AdminPermissions.CanDeleteCourse)]
         public async Task<HttpResponseMessage> Delete(int courseId)
         {

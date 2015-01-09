@@ -195,7 +195,6 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\HelpPage\ApiDescriptionExtensions.cs" />
@@ -230,12 +229,13 @@
     <Compile Include="Controllers\CourseUsersController.cs" />
     <Compile Include="Controllers\EntitiesController.cs" />
     <Compile Include="Controllers\GradeComponentsController.cs" />
-    <Compile Include="ApiRouteConstraints.cs" />
+    <Compile Include="Filters\ApiRouteConstraints.cs" />
     <Compile Include="Controllers\SubmissionsController.cs" />
     <Compile Include="Controllers\TasksController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="Messages.Designer.cs">
+    <Compile Include="Filters\ValidateModelStateAttribute.cs" />
+    <Compile Include="Resources\Messages.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Messages.resx</DependentUpon>
@@ -247,21 +247,20 @@
     </Compile>
     <Compile Include="Handlers\AuthorizeHandler.cs" />
     <Compile Include="Handlers\PermissionsHandler.cs" />
-    <Compile Include="HeaderConstants.Designer.cs">
+    <Compile Include="Resources\HeaderConstants.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>HeaderConstants.resx</DependentUpon>
     </Compile>
-    <Compile Include="LdapFields.Designer.cs">
+    <Compile Include="Resources\LdapFields.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>LdapFields.resx</DependentUpon>
     </Compile>
-    <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="PermissionsAuthorize.cs" />
-    <Compile Include="Principals\UserPrincipal.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Filters\PermissionsAuthorize.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="UserPrincipal.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
@@ -286,7 +285,6 @@
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\CollectionModelDescription.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
-    <Content Include="Index.html" />
     <Content Include="TestPage.html" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -302,6 +300,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Compile Include="App_Start\Startup.Auth.cs" />
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
@@ -319,15 +318,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="HeaderConstants.resx">
+    <EmbeddedResource Include="Resources\HeaderConstants.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>HeaderConstants.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="LdapFields.resx">
+    <EmbeddedResource Include="Resources\LdapFields.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>LdapFields.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Messages.resx">
+    <EmbeddedResource Include="Resources\Messages.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Messages.Designer.cs</LastGenOutput>
     </EmbeddedResource>

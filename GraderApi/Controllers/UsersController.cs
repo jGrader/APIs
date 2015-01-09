@@ -1,9 +1,11 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Filters;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
     using Principals;
+    using Resources;
     using System;
     using System.Collections.Generic;
     using System.Net;
@@ -43,7 +45,6 @@
         // POST: api/Users/Authentication
         // Dummy action for Basic Authentication to call and let the Handler validate
         [HttpPost]
-        [ResponseType(typeof (void))]
         public HttpResponseMessage Authentication()
         {
             return Request.CreateResponse(HttpStatusCode.NoContent);
@@ -52,7 +53,6 @@
         // GET: api/Users/Courses
         // No permissions needed because it only gets the courses of the currently logged in user
         [HttpGet]
-        [ResponseType(typeof(IEnumerable<CourseModel>))]
         public async Task<HttpResponseMessage> Courses()
         {
             var currentUser = HttpContext.Current.User as UserPrincipal;
@@ -74,7 +74,7 @@
 
         // DELETE: api/Users/{userId}
         [HttpDelete]
-        [ResponseType(typeof(void))]
+        [ValidateModelState]
         [PermissionsAuthorize(SuperUserPermissions.CanDeleteUser)]
         public async Task<HttpResponseMessage> Delete(int userId)
         {

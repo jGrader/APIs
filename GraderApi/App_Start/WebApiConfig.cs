@@ -1,10 +1,10 @@
-﻿namespace GraderApi
-{
-    using Handlers;
-    using System.Net.Http.Headers;
-    using System.Web.Http;
-    using System.Web.Mvc;
+﻿using GraderApi.Handlers;
+using System.Net.Http.Headers;
+using System.Web.Http;
+using System.Web.Mvc;
 
+namespace GraderApi
+{
     public static class WebApiConfig
     {
         public static void Register(HttpConfiguration config)

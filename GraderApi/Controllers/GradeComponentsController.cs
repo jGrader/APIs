@@ -1,15 +1,15 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Filters;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
+    using Resources;
     using System;
-    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using System.Web.Http.Description;
 
     public class GradeComponentsController : ApiController
     {
@@ -21,7 +21,6 @@
 
         // GET: api/GradeComponents/All
         [HttpGet]
-        [ResponseType(typeof (IEnumerable<GradeComponentModel>))]
         [PermissionsAuthorize(SuperUserPermissions.CanSeeAllGradedParts)]
         public async Task<HttpResponseMessage> All()
         {
@@ -38,7 +37,7 @@
 
         // GET: api/Courses/{courseId}/GradeComponents/All
         [HttpGet]
-        [ResponseType(typeof(IEnumerable<GradeComponentModel>))]
+        [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanSeeGradedParts)]
         public async Task<HttpResponseMessage> All(int courseId)
         {
@@ -55,7 +54,7 @@
 
         // GET: api/Courses/{courseId}/GradeComponents/{gradeComponentId}
         [HttpGet]
-        [ResponseType(typeof(GradeComponentModel))]
+        [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanSeeGradedParts)]
         public async Task<HttpResponseMessage> Get(int courseId, int gradeComponentId)
         {
@@ -79,14 +78,10 @@
 
         // POST: api/Courses/{courseId}/GradeComponents
         [HttpPost]
-        [ResponseType(typeof(GradeComponentModel))]
+        [ValidateModelState]
         [PermissionsAuthorize(CourseOwnerPermissions.CanCreateGradedPart)]
         public async Task<HttpResponseMessage> Add(int courseId, [FromBody] GradeComponentModel gradeComponent)
         {
-            if (!ModelState.IsValid) 
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
-            }
             if (courseId != gradeComponent.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -107,14 +102,10 @@
 
         // PUT: api/Courses/{courseId}/GradeComponents/{gradeComponentId}
         [HttpPut]
-        [ResponseType(typeof(GradeComponentModel))]
+        [ValidateModelState]
         [PermissionsAuthorize(CourseOwnerPermissions.CanUpdateGradedPart)]
         public async Task<HttpResponseMessage> Update(int courseId, int gradeComponentId, [FromBody] GradeComponentModel gradeComponent)
         {
-            if (!ModelState.IsValid) 
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
-            }
             if (gradeComponentId != gradeComponent.Id) 
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidGradeComponentId);
@@ -140,7 +131,7 @@
 
         // DELETE: api/Courses/{courseId}/GradeComponents/{gradeComponentId}
         [HttpDelete]
-        [ResponseType(typeof(void))]
+        [ValidateModelState]
         [PermissionsAuthorize(CourseOwnerPermissions.CanDeleteGradedPart)]
         public async Task<HttpResponseMessage> Delete(int courseId, int gradeComponentId)
         {

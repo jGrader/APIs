@@ -1,15 +1,15 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Filters;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
+    using Resources;
     using System;
-    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using System.Web.Http.Description;
 
     public class CourseUsersController : ApiController
     {
@@ -21,7 +21,6 @@
 
         // GET: api/CourseUsers/All
         [HttpGet]
-        [ResponseType(typeof(IEnumerable<CourseUserModel>))]
         [PermissionsAuthorize(SuperUserPermissions.CanSeeAllCourseUsers)]
         public async Task<HttpResponseMessage> All()
         {
@@ -38,7 +37,7 @@
 
         // GET: api/Courses/{courseId}/CourseUsers
         [HttpGet]
-        [ResponseType(typeof(IEnumerable<CourseUserModel>))]
+        [ValidateModelState]
         public async Task<HttpResponseMessage> All(int courseId)
         {
             try
@@ -54,7 +53,7 @@
 
         // GET: api/Courses/{courseId}/CourseUsers/{courseUserId}
         [HttpGet]
-        [ResponseType(typeof(CourseUserModel))]
+        [ValidateModelState]
         [PermissionsAuthorize(CourseOwnerPermissions.CanSeeEnrollment)]
         public async Task<HttpResponseMessage> Get(int courseId, int courseUserId)
         {
@@ -79,14 +78,10 @@
 
         // POST: api/Courses/{courseId}/CourseUsers
         [HttpPost]
-        [ResponseType(typeof(CourseUserModel))]
+        [ValidateModelState]
         [PermissionsAuthorize(CourseOwnerPermissions.CanAddEnrollment)]
         public async Task<HttpResponseMessage> Add(int courseId, [FromBody] CourseUserModel courseUser)
         {
-            if (!ModelState.IsValid)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
-            }
             if (courseId != courseUser.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -107,14 +102,10 @@
 
         // PUT: api/Courses/{courseId}/CourseUsers/{courseUserId}
         [HttpPut]
-        [ResponseType(typeof(CourseUserModel))]
+        [ValidateModelState]
         [PermissionsAuthorize(CourseOwnerPermissions.CanUpdateEnrollment)]
         public async Task<HttpResponseMessage> Update(int courseId, int courseUserId, [FromBody] CourseUserModel courseUser)
         {
-            if (!ModelState.IsValid)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ModelState);
-            }
             if (courseUserId != courseUser.Id)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -139,7 +130,7 @@
 
         // DELETE: api/Courses/{courseId}/CourseUsers/{courseUserId}
         [HttpDelete]
-        [ResponseType(typeof(void))]
+        [ValidateModelState]
         [PermissionsAuthorize(CourseOwnerPermissions.CanDeleteEnrollment)]
         public async Task<HttpResponseMessage> Delete(int courseId, int courseUserId)
         {
