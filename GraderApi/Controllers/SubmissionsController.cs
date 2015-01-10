@@ -145,7 +145,7 @@
             
             var streamProvider = new CustomMultipartFormDataStreamProvider(fileSavePath, finalFileModels);
             // Read the MIME multipart content using the stream provider we just created.
-            await Request.Content.ReadAsMultipartAsync(streamProvider).ContinueWith(async t =>
+            var work = await Request.Content.ReadAsMultipartAsync(streamProvider).ContinueWith(async t =>
             {
                 if (t.IsFaulted || t.IsCanceled)
                 {
@@ -167,7 +167,7 @@
                         var isDeleted = await _submissionRepository.DeleteSubmission(query.Id);
                         if (!isDeleted)
                         {
-                            Request.CreateResponse(HttpStatusCode.InternalServerError);
+                            return Request.CreateResponse(HttpStatusCode.InternalServerError);
                         }
 
                         // Delete the file itself also
@@ -182,14 +182,14 @@
                     var result = await _submissionRepository.Add(submission);
                     if (result == null)
                     {
-                        Request.CreateResponse(HttpStatusCode.InternalServerError);
+                        return Request.CreateResponse(HttpStatusCode.InternalServerError);
                     }
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             });
 
-            return Request.CreateResponse(HttpStatusCode.InternalServerError);
+            return Request.CreateResponse(work.Result.StatusCode);
         }
         private class CustomMultipartFormDataStreamProvider : MultipartFormDataStreamProvider
         {
