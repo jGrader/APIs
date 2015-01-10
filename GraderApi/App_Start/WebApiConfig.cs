@@ -1,4 +1,5 @@
-﻿using GraderApi.Handlers;
+﻿using GraderApi.Filters;
+using GraderApi.Handlers;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -91,6 +92,14 @@ namespace GraderApi
                 routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{submissionId}",
                 defaults: new { submissionId = UrlParameter.Optional },
                 constraints: new { controller = "Submissions", courseId = new ApiRouteConstraints(), submissionId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "TeamRoute",
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{teamId}",
+                defaults: new { teamId = UrlParameter.Optional },
+                constraints: new { controller = "Teams", courseId = new ApiRouteConstraints(), teamId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 

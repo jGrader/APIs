@@ -150,23 +150,13 @@
             return result;
         }
 
-        public static JObject ToJson(this TeamMemberModel tmm)
-        {
-            var result = new JObject();
-
-            result.Add("Id", tmm.Id);
-            result.Add("TeamId", tmm.TeamId);
-            result.Add("UserId", tmm.UserId);
-
-            return result;
-        }
-
         public static JObject ToJson(this TeamModel tm)
         {
             var result = new JObject();
 
             result.Add("Id", tm.Id);
-            result.Add("CourseId", tm.CourseId);
+            result.Add("EntityId", tm.EntityId);
+            result.Add("TeamMembers", tm.TeamMembers.ToJson());
 
             return result;
         }
@@ -276,13 +266,6 @@
         }
 
         public static JArray ToJson(this IEnumerable<TaskModel> cm)
-        {
-            var query = (from c in cm select c.ToJson());
-            var result = new JArray(query);
-            return result;
-        }
-
-        public static JArray ToJson(this IEnumerable<TeamMemberModel> cm)
         {
             var query = (from c in cm select c.ToJson());
             var result = new JArray(query);

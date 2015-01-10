@@ -1,5 +1,5 @@
-﻿using GraderApi;
-using GraderApi.Controllers;
+﻿using GraderApi.Controllers;
+using GraderApi.Filters;
 using GraderDataAccessLayer;
 using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Models;
@@ -17,9 +17,6 @@ using System.Web.Http;
 
 namespace UnitTestProject.Tests.ControllersTests
 {
-    using System.Net.Http.Headers;
-    using GraderApi.Handlers;
-
     [TestClass]
     public class CoursesControllerTests
     {

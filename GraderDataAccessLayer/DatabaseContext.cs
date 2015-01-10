@@ -24,7 +24,6 @@ namespace GraderDataAccessLayer
         public DbSet<SshKeyModel> SshKey { get; set; }
         public DbSet<SubmissionModel> Submission { get; set; }
         public DbSet<TaskModel> Task { get; set; }
-        public DbSet<TeamMemberModel> TeamMember { get; set; }
         public DbSet<TeamModel> Team { get; set; }
         public DbSet<UserModel> User { get; set; }
         public DbSet<SessionIdModel> SessionId { get; set; }
@@ -33,6 +32,16 @@ namespace GraderDataAccessLayer
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
             modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
+
+            // Resolve the Many-To-Many relation between Teams and Users
+            modelBuilder.Entity<TeamModel>().HasMany(c => c.TeamMembers).WithMany(p => p.Teams).
+                Map(
+                    m =>
+                    {
+                        m.MapLeftKey("TeamId");
+                        m.MapRightKey("UserId");
+                        m.ToTable("UserTeams");
+                    });
         }
     }
 
@@ -115,6 +124,20 @@ namespace GraderDataAccessLayer
             };
             files.ForEach(f => context.File.Add(f));
             context.SaveChanges();
+
+            // Create Teams
+            var teams = new List<TeamModel>
+            {
+                new TeamModel { EntityId = 1 },
+                new TeamModel { EntityId = 2 }
+            };
+            teams[0].TeamMembers.Add(users[0]);
+            teams[0].TeamMembers.Add(users[1]);
+            teams[1].TeamMembers.Add(users[0]);
+            teams[1].TeamMembers.Add(users[1]);
+
+            teams.ForEach(t => context.Team.Add(t));
+            context.SaveChanges(); 
         }
     }
 }

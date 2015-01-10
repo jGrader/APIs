@@ -1,14 +1,13 @@
-﻿namespace GraderApi
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web.Http.Routing;
+using GraderDataAccessLayer.Interfaces;
+using GraderDataAccessLayer.Repositories;
+
+namespace GraderApi.Filters
 {
-    using System;
-    using System.Net.Http;
-    using System.Threading.Tasks;
-    using System.Web.Http.Routing;
-    using System.Collections.Generic;
-    using GraderDataAccessLayer.Interfaces;
-    using GraderDataAccessLayer.Repositories;
-
-
     public class ApiRouteConstraints : IHttpRouteConstraint, IDisposable
     {
         private IUserRepository _userRepository;
@@ -19,6 +18,7 @@
         private IEntityRepository _entityRepository;
         private IFileRepository _fileRepository;
         private ISubmissionRepository _submissionRepository;
+        private ITeamRepository _teamRepository;
 
         public ApiRouteConstraints()
         {
@@ -30,6 +30,7 @@
             _entityRepository = new EntityRepository();
             _fileRepository = new FileRepository();
             _submissionRepository = new SubmissionRepository();
+            _teamRepository = new TeamRepository();
         }
         
         public bool Match(HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection)
@@ -158,6 +159,19 @@
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
+                case "teamId":
+                {
+                    int teamId;
+                    if (!int.TryParse(stringValue, out teamId))
+                    {
+                        return false;
+                    }
+
+                    //
+                    var result = Task.Run(() => _teamRepository.Get(teamId));
+                    Task.WaitAll(result);
+                    return (result.Result != null);
+                }
             }
 
             return false;
@@ -183,6 +197,7 @@
             DisposeEntityRepository();
             DisposeFileRepository();
             DisposeSubmissionRepository();
+            DisposeTeamRepository();
         }
         private void DisposeUserRepository()
         {
@@ -263,6 +278,16 @@
 
             _submissionRepository.Dispose();
             _submissionRepository = null;
+        }
+        private void DisposeTeamRepository()
+        {
+            if (_teamRepository == null)
+            {
+                return;
+            }
+
+            _teamRepository.Dispose();
+            _teamRepository = null;
         }
         #endregion
     }

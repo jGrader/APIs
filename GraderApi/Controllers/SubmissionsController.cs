@@ -4,7 +4,6 @@
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Repositories;
     using Principals;
     using Resources;
     using System;
@@ -18,15 +17,12 @@
     using System.Threading.Tasks;
     using System.Web;
     using System.Web.Http;
-    using WebGrease.Css.Extensions;
 
     public class SubmissionsController : ApiController
     {
         private readonly ISubmissionRepository _submissionRepository;
         private readonly IEntityRepository _entityRepository;
-        public SubmissionsController(
-            ISubmissionRepository submissionRepository,
-            IEntityRepository entityRepository)
+        public SubmissionsController(ISubmissionRepository submissionRepository, IEntityRepository entityRepository)
         {
             _submissionRepository = submissionRepository;
             _entityRepository = entityRepository;
@@ -120,19 +116,20 @@
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, Messages.UserNotFound);
             }
 
-            if (fileModels.FirstOrDefault() == null)
+            var firstOrDefault = fileModels.FirstOrDefault();
+            if (firstOrDefault == null)
             {
                 // There were no files to submit, return error
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, Messages.NoFiles);
             }
 
-            var task = fileModels.FirstOrDefault().Entity.Task;
+            var task = firstOrDefault.Entity.Task;
             var fileSavePath = Path.Combine(HttpContext.Current.Server.MapPath("~/Content/UploadedFiles/"), task.CourseId + "_" + task.Course.Name,
                 fileModels.First().Entity.TaskId + "_" + task.Name, fileModels.First().Entity.Id + "_" + fileModels.First().Entity.Name, currentUser.User.UserName);
 
             if (!Directory.Exists(fileSavePath))
             {
-                DirectoryInfo di = Directory.CreateDirectory(fileSavePath);
+                Directory.CreateDirectory(fileSavePath);
             }
 
             // HttpContext.Current MIGHT be null, need to research on this.
@@ -157,7 +154,7 @@
                 {
                     var fileId = fileModels[index].Id;
                     var file = streamProvider.FileData[index];
-                    var submission = new SubmissionModel() {UserId = currentUser.User.Id, FileId = fileId, TimeStamp = DateTime.UtcNow, FilePath = Path.Combine(fileSavePath, file.LocalFileName) };
+                    var submission = new SubmissionModel {UserId = currentUser.User.Id, FileId = fileId, TimeStamp = DateTime.UtcNow, FilePath = Path.Combine(fileSavePath, file.LocalFileName) };
 
                     // Delete any old submission for the same file
                     
@@ -183,6 +180,22 @@
                     if (result == null)
                     {
                         return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                    }
+
+                    // Now add the submission to all the other TeamMembers
+                    var team = currentUser.User.Teams.FirstOrDefault(w => w.EntityId == firstOrDefault.EntityId);
+                    if (team != null)
+                    {
+                        // The user is working in a Team; add the submissions to the other TeamMembers
+                        foreach (var teamMember in team.TeamMembers)
+                        {
+                            var s = new SubmissionModel { UserId = teamMember.Id, FileId = fileId, TimeStamp = DateTime.UtcNow, FilePath = Path.Combine(fileSavePath, file.LocalFileName) };
+                            var r = await _submissionRepository.Add(s);
+                            if (r == null)
+                            {
+                                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                            }
+                        }
                     }
                 }
 

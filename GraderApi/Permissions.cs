@@ -10,7 +10,8 @@
         CanSeeAllEntities = 1 << 6,
         CanSeeAllFiles = 1 << 7,
         CanSeeAllSubmissions = 1 << 8,
-        CanDeleteSubmission = 1 << 9
+        CanDeleteSubmission = 1 << 9,
+        CanSeeAllTeams = 1 << 10
     }
 
     public enum AdminPermissions
@@ -50,6 +51,10 @@
         CanDeleteFiles = 1 << 13,
         CanSeeSubmissions = 1 << 14,
         CanCreateSubmissions = 1 << 15,
-        CanUpdateSubmissions = 1 << 16
+        CanUpdateSubmissions = 1 << 16,
+        CanSeeTeams = 1 << 17,
+        CanCreateTeams = 1 << 18,
+        CanUpdateTeams = 1 << 19,
+        CanDeleteTeams = 1 << 20
     }
 }

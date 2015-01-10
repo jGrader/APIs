@@ -1,12 +1,17 @@
-﻿
-namespace GraderDataAccessLayer.Models
+﻿namespace GraderDataAccessLayer.Models
 {
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
    
     public class UserModel
     {
+        public UserModel()
+        {
+            Teams = new HashSet<TeamModel>();    
+        }
 
+        // Scalar Properties
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -32,5 +37,8 @@ namespace GraderDataAccessLayer.Models
 
         [Required]
         public string GraduationYear { get; set; }
+
+        //Navigation properties
+        public virtual ICollection<TeamModel> Teams { get; set; } 
     }
 }

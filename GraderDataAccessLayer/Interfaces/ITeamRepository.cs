@@ -1,18 +1,20 @@
 ﻿namespace GraderDataAccessLayer.Interfaces
 {
+    using Models;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
-    using GraderDataAccessLayer.Models;
 
-    interface ITeamRepository
+    public interface ITeamRepository : IDisposable
     {
-        IEnumerable<TeamModel> GetAll();
-        TeamModel Get(int id);
-        bool Add(TeamModel item);
-        bool Remove(int id);
-        bool Update(TeamModel item);
+        Task<TeamModel> Get(int teamId);
+
+        Task<IEnumerable<TeamModel>> GetAll();
+        Task<IEnumerable<TeamModel>> GetAllForEntity(int entityId);
+        Task<IEnumerable<TeamModel>> GetAllForCourse(int courseId);
+
+        Task<TeamModel> Add(TeamModel item);
+        Task<TeamModel> Update(TeamModel item);
+        Task<bool> Delete(int teamId);
     }
 }

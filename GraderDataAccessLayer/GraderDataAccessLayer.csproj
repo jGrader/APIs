@@ -59,7 +59,6 @@
     <Compile Include="Interfaces\ISessionIdRepository.cs" />
     <Compile Include="Interfaces\ISshKeyRepository.cs" />
     <Compile Include="Interfaces\ISubmissionRepository.cs" />
-    <Compile Include="Interfaces\ITeamMemberRepository.cs" />
     <Compile Include="Interfaces\ITeamRepository.cs" />
     <Compile Include="Interfaces\IUserRepository.cs" />
     <Compile Include="Models\AdminModel.cs" />
@@ -75,7 +74,6 @@
     <Compile Include="Models\SshKeyModel.cs" />
     <Compile Include="Models\SubmissionModel.cs" />
     <Compile Include="Models\TaskModel.cs" />
-    <Compile Include="Models\TeamMemberModel.cs" />
     <Compile Include="Models\TeamModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -90,6 +88,7 @@
     <Compile Include="Repositories\SessionIdRepository.cs" />
     <Compile Include="Repositories\SubmissionRepository.cs" />
     <Compile Include="Repositories\TaskRepository.cs" />
+    <Compile Include="Repositories\TeamRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
   </ItemGroup>
   <ItemGroup>
