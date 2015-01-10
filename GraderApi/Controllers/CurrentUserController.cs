@@ -49,6 +49,7 @@
             _user = principal.User;
         }
 
+        [HttpGet]
         public async Task<HttpResponseMessage> Courses()
         {
             try
@@ -65,6 +66,7 @@
             }
         }
 
+        [HttpGet]
         public async Task<HttpResponseMessage> Submissions(int courseId)
         {
             try
