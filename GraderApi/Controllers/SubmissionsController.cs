@@ -91,18 +91,11 @@
 
         // POST: api/Courses/{courseId}/Submissions/Add
         [HttpPost]
-
+        [ValidateModelState]
+        [ValidateMimeMultipartContent]
         [PermissionsAuthorize(CoursePermissions.CanCreateSubmissions)]
         public async Task<HttpResponseMessage> Add(int courseId, [FromUri] IEnumerable<FileModel> files)
         {
-            if (Request.Content.IsMimeMultipartContent())
-            {
-                var x = 0;
-            }
-            if (files == null)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, Messages.NoFiles);
-            }
             var fileModels = files as IList<FileModel> ?? files.ToList();
             foreach (var file in fileModels)
             {
