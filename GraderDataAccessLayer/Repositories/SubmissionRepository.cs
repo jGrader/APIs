@@ -31,6 +31,12 @@
             var searchResult = await Task.Run(() => _db.Submission.Where(s => s.File.Entity.Task.CourseId == courseId));
             return searchResult;
         }
+
+        public async Task<IEnumerable<SubmissionModel>> GetAllByUserId(int userId)
+        {
+            var searchResult = await Task.Run(() => _db.Submission.Where(s => s.File.Entity.Task.CourseId == userId));
+            return searchResult;
+        }
         public async Task<IEnumerable<SubmissionModel>> GetAllByLambda(Expression<Func<SubmissionModel, bool>> exp)
         {
             var searchResult = await Task.Run(() => _db.Submission.Where(exp));

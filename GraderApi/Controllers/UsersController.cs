@@ -49,28 +49,6 @@
         {
             return Request.CreateResponse(HttpStatusCode.NoContent);
         }
-        
-        // GET: api/Users/Courses
-        // No permissions needed because it only gets the courses of the currently logged in user
-        [HttpGet]
-        public async Task<HttpResponseMessage> Courses()
-        {
-            var currentUser = HttpContext.Current.User as UserPrincipal;
-            if (currentUser == null || currentUser.User == null)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, Messages.UserNotFound);
-            }
-
-            try
-            {
-                var courses = await _courseUserRepository.GetAllByUser(currentUser.User.Id);
-                return Request.CreateResponse(HttpStatusCode.OK, courses.ToJson());
-            }
-            catch (Exception e)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
-            }
-        }
 
         // DELETE: api/Users/{userId}
         [HttpDelete]

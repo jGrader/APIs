@@ -12,7 +12,8 @@
         
         Task<IEnumerable<SubmissionModel>> GetAll();
         Task<IEnumerable<SubmissionModel>> GetAllByCourseId(int courseId);
-        Task<IEnumerable<Models.SubmissionModel>> GetAllByLambda(Expression<Func<SubmissionModel, bool>> exp);
+        Task<IEnumerable<SubmissionModel>> GetAllByUserId(int userId);
+        Task<IEnumerable<SubmissionModel>> GetAllByLambda(Expression<Func<SubmissionModel, bool>> exp);
 
         Task<SubmissionModel> Add(SubmissionModel item);
         Task<bool> DeleteSubmission(int sumbmissionId);
