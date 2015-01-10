@@ -15,10 +15,5 @@
                 actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, Messages.UnsupportedMediaType);
             }
         }
-
-        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
-        {
-
-        }
     }
 }

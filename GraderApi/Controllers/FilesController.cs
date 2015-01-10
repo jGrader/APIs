@@ -156,14 +156,5 @@
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _fileRepository.Dispose();
-            }
-            base.Dispose(disposing);
-        }
     }
 }

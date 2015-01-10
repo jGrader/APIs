@@ -10,24 +10,25 @@
     <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
     <script type="text/javascript">
         var models = new Array();
-        $form = $("<form></form<");
+        $form = $("<form></form>");
 
         models["Courses"] = ["Name", "CourseNumber", "ShortName", "Semester", "Year", "StartDate", "EndDate", "OwnerId"];
         models["CourseUsers"] = ["CourseId", "UserId", "Permissions", "ExtensionLimit", "ExcuseLimit"];
         models["Entities"] = ["Name", "Points", "BonusPoints", "OpenTime", "CloseTime", "TaskId"];
         models["Files"] = ["FileName", "Extension", "EntityId"];
         models["GradeComponents"] = ["Name", "Percentage", "CourseId"];
-        models["Submissions"] = ["FilePath", "TimeStamp", "UserId", "FileId"];
         models["Tasks"] = ["Name", "CourseId", "GradeComponentId"];
         models["Users"] = ["Name", "Surname", "Email", "UserName", "GraduationYear"];
 
+        var sessionId = sessionStorage.getItem("sessionId");
+        if (sessionId == null) {
+            sessionId = "";
+        } else {
+            $("#loginStatus").text("Logged in");
+        }
+
         $(document).ready(function () {
-            var sessionId = sessionStorage.getItem("sessionId");
-            if (sessionId == null) {
-                sessionId = "";
-            } else {
-                $("#loginStatus").text("Logged in");
-            }
+            
             $("button#login").click(function() {
                 var url = "api/Users/Authentication";
                 var headers = new Array();
@@ -233,7 +234,63 @@
                 }
             }
 
+            $('#Upload').click(function(e) {
+                e.preventDefault();
+
+                var courseId = $('#courseId').val();
+                var fileId = $('#fileId').val();
+                if (!courseId || !fileId) {
+                    return;
+                }
+
+                var headers = new Array();
+                headers["SessionId"] = sessionId;
+                headers["contentType"] = "application/json; charset=UTF-8";
+
+                var formData = new FormData();
+                var opmlFile = $('#fileInput').get(0).files;
+                formData.append("opmlFile", opmlFile[0]);
+
+                var files = [];
+                files.push({ Id: $('#fileId').val(), FileName: $('#FileName').val(), Extension: $('#Extension').val(), EntityId: $('#EntityId').val() });
+                alert(files);
+
+                $.ajax({
+                    url: "api/Courses/" + courseId + "/Submissions/Add/",
+                    headers: headers,
+                    type: 'POST',
+                    data: { '' : files },
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    dataType: 'json'
+                });
+            });
         });
+
+        function getFileDetails() {
+            var courseId = $('#courseId').val();
+            var fileId = $('#fileId').val();
+            if (!courseId || !fileId) {
+                return;
+            }
+
+            var headers = new Array();
+            headers["SessionId"] = sessionId;
+            headers["contentType"] = 'application/json; charset=utf-8';
+
+            $.ajax(
+            {
+                url: "api/Courses/" + courseId + "/Files/Get/" + fileId,
+                headers: headers,
+                type: 'GET',
+                success: function (data) {
+                    $('#FileName').val(data.FileName);
+                    $('#Extension').val(data.Extension);
+                    $('#EntityId').val(data.Id);
+                }
+            });
+        }
     </script>
     <div>
         <h2>LOGIN</h2>
@@ -246,6 +303,20 @@
         <h2>URL</h2>
         <input type="text" width="20" id="url" value="api/Courses/All"/>
         <input type="text" width="20" id="type" value="GET"/>
+    </div>
+    <div>
+        <h3>If file submission, write courseId and file Id</h3>
+        <input type="text" width="10" onchange="getFileDetails()" autocomplete="off" placeholder="CourseId" id="courseId" />    
+        <input type="file" name="data" id="fileInput" multiple="multiple" />
+         
+        <form id="fileSubmission">            
+            <input type="text" width="10" onchange="getFileDetails()" autocomplete="off" placeholder="FileId" name="files[0].Id" id="fileId" /> 
+            <input type="hidden" name="files[0].FileName" id="FileName"/>
+            <input type="hidden" name="files[0].Extension" id="Extension"/>
+            <input type="hidden" name="files[0].EntityId" id="EntityId"/>
+            <br /><br />
+            <input type="submit" id="Upload" value="Upload" />
+        </form>
     </div>
 
     <div id='HeaderGroup'>

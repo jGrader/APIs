@@ -21,7 +21,7 @@ namespace GraderDataAccessLayer
         public DbSet<FileModel> File { get; set; }
         public DbSet<GradeComponentModel> GradeComponent { get; set; }
         public DbSet<GradeModel> Grade { get; set; }
-        public DbSet<SshKeyModel> SSHKey { get; set; }
+        public DbSet<SshKeyModel> SshKey { get; set; }
         public DbSet<SubmissionModel> Submission { get; set; }
         public DbSet<TaskModel> Task { get; set; }
         public DbSet<TeamMemberModel> TeamMember { get; set; }
@@ -64,23 +64,56 @@ namespace GraderDataAccessLayer
             courses.ForEach(c => context.Course.Add(c));
             context.SaveChanges();
 
-            var gradeComponents = new List<GradeComponentModel>
-            {
-                new GradeComponentModel() { CourseId = 2, Name = "Midterm examination", Percentage = 20 },
-                new GradeComponentModel() { CourseId = 2, Name = "Final examination", Percentage = 30 },
-                new GradeComponentModel() { CourseId = 2, Name = "Homework assignments", Percentage = 20 },
-                new GradeComponentModel() { CourseId = 2, Name = "Weekly quizes", Percentage = 30 },
-            };
-            gradeComponents.ForEach(g => context.GradeComponent.Add(g));
-            context.SaveChanges();
-
             var courseUsers = new List<CourseUserModel>
             {
                 new CourseUserModel {ExcuseLimit = 1, ExtensionLimit = 1, UserId = 1, CourseId = 1, Permissions = 700},
                 new CourseUserModel {ExcuseLimit = 1, ExtensionLimit = 1, UserId = 2, CourseId = 1, Permissions = 700}
             };
-            
+
             courseUsers.ForEach(cu => context.CourseUser.Add(cu));
+            context.SaveChanges();
+
+            var gradeComponents = new List<GradeComponentModel>
+            {
+                new GradeComponentModel { CourseId = 2, Name = "Midterm examination", Percentage = 20 },
+                new GradeComponentModel { CourseId = 2, Name = "Final examination", Percentage = 30 },
+                new GradeComponentModel { CourseId = 2, Name = "Homework assignments", Percentage = 20 },
+                new GradeComponentModel { CourseId = 2, Name = "Weekly quizes", Percentage = 30 },
+                new GradeComponentModel { CourseId = 1, Name = "Monthly quizzes", Percentage = 30 },
+                new GradeComponentModel { CourseId = 1, Name = "Final exam", Percentage = 70 }
+            };
+            gradeComponents.ForEach(g => context.GradeComponent.Add(g));
+            context.SaveChanges();
+
+            var tasks = new List<TaskModel>
+            {
+                new TaskModel { CourseId = 2, GradeComponentId = 1, Name = "Assignment 1" },
+                new TaskModel { CourseId = 1, GradeComponentId = 5, Name = "Week 1 problems" }
+            };
+            tasks.ForEach(t => context.Task.Add(t));
+            context.SaveChanges();
+
+            var entities = new List<EntityModel>
+            {
+                new EntityModel { Name = "Problem 1.1", Points = 10, BonusPoints = 0, OpenTime = new DateTime(2015, 1, 10), CloseTime = new DateTime(2015, 1, 17), TaskId = 1 },
+                new EntityModel { Name = "Problem 1.2", Points = 25, BonusPoints = 0, OpenTime = new DateTime(2015, 1, 10), CloseTime = new DateTime(2015, 1, 17), TaskId = 1 },
+                new EntityModel { Name = "Problem 1.3", Points = 15, BonusPoints = 0, OpenTime = new DateTime(2015, 1, 10), CloseTime = new DateTime(2015, 1, 17), TaskId = 1 },
+                new EntityModel { Name = "Test 1", Points = 15, BonusPoints = 0, OpenTime = new DateTime(2015, 1, 10), CloseTime = new DateTime(2015, 1, 17), TaskId = 2 },
+                new EntityModel { Name = "Test 2", Points = 25, BonusPoints = 0, OpenTime = new DateTime(2015, 1, 10), CloseTime = new DateTime(2015, 1, 17), TaskId = 2 },
+            };
+            entities.ForEach(e => context.Entity.Add(e));
+            context.SaveChanges();
+
+            var files = new List<FileModel>
+            {
+                new FileModel { EntityId = 1, FileName = "file1.1", Extension = ".pdf" },
+                new FileModel { EntityId = 1, FileName = "file1.2", Extension = ".jpg" },
+                new FileModel { EntityId = 2, FileName = "file2", Extension = ".sml" },
+                new FileModel { EntityId = 3, FileName = "file3", Extension = ".cpp" },
+                new FileModel { EntityId = 4, FileName = "file4", Extension = ".pdf" },
+                new FileModel { EntityId = 5, FileName = "file5", Extension = ".bmp" }
+            };
+            files.ForEach(f => context.File.Add(f));
             context.SaveChanges();
         }
     }

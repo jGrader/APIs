@@ -85,8 +85,6 @@
 
         // POST: api/Courses/{courseId}/Submissions/Add
         [HttpPost]
-        [ValidateModelState]
-        [ValidateMimeMultipartContent]
         [PermissionsAuthorize(CoursePermissions.CanCreateSubmissions)]
         public async Task<HttpResponseMessage> Add(int courseId, [FromBody] IEnumerable<FileModel> files)
         {
