@@ -196,6 +196,15 @@ namespace GraderApi.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The request does not contain any files.
+        /// </summary>
+        internal static string NoFiles {
+            get {
+                return ResourceManager.GetString("NoFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to HTTPS is required for accessing this resource.
         /// </summary>
         internal static string NotHttps {

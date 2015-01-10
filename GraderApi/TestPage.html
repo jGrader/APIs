@@ -253,13 +253,13 @@
 
                 var files = [];
                 files.push({ 'Id': $('#fileId').val(), 'FileName': $('#FileName').val(), 'Extension': $('#Extension').val(), 'EntityId': $('#EntityId').val() });
-                //alert(files);
 
                 $.ajax({
-                    url: "api/Courses/" + courseId + "/Submissions/Add/",
+                    url: "api/Courses/" + courseId + "/Submissions/Add/?" + $('#fileSubmission').serialize(),
                     headers: headers,
                     type: 'POST',
-                    data: JSON.stringify(files),
+                    data: formData,
+                    //data: JSON.stringify(files),
                     cache: false,
                     contentType: false,
                     processData: false,

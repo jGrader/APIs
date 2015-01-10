@@ -91,9 +91,14 @@
 
         // POST: api/Courses/{courseId}/Submissions/Add
         [HttpPost]
+
         [PermissionsAuthorize(CoursePermissions.CanCreateSubmissions)]
-        public async Task<HttpResponseMessage> Add(int courseId, [FromBody] IEnumerable<FileModel> files)
+        public async Task<HttpResponseMessage> Add(int courseId, [FromUri] IEnumerable<FileModel> files)
         {
+            if (Request.Content.IsMimeMultipartContent())
+            {
+                var x = 0;
+            }
             if (files == null)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, Messages.NoFiles);
@@ -132,6 +137,11 @@
             var fileSavePath = Path.Combine(HttpContext.Current.Server.MapPath("~/Content/UploadedFiles/"), task.CourseId + "_" + task.Course.Name,
                 fileModels.First().Entity.TaskId + "_" + task.Name, fileModels.First().Entity.Id + "_" + fileModels.First().Entity.Name, currentUser.User.UserName);
 
+            if (!Directory.Exists(fileSavePath))
+            {
+                DirectoryInfo di = Directory.CreateDirectory(fileSavePath);
+            }
+
             // HttpContext.Current MIGHT be null, need to research on this.
             var finalFileModels = new List<FileModelExtension>();
             for (var i = 0; i < HttpContext.Current.Request.Files.Count; i++)
@@ -152,11 +162,13 @@
                 // At this point the files have been uploaded with the proper FileName
                 for (var index = 0; index < streamProvider.FileData.Count; index++)
                 {
+                    var fileId = fileModels[index].Id;
                     var file = streamProvider.FileData[index];
-                    var submission = new SubmissionModel() {UserId = currentUser.User.Id, FileId = fileModels[index].Id, TimeStamp = DateTime.UtcNow, FilePath = Path.Combine(fileSavePath, file.LocalFileName) };
+                    var submission = new SubmissionModel() {UserId = currentUser.User.Id, FileId = fileId, TimeStamp = DateTime.UtcNow, FilePath = Path.Combine(fileSavePath, file.LocalFileName) };
 
                     // Delete any old submission for the same file
-                    var query = (await _submissionRepository.GetAllByLambda(s => s.FileId == fileModels[index].Id && s.UserId == currentUser.User.Id)).FirstOrDefault();
+                    
+                    var query = (await _submissionRepository.GetAllByLambda(s => s.FileId == fileId && s.UserId == currentUser.User.Id)).FirstOrDefault();
                     if (query != null)
                     {
                         var isDeleted = await _submissionRepository.DeleteSubmission(query.Id);
