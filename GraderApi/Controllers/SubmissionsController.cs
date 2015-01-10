@@ -110,10 +110,17 @@
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, Messages.UserNotFound);
             }
 
+            if (fileModels.FirstOrDefault() == null)
+            {
+                // There were no files to submit, return error
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, Messages.NoFiles);
+            }
 
-            var fileSavePath = Path.Combine(HttpContext.Current.Server.MapPath("~/Content/UploadedFiles/"), fileModels.First().Entity.Task.CourseId + "_" + fileModels.First().Entity.Task.Course.Name,
-                fileModels.First().Entity.TaskId + "_" + fileModels.First().Entity.Task.Name, fileModels.First().Entity.Id + "_" + fileModels.First().Entity.Name, currentUser.User.UserName);
+            var task = fileModels.FirstOrDefault().Entity.Task;
+            var fileSavePath = Path.Combine(HttpContext.Current.Server.MapPath("~/Content/UploadedFiles/"), task.CourseId + "_" + task.Course.Name,
+                fileModels.First().Entity.TaskId + "_" + task.Name, fileModels.First().Entity.Id + "_" + fileModels.First().Entity.Name, currentUser.User.UserName);
 
+            // HttpContext.Current MIGHT be null, need to research on this.
             var finalFileModels = new List<FileModelExtension>();
             for (var i = 0; i < HttpContext.Current.Request.Files.Count; i++)
             {
@@ -194,10 +201,10 @@
 
             public FileModelExtension(FileModel f)
             {
-                this.Id = f.Id;
-                this.EntityId = f.EntityId;
-                this.Extension = f.Extension;
-                this.FileName = f.FileName;
+                Id = f.Id;
+                EntityId = f.EntityId;
+                Extension = f.Extension;
+                FileName = f.FileName;
             }
         }
 

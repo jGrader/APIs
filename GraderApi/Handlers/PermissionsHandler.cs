@@ -62,7 +62,7 @@
                 var controller = request.GetRouteData().Values["controller"] as string;
                 if (controller != "Courses")
                 {
-                    // If it's not the 'Courses' controller, right now it can only be the 'Users' controller
+                    // If it's not the 'Courses' controller, right now it can only be the 'Users' or 'CurrentUser' controller, none of which have Permission requirements
                     // Everything is public there except for SuperUser permissions which got cleared a few lines above; just move forward
                     return await base.SendAsync(request, cancellationToken);
                 }

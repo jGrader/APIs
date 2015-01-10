@@ -162,6 +162,9 @@
   <data name="InvalidTaskId" xml:space="preserve">
     <value>The provided taskId is invalid</value>
   </data>
+  <data name="NoFiles" xml:space="preserve">
+    <value>The request does not contain any files</value>
+  </data>
   <data name="NotHttps" xml:space="preserve">
     <value>HTTPS is required for accessing this resource</value>
   </data>
