@@ -9,6 +9,17 @@
     
     <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
     <script type="text/javascript">
+        var models = new Array();
+        $form = $("<form></form<");
+
+        models["Courses"] = ["Name", "CourseNumber", "ShortName", "Semester", "Year", "StartDate", "EndDate", "OwnerId"];
+        models["CourseUsers"] = ["CourseId", "UserId", "Permissions", "ExtensionLimit", "ExcuseLimit"];
+        models["Entities"] = ["Name", "Points", "BonusPoints", "OpenTime", "CloseTime", "TaskId"];
+        models["Files"] = ["FileName", "Extension", "EntityId"];
+        models["GradeComponents"] = ["Name", "Percentage", "CourseId"];
+        models["Submissions"] = ["FilePath", "TimeStamp", "UserId", "FileId"];
+        models["Tasks"] = ["Name", "CourseId", "GradeComponentId"];
+        models["Users"] = ["Name", "Surname", "Email", "UserName", "GraduationYear"];
 
         $(document).ready(function () {
             var sessionId = sessionStorage.getItem("sessionId");
@@ -119,20 +130,21 @@
                 headers["SessionId"] = sessionId;
                 headers["contentType"] = 'application/json; charset=utf-8';
 
-                var contents = $("#requestContent").val();
+                /*var contents = $("#requestContent").val();
                 var data = null;
                 if (contents != "") {
                     data = jQuery.parseJSON(contents);
-                }
+                }*/
+                var data = $form;
                 
                 $.ajax({
                     type: $("#type").val(),
                     url: url,
                     headers: headers,
-                    data: data,
-                    success: function (data) {
+                    data: data.serialize(),
+                    success: function (d) {
                         $("#resultDiv").empty();
-                        $("#resultDiv").append(formatData(data));
+                        $("#resultDiv").append(formatData(d));
                     },
                     error: function(jqXhr, textStatus, errorThrown) {
                         // $("#loginStatus").text("NOT LOGGED IN");
@@ -140,6 +152,25 @@
                         $("#resultDiv").append('<h3>' + jqXhr.status + ': ' + jqXhr.responseText + '</h3>');
                     }
                 });
+            });
+
+            $("#url").change(function() {
+                var val = $("#url").val();
+                var arr = val.split('/');
+                if (arr[arr.length - 1] == "Add") {
+                    var controller = arr[arr.length - 2];
+                    $form.remove();
+                    $form = $("<form></form<");
+                    var fields = models[controller];
+                    if (fields == null)
+                        return;
+                    for (i = 0; i < fields.length; i++) {
+                        $form.append(fields[i] + ':');
+                        $form.append('<input type="text" name="' + fields[i] + '" value="" /><br />');
+                    }
+                    $("#Form").empty();
+                    $("#Form").append($form);
+                }
             });
 
             function formatItem(data) {
@@ -232,10 +263,8 @@
         <input type='button' value='Add Button' id='addCookie'>
         <input type='button' value='Remove Button' id='removeCookie'>
     </div>
-    <div>
-        <p>
-            <textarea id='requestContent' rows='4' cols='50'></textarea>
-        </p>
+    <div id="Form">
+        
     </div>
     <div>
         <p>
