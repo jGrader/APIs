@@ -71,7 +71,7 @@
 
                 //Load virtual properties and return object
                 _db.Entry(item).Reference(c => c.Task).Load();
-                _db.Entry(item).Reference(c => c.Files).Load();
+                _db.Entry(item).Collection(c => c.Files).Load();
                 return item;
             }
             catch (DbException)

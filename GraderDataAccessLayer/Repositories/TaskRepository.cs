@@ -63,7 +63,7 @@ namespace GraderDataAccessLayer.Repositories
                 //Load virtual properties and return object
                 _db.Entry(item).Reference(c => c.Course).Load();
                 _db.Entry(item).Reference(c => c.GradeComponent).Load();
-                _db.Entry(item).Reference(c => c.Entities).Load();
+                _db.Entry(item).Collection(c => c.Entities).Load();
                 return item;
             }
             catch (DbException)

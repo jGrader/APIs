@@ -47,6 +47,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Net.Http" />
@@ -85,6 +86,10 @@
     <ProjectReference Include="..\GraderDataAccessLayer\GraderDataAccessLayer.csproj">
       <Project>{f8a2941c-65ac-41d7-af65-8a4443209898}</Project>
       <Name>GraderDataAccessLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JsonSerializer\JsonSerializer.csproj">
+      <Project>{fd18aff1-e18c-48e1-8952-f7c343d1c5c5}</Project>
+      <Name>JsonSerializer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
