@@ -9,6 +9,8 @@
         CanSeeAllTasks = 1 << 5,
         CanSeeAllEntities = 1 << 6,
         CanSeeAllFiles = 1 << 7,
+        CanSeeAllSubmissions = 1 << 8,
+        CanDeleteSubmission = 1 << 9
     }
 
     public enum AdminPermissions
@@ -45,6 +47,9 @@
         CanSeeFiles = 1 << 10,
         CanCreateFiles = 1 << 11,
         CanUpdateFiles = 1 << 12,
-        CanDeleteFiles = 1 << 13
+        CanDeleteFiles = 1 << 13,
+        CanSeeSubmissions = 1 << 14,
+        CanCreateSubmissions = 1 << 15,
+        CanUpdateSubmissions = 1 << 16
     }
 }

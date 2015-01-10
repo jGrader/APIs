@@ -79,6 +79,24 @@ namespace GraderApi.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The uploaded files and the expected files to be uploaded ... IDK, something is wrong.
+        /// </summary>
+        internal static string FileNamesDoNotMatch {
+            get {
+                return ResourceManager.GetString("FileNamesDoNotMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The number of uploaded files is not consistent with the number of expected files..
+        /// </summary>
+        internal static string FileNumberDoesNotMatch {
+            get {
+                return ResourceManager.GetString("FileNumberDoesNotMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There was an internal error. Please try again!.
         /// </summary>
         internal static string InternalDatabaseError {
@@ -201,6 +219,15 @@ namespace GraderApi.Resources {
         internal static string PermissionsInsufficient {
             get {
                 return ResourceManager.GetString("PermissionsInsufficient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request does not have mime/form-data enctype!.
+        /// </summary>
+        internal static string UnsupportedMediaType {
+            get {
+                return ResourceManager.GetString("UnsupportedMediaType", resourceCulture);
             }
         }
         

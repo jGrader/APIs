@@ -235,6 +235,7 @@
     <Compile Include="Controllers\TasksController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Filters\ValidateMimeMultipartContentAttribute.cs" />
     <Compile Include="Filters\ValidateModelStateAttribute.cs" />
     <Compile Include="Resources\Messages.Designer.cs">
       <AutoGen>True</AutoGen>

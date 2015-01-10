@@ -84,15 +84,6 @@ namespace GraderApi
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
-            // SEE IF YOU CAN'T GET RID OF THIS ONE
-            config.Routes.MapHttpRoute(
-                name: "SubmitFile",
-                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{entityId}",
-                defaults: new {  },
-                constraints: new { controller = "Submissions", courseId = new ApiRouteConstraints(), entityId = new ApiRouteConstraints() },
-                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
-            );
-
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{action}/{id}",

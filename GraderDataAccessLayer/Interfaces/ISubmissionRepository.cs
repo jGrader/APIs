@@ -3,40 +3,18 @@
     using Models;
     using System;
     using System.Collections.Generic;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
 
     public interface ISubmissionRepository : IDisposable
     {
         Task<SubmissionModel> Get(int id);
-        Task<IEnumerable<SubmissionModel>> GetAllByUserId(int id);
-        Task<IEnumerable<SubmissionModel>> GetAllBefore(DateTime timestamp);
-        Task<IEnumerable<SubmissionModel>> GetAllAfter(DateTime timestamp);
-
+        
         Task<IEnumerable<SubmissionModel>> GetAll();
+        Task<IEnumerable<SubmissionModel>> GetAllByCourseId(int courseId);
+        Task<IEnumerable<Models.SubmissionModel>> GetAllByLambda(Expression<Func<SubmissionModel, bool>> exp);
 
         Task<SubmissionModel> Add(SubmissionModel item);
-        Task<SubmissionModel> Update(SubmissionModel item);
         Task<bool> DeleteSubmission(int sumbmissionId);
-
-
-        Task<FileModel> GetFile(int courseId, string entityName, string username, string filename);
-        Task<IEnumerable<FileModel>> GetAllFiles(int courseId);
-        Task<IEnumerable<FileModel>> GetAllFilesByEntityId(int id);
-        Task<IEnumerable<FileModel>> GetAllFilesBefore(DateTime timestamp);
-        Task<IEnumerable<FileModel>> GetAllFilesAfter(DateTime timestamp);
-        Task<IEnumerable<FileModel>> GetAllFilesByUserIdAndEntityId(int userId, int entityId);
-
-        Task<string> Add(FileModel item);
-        Task<bool> Update(FileModel item);
-        Task<bool> DeleteFile(int fileId);
- 
-
-        /* Why do these exist?
-        int GetUserId(int id);
-        int GetEntityId(int id);
-        string GetFileName(int id);
-        string GetFilePath(int id);
-        string GetTimeStamp(int id);
-        */
     }
 }
