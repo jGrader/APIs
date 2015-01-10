@@ -4,6 +4,7 @@
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
+    using GraderDataAccessLayer.Repositories;
     using Principals;
     using Resources;
     using System;
@@ -17,13 +18,18 @@
     using System.Threading.Tasks;
     using System.Web;
     using System.Web.Http;
+    using WebGrease.Css.Extensions;
 
     public class SubmissionsController : ApiController
     {
         private readonly ISubmissionRepository _submissionRepository;
-        public SubmissionsController(ISubmissionRepository submissionRepository)
+        private readonly IEntityRepository _entityRepository;
+        public SubmissionsController(
+            ISubmissionRepository submissionRepository,
+            IEntityRepository entityRepository)
         {
             _submissionRepository = submissionRepository;
+            _entityRepository = entityRepository;
         }
 
         // GET: api/Submissions/All
@@ -88,7 +94,15 @@
         [PermissionsAuthorize(CoursePermissions.CanCreateSubmissions)]
         public async Task<HttpResponseMessage> Add(int courseId, [FromBody] IEnumerable<FileModel> files)
         {
+            if (files == null)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, Messages.NoFiles);
+            }
             var fileModels = files as IList<FileModel> ?? files.ToList();
+            foreach (var file in fileModels)
+            {
+                file.Entity = await _entityRepository.Get(file.EntityId);
+            }
             if (fileModels.Any(file => file.Entity.Task.CourseId != courseId))
             {
                 // If the files uploaded do not belong to this course, exit; how can that happen ?!

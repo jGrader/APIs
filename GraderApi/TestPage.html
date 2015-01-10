@@ -252,14 +252,14 @@
                 formData.append("opmlFile", opmlFile[0]);
 
                 var files = [];
-                files.push({ Id: $('#fileId').val(), FileName: $('#FileName').val(), Extension: $('#Extension').val(), EntityId: $('#EntityId').val() });
-                alert(files);
+                files.push({ 'Id': $('#fileId').val(), 'FileName': $('#FileName').val(), 'Extension': $('#Extension').val(), 'EntityId': $('#EntityId').val() });
+                //alert(files);
 
                 $.ajax({
                     url: "api/Courses/" + courseId + "/Submissions/Add/",
                     headers: headers,
                     type: 'POST',
-                    data: { '' : files },
+                    data: JSON.stringify(files),
                     cache: false,
                     contentType: false,
                     processData: false,
