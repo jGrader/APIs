@@ -185,54 +185,117 @@ namespace GraderApi.Controllers
             var fileSavePath = Path.Combine(HttpContext.Current.Server.MapPath("~/Content/UploadedFiles/"), task.CourseId + "_" + task.Course.Name,
                 task.Id + "_" + task.Name, firstOrDefault.Entity.Id + "_" + firstOrDefault.Entity.Name);
 
-            // Everything is awesome !!!
-            // Start copying the files to their final location
-            foreach (var tempFile in result.FileData)
+            // These variables are where we store old info in case smtg goes wrong to be able to revert
+            var backUpInformation = new List<Tuple<SubmissionModel, string, string>>();
+            var newlyAddedInformation = new List<Tuple<SubmissionModel, string>>();
+
+            try
             {
-                var originalFileName = tempFile.Headers.ContentDisposition.FileName.Replace("\"", string.Empty);
-                var fileModel = fileModelExtensions.First(f => f.OriginalFileName == originalFileName);
-
-                foreach (var teamMember in currentTeam.TeamMembers)
+                // Everything is awesome !!!
+                // Start copying the files to their final location
+                foreach (var tempFile in result.FileData)
                 {
-                    var finalPath = Path.Combine(fileSavePath, teamMember.UserName);
-                    Directory.CreateDirectory(finalPath);
+                    var originalFileName = tempFile.Headers.ContentDisposition.FileName.Replace("\"", string.Empty);
+                    var fileModel = fileModelExtensions.First(f => f.OriginalFileName == originalFileName);
 
-                    // Copy the file to the correct location with the correct name
-                    var tempFilePath = tempFile.LocalFileName;
-                    var finalFilePath = finalPath + "\\" + (fileModel.FileName + fileModel.Extension);
-                    File.Copy(tempFilePath, finalFilePath, true);
-
-                    // Now it's time to register a submission for this file in the Database
-                    var submission = new SubmissionModel { FileId = fileModel.Id, FilePath = finalFilePath, TimeStamp = DateTime.UtcNow, UserId = teamMember.Id };
-                    var member = teamMember; // We have this for a weird possible bug between different versions of compiler
-                    var query = (await _submissionRepository.GetAllByLambda(s => s.FileId == fileModel.Id && s.UserId == member.Id)).FirstOrDefault();
-                    if (query != null)
+                    foreach (var teamMember in currentTeam.TeamMembers)
                     {
-                        // There exists an old submission for this file; update it!
-                        submission.Id = query.Id;
-                        var updateResult = await _submissionRepository.Update(submission);
-                        if (updateResult == null)
+                        // We have this for a weird possible bug between different versions of compiler
+                        // for the GetAllByLambda call not getting the value from an inner-scope variable
+                        var member = teamMember; 
+
+                        var finalPath = Path.Combine(fileSavePath, member.UserName);
+                        Directory.CreateDirectory(finalPath);
+
+                        // Copy the file to the correct location with the correct name
+                        var tempFilePath = tempFile.LocalFileName;
+                        var finalFilePath = finalPath + "\\" + (fileModel.FileName + fileModel.Extension);
+                        var backUpPath = finalPath + "\\Backup";
+                        var finalBackUpFilePath = backUpPath + "\\" + (fileModel.FileName + fileModel.Extension);
+                        if (File.Exists(finalFilePath))
                         {
-                            // TODO: Revert all changes
-                            return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                            //First make a backup
+                            Directory.CreateDirectory(backUpPath);
+                            File.Copy(finalFilePath, finalBackUpFilePath, true);
                         }
-                    }
-                    else
-                    {
-                        // This is the very first submission
-                        var addResult = await _submissionRepository.Add(submission);
-                        if (addResult == null)
+                        File.Copy(tempFilePath, finalFilePath, true);
+
+                        // Now it's time to register a submission for this file in the Database
+                        var submission = new SubmissionModel { FileId = fileModel.Id, FilePath = finalFilePath, TimeStamp = DateTime.UtcNow, UserId = member.Id };
+                        var query = (await _submissionRepository.GetAllByLambda(s => s.FileId == fileModel.Id && s.UserId == member.Id)).FirstOrDefault();
+                        if (query != null)
                         {
-                            // TODO: Revert all changes
-                            return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                            // There exists an old submission for this file; update it!
+                            backUpInformation.Add(new Tuple<SubmissionModel, string, string>(query, finalBackUpFilePath, finalFilePath));
+
+                            submission.Id = query.Id;
+                            var updateResult = await _submissionRepository.Update(submission);
+                            if (updateResult == null)
+                            {
+                                Directory.Delete(tempPath);
+                                var revertResult =
+                                    await RevertFailedSubmisionChanges(backUpInformation, newlyAddedInformation);
+
+                                return Request.CreateResponse(revertResult == HttpStatusCode.OK ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
+                            }
+                        }
+                        else
+                        {
+                            // This is the very first submission
+                            var addResult = await _submissionRepository.Add(submission);
+                            if (addResult == null)
+                            {
+                                Directory.Delete(tempPath);
+                                var revertResult =
+                                    await RevertFailedSubmisionChanges(backUpInformation, newlyAddedInformation);
+
+                                return Request.CreateResponse(revertResult == HttpStatusCode.OK ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
+                            }
+
+                            newlyAddedInformation.Add(new Tuple<SubmissionModel, string>(addResult, finalFilePath));
                         }
                     }
                 }
+
+                // Nothing went wrong; just delete the TempFolder and exit
+                Directory.Delete(tempPath, true);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                Directory.Delete(tempPath);
+                var revertResult = Task.Run(() => RevertFailedSubmisionChanges(backUpInformation, newlyAddedInformation));
+                Task.WaitAll(revertResult);
+
+                return Request.CreateErrorResponse(revertResult.Result == HttpStatusCode.OK ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError, e);
+            }
+        }
+        private async Task<HttpStatusCode> RevertFailedSubmisionChanges(IEnumerable<Tuple<SubmissionModel, string, string>> backUpInformation, 
+            IEnumerable<Tuple<SubmissionModel, string>> newlyAddedInformation)
+        {
+            foreach (var x in newlyAddedInformation)
+            {
+                var result = await _submissionRepository.DeleteSubmission(x.Item1.Id);
+                if (!result)
+                {
+                    return HttpStatusCode.InternalServerError;
+                }
+
+                File.Delete(x.Item2);
             }
 
-            // Nothing went wrong; just delete the TempFolder and exit
-            Directory.Delete(tempPath, true);
-            return Request.CreateResponse(HttpStatusCode.OK);
+            foreach (var y in backUpInformation)
+            {
+                var result = await _submissionRepository.Update(y.Item1);
+                if (result == null)
+                {
+                    return HttpStatusCode.InternalServerError;
+                }
+
+                File.Move(y.Item2, y.Item3);
+            }
+
+            return HttpStatusCode.OK;
         }
         private class FileModelExtension : FileModel
         {
