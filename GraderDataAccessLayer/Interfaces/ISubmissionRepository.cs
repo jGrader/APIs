@@ -16,6 +16,7 @@
         Task<IEnumerable<SubmissionModel>> GetAllByLambda(Expression<Func<SubmissionModel, bool>> exp);
 
         Task<SubmissionModel> Add(SubmissionModel item);
+        Task<SubmissionModel> Update(SubmissionModel item);
         Task<bool> DeleteSubmission(int sumbmissionId);
     }
 }

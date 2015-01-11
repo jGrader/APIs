@@ -57,7 +57,32 @@
 
                 //Load virtual properties and return object
                 _db.Entry(item).Reference(c => c.User).Load();
+                _db.Entry(item).Reference(c => c.File).Load();
                 return item;
+            }
+            catch (DbException)
+            {
+                return null;
+            }
+        }
+        public async Task<SubmissionModel> Update(SubmissionModel item)
+        {
+            if (item == null)
+            {
+                throw new ArgumentNullException("item");
+            }
+
+            var dbItem = await _db.Submission.FirstOrDefaultAsync(c => c.Id == item.Id);
+            if (dbItem == null)
+            {
+                throw new ObjectNotFoundException();
+            }
+
+            try
+            {
+                _db.Entry(dbItem).CurrentValues.SetValues(item);
+                await _db.SaveChangesAsync();
+                return await Get(item.Id);
             }
             catch (DbException)
             {

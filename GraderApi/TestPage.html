@@ -249,13 +249,17 @@
 
                 var formData = new FormData();
                 var opmlFile = $('#fileInput').get(0).files;
-                formData.append("opmlFile", opmlFile[0]);
+
 
                 var files = [];
-                files.push({ 'Id': $('#fileId').val(), 'FileName': $('#FileName').val(), 'Extension': $('#Extension').val(), 'EntityId': $('#EntityId').val() });
+                files.push({ 'Id': $('#fileId').val(), 'OriginalFileName': opmlFile[0].name, 'FileName': $('#FileName').val(), 'Extension': $('#Extension').val(), 'EntityId': $('#EntityId').val() });
+
+                formData.append("fileModels", JSON.stringify(files));
+                formData.append("File_0", opmlFile[0]);
+
 
                 $.ajax({
-                    url: "api/Courses/" + courseId + "/Submissions/Add/?" + $('#fileSubmission').serialize(),
+                    url: "api/Courses/" + courseId + "/Submissions/Add/",
                     headers: headers,
                     type: 'POST',
                     data: formData,
