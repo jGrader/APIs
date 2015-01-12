@@ -1,5 +1,6 @@
 ﻿namespace GraderApi.Handlers
 {
+    using GraderDataAccessLayer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Repositories;
     using Principals;
@@ -18,9 +19,11 @@
 
     public class PermissionsHandler : DelegatingHandler
     {
-        public PermissionsHandler(HttpConfiguration httpConfiguration)
+        private readonly DatabaseContext _context;
+        public PermissionsHandler(HttpConfiguration httpConfiguration, DatabaseContext context)
         {
-            InnerHandler = new HttpControllerDispatcher(httpConfiguration); 
+            InnerHandler = new HttpControllerDispatcher(httpConfiguration);
+            _context = context;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -35,7 +38,7 @@
             
             // Check whether the currentUser is a super user or an admin
             var adminPermissions = new string[] { };
-            using (IAdminRepository adminRepository = new AdminRepository())
+            using (IAdminRepository adminRepository = new AdminRepository(_context))
             {
                 var adminUser = await adminRepository.GetByUserId(currentUser.User.Id);
                 if (adminUser != null) //This means that the user is an admin
@@ -85,7 +88,7 @@
             {
                 // Only admins can be CourseOwners, 
                 // so this test only applies to those who have adminPermissions
-                using (var courseRepository = new CourseRepository())
+                using (var courseRepository = new CourseRepository(_context))
                 {
                     var course = await courseRepository.Get(courseId);
                     if (course == null)
@@ -107,7 +110,7 @@
             }
 
             // If the user is not the CourseOwner, check that (s)he is actually enrolled for this course 
-            using (var courseUserRepository = new CourseUserRepository())
+            using (var courseUserRepository = new CourseUserRepository(_context))
             {
                 var courseUser = (await courseUserRepository.GetAllByLambda(cu => (cu.UserId == currentUser.User.Id) && (cu.CourseId == courseId))).FirstOrDefault();
                 if (courseUser == null)

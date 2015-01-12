@@ -13,9 +13,12 @@
 
     public class CourseRepository : ICourseRepository
     {
-        private DatabaseContext _db = new DatabaseContext();
+        private DatabaseContext _db;
 
-
+        public CourseRepository(DatabaseContext db)
+        {
+            _db = db;
+        }
         public async Task<CourseModel> Get(int courseId)
         {
             return await _db.Course.FirstOrDefaultAsync(c => c.Id == courseId);
@@ -147,12 +150,7 @@
             {
                 return;
             }
-            if (_db == null)
-            {
-                return;
-            }
 
-            _db.Dispose();
             _db = null;
         }      
     }

@@ -13,8 +13,12 @@
 
     public class SubmissionRepository: ISubmissionRepository
     {
-        private DatabaseContext _db = new DatabaseContext();
+        private DatabaseContext _db;
 
+        public SubmissionRepository(DatabaseContext db)
+        {
+            _db = db;
+        }
 
         public async Task<SubmissionModel> Get(int id)
         {
@@ -121,12 +125,6 @@
             {
                 return;
             }
-            if (_db == null)
-            {
-                return;
-            }
-
-            _db.Dispose();
             _db = null;
         }    
     }

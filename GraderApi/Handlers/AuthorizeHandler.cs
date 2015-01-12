@@ -22,16 +22,17 @@ using System.Web.Security;
 namespace GraderApi.Handlers
 {
     using System.Configuration;
+    using GraderDataAccessLayer;
 
     public class AuthorizeHandler : DelegatingHandler
     {
         private readonly IUserRepository _userRepository;
         private readonly ISessionIdRepository _sessionIdRepository;
 
-        public AuthorizeHandler()
+        public AuthorizeHandler(DatabaseContext context)
         {
-            _userRepository = new UserRepository();
-            _sessionIdRepository = new SessionIdRepository();
+            _userRepository = new UserRepository(context);
+            _sessionIdRepository = new SessionIdRepository(context);
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

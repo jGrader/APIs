@@ -11,9 +11,12 @@
 
     public class AdminRepository : IAdminRepository
     {
-        private DatabaseContext _db = new DatabaseContext();
+        private DatabaseContext _db;
 
-
+        public AdminRepository(DatabaseContext db)
+        {
+            _db = db;
+        }
         public async Task<AdminModel> Get(int id)
         {
             var searchResult = await _db.Admin.FirstOrDefaultAsync(a => a.Id == id);
@@ -95,12 +98,6 @@
             {
                 return;
             }
-            if (_db == null)
-            {
-                return;
-            }
-
-            _db.Dispose();
             _db = null;
         }
     }

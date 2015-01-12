@@ -13,8 +13,12 @@
 
     public class UserRepository : IUserRepository
     {
-        private DatabaseContext _db = new DatabaseContext();
+        private DatabaseContext _db;
 
+        public UserRepository(DatabaseContext db)
+        {
+            _db = db;
+        }
 
         public async Task<UserModel> Get(int id)
         {
@@ -116,12 +120,7 @@
             {
                 return;
             }
-            if (_db == null)
-            {
-                return;
-            }
 
-            _db.Dispose();
             _db = null;
         }      
     }

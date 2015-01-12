@@ -12,8 +12,12 @@
 
     public class SessionIdRepository : ISessionIdRepository
     {
-        DatabaseContext _db = new DatabaseContext();
+        private DatabaseContext _db;
 
+        public SessionIdRepository(DatabaseContext db)
+        {
+            _db = db;
+        }
 
         public async Task<IEnumerable<SessionIdModel>> GetAll()
         {
@@ -111,12 +115,7 @@
             {
                 return;
             }
-            if (_db == null)
-            {
-                return;
-            }
 
-            _db.Dispose();
             _db = null;
         }      
     }

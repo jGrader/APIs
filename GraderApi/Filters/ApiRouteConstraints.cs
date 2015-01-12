@@ -8,6 +8,8 @@ using GraderDataAccessLayer.Repositories;
 
 namespace GraderApi.Filters
 {
+    using GraderDataAccessLayer;
+
     public class ApiRouteConstraints : IHttpRouteConstraint, IDisposable
     {
         private IUserRepository _userRepository;
@@ -20,17 +22,17 @@ namespace GraderApi.Filters
         private ISubmissionRepository _submissionRepository;
         private ITeamRepository _teamRepository;
 
-        public ApiRouteConstraints()
+        public ApiRouteConstraints(DatabaseContext context)
         {
-            _userRepository = new UserRepository();
-            _courseRepository = new CourseRepository();
-            _courseUserRepository = new CourseUserRepository();
-            _gradeComponentRepository = new GradeComponentRepository();
-            _taskRepository = new TaskRepository();
-            _entityRepository = new EntityRepository();
-            _fileRepository = new FileRepository();
-            _submissionRepository = new SubmissionRepository();
-            _teamRepository = new TeamRepository();
+            _userRepository = new UserRepository(context);
+            _courseRepository = new CourseRepository(context);
+            _courseUserRepository = new CourseUserRepository(context);
+            _gradeComponentRepository = new GradeComponentRepository(context);
+            _taskRepository = new TaskRepository(context);
+            _entityRepository = new EntityRepository(context);
+            _fileRepository = new FileRepository(context);
+            _submissionRepository = new SubmissionRepository(context);
+            _teamRepository = new TeamRepository(context);
         }
         
         public bool Match(HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection)

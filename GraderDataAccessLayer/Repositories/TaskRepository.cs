@@ -14,8 +14,12 @@ namespace GraderDataAccessLayer.Repositories
 
     public class TaskRepository : ITaskRepository
     {
-        private DatabaseContext _db = new DatabaseContext();
-    
+        private DatabaseContext _db;
+
+        public TaskRepository(DatabaseContext db)
+        {
+            _db = db;
+        }
 
         public async Task<TaskModel> Get(int id)
         {
@@ -127,12 +131,7 @@ namespace GraderDataAccessLayer.Repositories
             {
                 return;
             }
-            if (_db == null)
-            {
-                return;
-            }
 
-            _db.Dispose();
             _db = null;
         }
     }

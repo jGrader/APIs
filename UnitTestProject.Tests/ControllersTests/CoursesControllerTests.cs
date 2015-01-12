@@ -21,7 +21,7 @@ namespace UnitTestProject.Tests.ControllersTests
     public class CoursesControllerTests
     {
         #region Initialization and Cleanup
-
+        private DatabaseContext _context = new DatabaseContext();
         private static ICourseRepository Cr;
         private CoursesController _cc;
 
@@ -44,7 +44,7 @@ namespace UnitTestProject.Tests.ControllersTests
         [TestInitialize]
         public void Initialize()
         {
-            Cr = new CourseRepository();
+            Cr = new CourseRepository(_context);
             _cc = new CoursesController(Cr);
 
             _cc.Configuration = new HttpConfiguration();
@@ -53,7 +53,7 @@ namespace UnitTestProject.Tests.ControllersTests
                name: "CourseRoute",
                 routeTemplate: "api/{controller}/{action}/{courseId}",
                 defaults: new { },
-                constraints: new { controller = "Courses", courseId = new ApiRouteConstraints() }
+                constraints: new { controller = "Courses", courseId = new ApiRouteConstraints(_context) }
                );
 
             _cc.Configuration.Routes.MapHttpRoute(

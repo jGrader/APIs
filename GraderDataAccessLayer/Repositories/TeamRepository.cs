@@ -12,8 +12,12 @@
 
     public class TeamRepository : ITeamRepository
     {
-        private DatabaseContext _db = new DatabaseContext();
+        private DatabaseContext _db;
 
+        public TeamRepository(DatabaseContext db)
+        {
+            _db = db;
+        }
       
         public async Task<TeamModel> Get(int teamId)
         {
@@ -114,12 +118,7 @@
             {
                 return;
             }
-            if (_db == null)
-            {
-                return;
-            }
 
-            _db.Dispose();
             _db = null;
         }  
     }

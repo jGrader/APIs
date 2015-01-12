@@ -15,7 +15,7 @@ namespace UnitTestProject.Tests.RepositoryTests
     public class CourseUserRepositoryTests
     {
         #region Initialization and Cleanup
-
+        private DatabaseContext _context =  new DatabaseContext();
         private ICourseUserRepository _cur;
 
         [ClassInitialize]
@@ -36,7 +36,7 @@ namespace UnitTestProject.Tests.RepositoryTests
         [TestInitialize]
         public void Initialize()
         {
-            _cur = new CourseUserRepository();
+            _cur = new CourseUserRepository(_context);
         }
 
         [TestCleanup]

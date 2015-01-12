@@ -13,9 +13,12 @@
 
     public class EntityRepository : IEntityRepository
     {
-        private DatabaseContext _db = new DatabaseContext();
+        private DatabaseContext _db;
 
-
+        public EntityRepository(DatabaseContext db)
+        {
+            _db = db;
+        }
         public async Task<EntityModel> Get(int id)
         {
             var searchResult = await _db.Entity.FirstOrDefaultAsync(e => e.Id == id);
@@ -135,12 +138,7 @@
             {
                 return;
             }
-            if (_db == null)
-            {
-                return;
-            }
 
-            _db.Dispose();
             _db = null;
         }      
     }
