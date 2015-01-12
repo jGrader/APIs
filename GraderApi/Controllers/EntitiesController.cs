@@ -15,9 +15,13 @@
     public class EntitiesController : ApiController
     {
         private readonly IEntityRepository _entityRepository;
-        public EntitiesController(IEntityRepository entityRepository)
+        private readonly ITaskRepository _taskRepository;
+        public EntitiesController(
+            IEntityRepository entityRepository,
+            ITaskRepository taskRepository)
         {
             _entityRepository = entityRepository;
+            _taskRepository = taskRepository;
         }
 
         // GET: api/Entities/All
@@ -107,6 +111,7 @@
         [PermissionsAuthorize(CoursePermissions.CanCreateEntities)]
         public async Task<HttpResponseMessage> Add(int courseId, [FromBody] EntityModel entity)
         {
+            entity.Task = await _taskRepository.Get(entity.TaskId);
             if (courseId != entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -136,6 +141,7 @@
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
+            entity.Task = await _taskRepository.Get(entityId);
             if (courseId != entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);

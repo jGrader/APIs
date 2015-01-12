@@ -231,6 +231,7 @@
     <Compile Include="Controllers\EntitiesController.cs" />
     <Compile Include="Controllers\FilesController.cs" />
     <Compile Include="Controllers\GradeComponentsController.cs" />
+    <Compile Include="Controllers\GradesController.cs" />
     <Compile Include="Controllers\TeamsController.cs" />
     <Compile Include="Filters\ApiRouteConstraints.cs" />
     <Compile Include="Controllers\SubmissionsController.cs" />

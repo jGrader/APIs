@@ -38,5 +38,9 @@
         [Required]
         [DataType(DataType.Text)]
         public string Comment { get; set; }
+
+        [Required]
+        [DataType(DataType.DateTime)]
+        public DateTime TimeStamp { get; set; }
     }
 }
