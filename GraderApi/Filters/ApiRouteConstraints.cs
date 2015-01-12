@@ -215,6 +215,18 @@ namespace GraderApi.Filters
             DisposeFileRepository();
             DisposeSubmissionRepository();
             DisposeTeamRepository();
+            DisposeGradeRepository();
+        }
+
+        private void DisposeGradeRepository()
+        {
+            if (_gradeRepository == null)
+            {
+                return;
+            }
+
+            _gradeRepository.Dispose();
+            _gradeRepository = null;
         }
         private void DisposeUserRepository()
         {
