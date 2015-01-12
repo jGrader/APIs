@@ -21,6 +21,7 @@ namespace GraderApi.Filters
         private IFileRepository _fileRepository;
         private ISubmissionRepository _submissionRepository;
         private ITeamRepository _teamRepository;
+        private IGradeRepository _gradeRepository;
 
         public ApiRouteConstraints(DatabaseContext context)
         {
@@ -33,6 +34,7 @@ namespace GraderApi.Filters
             _fileRepository = new FileRepository(context);
             _submissionRepository = new SubmissionRepository(context);
             _teamRepository = new TeamRepository(context);
+            _gradeRepository = new GradeRepository(context);
         }
         
         public bool Match(HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection)
@@ -171,6 +173,19 @@ namespace GraderApi.Filters
 
                     //
                     var result = Task.Run(() => _teamRepository.Get(teamId));
+                    Task.WaitAll(result);
+                    return (result.Result != null);
+                }
+                case "gradeId":
+                {
+                    int gradeId;
+                    if (!int.TryParse(stringValue, out gradeId))
+                    {
+                        return false;
+                    }
+
+                    //
+                    var result = Task.Run(() => _gradeRepository.Get(gradeId));
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }

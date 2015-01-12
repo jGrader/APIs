@@ -26,6 +26,14 @@ namespace GraderApi
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(
+                name: "GradeRoute",
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{gradeId}",
+                defaults: new { gradeId = UrlParameter.Optional},
+                constraints: new { controller = "Grades", courseId = new ApiRouteConstraints(context), gradeId = new ApiRouteConstraints(context)},
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration, context)
+            );
+
+            config.Routes.MapHttpRoute(
                 name: "CurrentUserRoute",
                 routeTemplate: "api/{controller}/{action}/{courseId}",
                 defaults: new { courseId = UrlParameter.Optional },

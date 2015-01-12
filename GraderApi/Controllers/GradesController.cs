@@ -56,13 +56,12 @@ namespace GraderApi.Controllers
             try
             {
                 var res = new List<IEnumerable<GradeModel>>();
-                var entities = (await _entityRepository.GetAllByCourseId(courseId)).Select(e => _gradeRepository.GetGradesByEntityId(e.Id)).ToArray();
-                foreach (var task in entities)
+                var entities = (await _entityRepository.GetAllByCourseId(courseId));
+                foreach (var entity in entities)
                 {
-                    task.Start();
+                    var tmp = await _gradeRepository.GetGradesByEntityId(entity.Id);
+                    res.Add(tmp);
                 }
-                Task.WaitAll(entities);
-                entities.ForEach(task => res.Add(task.Result));
 
                 var jsonResult = new JArray();
                 res.ForEach(g => jsonResult.Add(g.ToJson()));
