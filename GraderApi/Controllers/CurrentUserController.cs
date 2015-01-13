@@ -1,19 +1,16 @@
 ﻿namespace GraderApi.Controllers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Http;
-    using System.Runtime.InteropServices;
-    using System.Threading.Tasks;
-    using System.Web;
-    using System.Web.Http;
-    using System.Web.UI;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
     using Principals;
+    using System;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+    using System.Web;
+    using System.Web.Http;
 
     public class CurrentUserController : ApiController
     {
