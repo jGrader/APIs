@@ -5,7 +5,6 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-
     public interface IEntityRepository : IDisposable
     {
         Task<EntityModel> Get(int id);

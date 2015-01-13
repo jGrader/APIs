@@ -27,163 +27,176 @@
 
         public static JObject ToJson(this AdminModel am)
         {
-            var result = new JObject();
-
-            result.Add("Id", am.Id);
-            result.Add("UserId", am.UserId);
-            result.Add("IsSuperUser", am.IsSuperUser);
+            var result = new JObject
+            {
+                {"Id", am.Id}, 
+                {"UserId", am.UserId}, 
+                {"IsSuperUser", am.IsSuperUser}
+            };
 
             return result;
         }
 
         public static JObject ToJson(this CourseUserModel cum)
         {
-            var result = new JObject();
-
-            result.Add("Id", cum.Id);
-            result.Add("CourseId", cum.CourseId);
-            result.Add("UserId", cum.UserId);
-            result.Add("Permissions", cum.Permissions);
-            result.Add("ExtensionLimit", cum.ExtensionLimit);
-            result.Add("ExcuseLimit", cum.ExcuseLimit);
+            var result = new JObject
+            {
+                {"Id", cum.Id},
+                {"CourseId", cum.CourseId},
+                {"UserId", cum.UserId},
+                {"Permissions", cum.Permissions},
+                {"ExtensionLimit", cum.ExtensionLimit},
+                {"ExcuseLimit", cum.ExcuseLimit}
+            };
 
             return result;
         }
 
         public static JObject ToJson(this EntityModel em)
         {
-            var result = new JObject();
-
-            result.Add("Id", em.Id);
-            result.Add("Points", em.Points);
-            result.Add("BonusPoints", em.BonusPoints);
-            result.Add("TaskId", em.TaskId);
-            result.Add("OpenTime", em.OpenTime);
-            result.Add("CloseTime", em.CloseTime);
-            result.Add("Name", em.Name);
+            var result = new JObject
+            {
+                {"Id", em.Id},
+                {"Points", em.Points},
+                {"BonusPoints", em.BonusPoints},
+                {"TaskId", em.TaskId},
+                {"OpenTime", em.OpenTime},
+                {"CloseTime", em.CloseTime},
+                {"Name", em.Name}
+            };
 
             return result;
         }
 
         public static JObject ToJson(this ExcuseModel em)
         {
-            var result = new JObject();
-
-            result.Add("Id", em.Id);
-            result.Add("EntityId", em.EntityId);
-            result.Add("UserId", em.UserId);
+            var result = new JObject
+            {
+                {"Id", em.Id}, 
+                {"EntityId", em.EntityId}, 
+                {"UserId", em.UserId}
+            };
 
             return result;
         }
 
         public static JObject ToJson(this ExtensionModel em)
         {
-            var result = new JObject();
-
-            result.Add("Id", em.Id);
-            result.Add("EntityId", em.EntityId);
-            result.Add("UserId", em.UserId);
+            var result = new JObject
+            {
+                {"Id", em.Id}, 
+                {"EntityId", em.EntityId}, 
+                {"UserId", em.UserId}
+            };
 
             return result;
         }
 
         public static JObject ToJson(this GradeComponentModel gcm)
         {
-            var result = new JObject();
-
-            result.Add("Id", gcm.Id);
-            result.Add("CourseId", gcm.CourseId);
-            result.Add("Name", gcm.Name);
-            result.Add("Percentage", gcm.Percentage);
+            var result = new JObject
+            {
+                {"Id", gcm.Id},
+                {"CourseId", gcm.CourseId},
+                {"Name", gcm.Name},
+                {"Percentage", gcm.Percentage}
+            };
 
             return result;
         }
 
         public static JObject ToJson(this GradeModel gm)
         {
-            var result = new JObject();
-
-            result.Add("Id", gm.Id);
-            result.Add("UserId", gm.UserId);
-            result.Add("GraderId", gm.GraderId);
-            result.Add("EntityId", gm.EntityId);
-            result.Add("Grade", gm.Grade);
-            result.Add("BonusGrade", gm.BonusGrade);
-            result.Add("Comment", gm.Comment);
+            var result = new JObject
+            {
+                {"Id", gm.Id},
+                {"UserId", gm.UserId},
+                {"GraderId", gm.GraderId},
+                {"EntityId", gm.EntityId},
+                {"Grade", gm.Grade},
+                {"BonusGrade", gm.BonusGrade},
+                {"Comment", gm.Comment}
+            };
 
             return result;
         }
 
         public static JObject ToJson(this SshKeyModel skm)
         {
-            var result = new JObject();
-
-            result.Add("Id", skm.Id);
-            result.Add("Key", skm.Key);
-            result.Add("UserId", skm.UserId);
+            var result = new JObject
+            {
+                {"Id", skm.Id}, 
+                {"Key", skm.Key}, 
+                {"UserId", skm.UserId}
+            };
 
             return result;
         }
 
         public static JObject ToJson(this SubmissionModel sm)
         {
-            var result = new JObject();
-
-            result.Add("Id", sm.Id);
-            result.Add("UserId", sm.UserId);
-            result.Add("FileId", sm.FileId);
-            result.Add("FilePath", sm.FilePath);
-            result.Add("TimeStamp", sm.TimeStamp);
+            var result = new JObject
+            {
+                {"Id", sm.Id},
+                {"UserId", sm.UserId},
+                {"FileId", sm.FileId},
+                {"FilePath", sm.FilePath},
+                {"TimeStamp", sm.TimeStamp}
+            };
 
             return result;
         }
 
         public static JObject ToJson(this TaskModel tm)
         {
-            var result = new JObject();
-
-            result.Add("Id", tm.Id);
-            result.Add("Name", tm.Name);
-            result.Add("GradeComponentId", tm.GradeComponentId);
-            result.Add("CourseId", tm.CourseId);
+            var result = new JObject
+            {
+                {"Id", tm.Id},
+                {"Name", tm.Name},
+                {"GradeComponentId", tm.GradeComponentId},
+                {"CourseId", tm.CourseId}
+            };
 
             return result;
         }
 
         public static JObject ToJson(this TeamModel tm)
         {
-            var result = new JObject();
-
-            result.Add("Id", tm.Id);
-            result.Add("EntityId", tm.EntityId);
-            result.Add("TeamMembers", tm.TeamMembers.ToJson());
+            var result = new JObject
+            {
+                {"Id", tm.Id},
+                {"EntityId", tm.EntityId},
+                {"TeamMembers", tm.TeamMembers.ToJson()}
+            };
 
             return result;
         }
 
         public static JObject ToJson(this UserModel um)
         {
-            var result = new JObject();
-
-            result.Add("Id", um.Id);
-            result.Add("Name", um.Name);
-            result.Add("Surname", um.Surname);
-            result.Add("Email", um.Email);
-            result.Add("UserName", um.UserName);
-            result.Add("PasswordHash", um.PasswordHash);
-            result.Add("GraduationYear", um.GraduationYear);
+            var result = new JObject
+            {
+                {"Id", um.Id},
+                {"Name", um.Name},
+                {"Surname", um.Surname},
+                {"Email", um.Email},
+                {"UserName", um.UserName},
+                {"PasswordHash", um.PasswordHash},
+                {"GraduationYear", um.GraduationYear}
+            };
 
             return result;
         }
 
         public static JObject ToJson(this FileModel fm)
         {
-            var result = new JObject();
-
-            result.Add("Id", fm.Id);
-            result.Add("FileName", fm.FileName);
-            result.Add("Extension", fm.Extension);
-            result.Add("EntityId", fm.EntityId);
+            var result = new JObject
+            {
+                {"Id", fm.Id},
+                {"FileName", fm.FileName},
+                {"Extension", fm.Extension},
+                {"EntityId", fm.EntityId}
+            };
 
             return result;
         }

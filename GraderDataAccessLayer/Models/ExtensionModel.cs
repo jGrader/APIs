@@ -10,15 +10,21 @@
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        //Navigation property
-        public int UserId { get; set; }
         [Required]
+        [DataType(DataType.DateTime)]
+        public DateTime NewDeadline { get; set; }
+
+        //Navigation properties
+        [Required]
+        public int UserId { get; set; }
+
+        [Required]
+        public int EntityId { get; set; }
+
+
         [ForeignKey("UserId")]
         public virtual UserModel User { get; set; }
 
-        //Navigation property
-        public int EntityId { get; set; }
-        [Required]
         [ForeignKey("EntityId")]
         public virtual EntityModel Entity { get; set; }
     }

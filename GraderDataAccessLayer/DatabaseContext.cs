@@ -18,6 +18,7 @@ namespace GraderDataAccessLayer
         public DbSet<CourseUserModel> CourseUser { get; set; }
         public DbSet<EntityModel> Entity { get; set; }
         public DbSet<ExtensionModel> Extension { get; set; }
+        public DbSet<ExcuseModel> Excuse { get; set; }
         public DbSet<FileModel> File { get; set; }
         public DbSet<GradeComponentModel> GradeComponent { get; set; }
         public DbSet<GradeModel> Grade { get; set; }

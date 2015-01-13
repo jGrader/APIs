@@ -14,20 +14,21 @@
     public class CourseRepository : ICourseRepository
     {
         private DatabaseContext _db;
-
         public CourseRepository(DatabaseContext db)
         {
             _db = db;
         }
+
+
         public async Task<CourseModel> Get(int courseId)
         {
             return await _db.Course.FirstOrDefaultAsync(c => c.Id == courseId);
         }
+
         public async Task<IEnumerable<CourseModel>> GetAll()
         {
             return await Task.Run(() => _db.Course);
         }     
-
         public async Task<IEnumerable<CourseModel>> GetByName(string name)
         {
             var searchResult = await Task.Run(() => _db.Course.Where(c => c.Name == name));

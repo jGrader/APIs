@@ -55,6 +55,8 @@
     <Compile Include="Interfaces\IAdminRepository.cs" />
     <Compile Include="Interfaces\ICourseUserRepository.cs" />
     <Compile Include="Interfaces\IEntityRepository.cs" />
+    <Compile Include="Interfaces\IExcuseRepository.cs" />
+    <Compile Include="Interfaces\IExtensionRepository.cs" />
     <Compile Include="Interfaces\IFileRepository.cs" />
     <Compile Include="Interfaces\IGradeRepository.cs" />
     <Compile Include="Interfaces\ISessionIdRepository.cs" />
@@ -81,6 +83,8 @@
     <Compile Include="Repositories\AdminRepository.cs" />
     <Compile Include="Repositories\CourseUserRepository.cs" />
     <Compile Include="Repositories\EntityRepository.cs" />
+    <Compile Include="Repositories\ExcuseRepository.cs" />
+    <Compile Include="Repositories\ExtensionRepository.cs" />
     <Compile Include="Repositories\FileRepository.cs" />
     <Compile Include="Repositories\GradeComponentRepository.cs" />
     <Compile Include="Interfaces\ICourseRepository.cs" />
