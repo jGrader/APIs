@@ -1,13 +1,12 @@
 ﻿using GraderApi.Filters;
 using GraderApi.Handlers;
+using GraderDataAccessLayer;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Mvc;
 
 namespace GraderApi
 {
-    using GraderDataAccessLayer;
-
     public static class WebApiConfig
     {
         public static void Register(HttpConfiguration config, DatabaseContext context)

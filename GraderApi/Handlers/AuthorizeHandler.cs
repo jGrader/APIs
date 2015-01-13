@@ -1,28 +1,25 @@
-﻿using GraderApi.Principals;
-using GraderDataAccessLayer.Interfaces;
-using GraderDataAccessLayer.Models;
-using GraderDataAccessLayer.Repositories;
-using GraderApi.Resources;
-using System;
-using System.Collections.Generic;
-using System.DirectoryServices;
-using System.Globalization;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Security.Principal;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Configuration;
-using System.Web.Security;
-
-
-namespace GraderApi.Handlers
+﻿namespace GraderApi.Handlers
 {
-    using System.Configuration;
     using GraderDataAccessLayer;
+    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer.Models;
+    using GraderDataAccessLayer.Repositories;
+    using Resources;
+    using System;
+    using System.Collections.Generic;
+    using System.Configuration;
+    using System.DirectoryServices;
+    using System.Globalization;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+    using System.Security.Principal;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Web;
+    using System.Web.Configuration;
+    using System.Web.Security;
 
     public class AuthorizeHandler : DelegatingHandler
     {
@@ -295,7 +292,6 @@ namespace GraderApi.Handlers
                     }
                 }
             }
-
             public static bool IsUserInRole(string username, string roleName)
             {
                 IEnumerable<string> roles = GetRolesForUser(username);

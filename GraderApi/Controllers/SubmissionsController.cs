@@ -1,17 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using Microsoft.Ajax.Utilities;
-
-namespace GraderApi.Controllers
+﻿namespace GraderApi.Controllers
 {
     using Filters;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
-    using Principals;
     using Resources;
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
     using System.Net;

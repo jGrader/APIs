@@ -1,5 +1,6 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Filters;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -13,7 +14,6 @@
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
-    using Principals;
 
     public class CurrentUserController : ApiController
     {
@@ -26,15 +26,8 @@
         private readonly IGradeRepository _gradeRepository;
         private readonly UserModel _user;
 
-        public CurrentUserController(
-            ICourseRepository courseRepository,
-            ICourseUserRepository coureUserRepository,
-            IEntityRepository entityRepository,
-            IFileRepository fileRepository,
-            ISubmissionRepository submissionRepository,
-            ITaskRepository taskRepository,
-            IGradeRepository gradeRepository
-            )
+        public CurrentUserController(ICourseRepository courseRepository, ICourseUserRepository coureUserRepository, IEntityRepository entityRepository,
+            IFileRepository fileRepository, ISubmissionRepository submissionRepository, ITaskRepository taskRepository, IGradeRepository gradeRepository)
         {
             _courseRepository = courseRepository;
             _courseUserRepository = coureUserRepository;
@@ -52,6 +45,7 @@
             _user = principal.User;
         }
 
+        // GET: api/CurrentUser/Courses
         [HttpGet]
         public async Task<HttpResponseMessage> Courses()
         {
@@ -69,12 +63,14 @@
             }
         }
 
+        // GET: api/CurrentUser/Submissions/{courseId}
         [HttpGet]
+        [ValidateModelState]
         public async Task<HttpResponseMessage> Submissions(int courseId)
         {
             try
             {
-                var submissions = await _submissionRepository.GetAllByUserId(_user.Id);
+                var submissions = await _submissionRepository.GetAllByLambda(s => s.UserId == _user.Id && s.File.Entity.Task.CourseId == courseId);
                 return Request.CreateResponse(HttpStatusCode.OK, submissions.ToJson());
 
             }
@@ -84,7 +80,9 @@
             }
         }
 
+        // GET: api/CurrentUser/Grades/{courseId}
         [HttpGet]
+        [ValidateModelState]
         public async Task<HttpResponseMessage> Grades(int courseId)
         {
             try

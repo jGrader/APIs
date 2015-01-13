@@ -1,31 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-
-namespace GraderApi.Controllers
+﻿namespace GraderApi.Controllers
 {
-    using System.Threading.Tasks;
     using Filters;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
     using Newtonsoft.Json.Linq;
     using Resources;
-    using WebGrease.Css.Extensions;
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+    using System.Web.Http;
 
     public class GradesController : ApiController
     {
         private readonly IGradeRepository _gradeRepository;
         private readonly IEntityRepository _entityRepository;
         private readonly ITaskRepository _taskRepository;
-
-        public GradesController(
-            IGradeRepository gradeRepository,
-            IEntityRepository entityRepository,
-            ITaskRepository taskRepository)
+        public GradesController(IGradeRepository gradeRepository, IEntityRepository entityRepository, ITaskRepository taskRepository)
         {
             _gradeRepository = gradeRepository;
             _entityRepository = entityRepository;
@@ -105,7 +98,7 @@ namespace GraderApi.Controllers
         [HttpPut]
         [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanGrade)]
-        public async Task<HttpResponseMessage> Update(int courseId, int gradeId, [FromBody]GradeModel grade)
+        public async Task<HttpResponseMessage> Update(int courseId, int gradeId, [FromBody] GradeModel grade)
         {
             if (gradeId != grade.Id)
             {

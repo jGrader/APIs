@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Web;
+﻿using System.Security.Principal;
 using GraderDataAccessLayer.Models;
 
-namespace GraderApi.Principals
+namespace GraderApi
 {
     public class UserPrincipal : GenericPrincipal
     {

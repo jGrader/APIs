@@ -16,9 +16,7 @@
     {
         private readonly IEntityRepository _entityRepository;
         private readonly ITaskRepository _taskRepository;
-        public EntitiesController(
-            IEntityRepository entityRepository,
-            ITaskRepository taskRepository)
+        public EntitiesController(IEntityRepository entityRepository, ITaskRepository taskRepository)
         {
             _entityRepository = entityRepository;
             _taskRepository = taskRepository;

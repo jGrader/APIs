@@ -4,25 +4,20 @@
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
-    using Principals;
-    using Resources;
     using System;
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using System.Web;
     using System.Web.Http;
     using System.Web.Http.Description;
 
     public class UsersController : ApiController
     {
         private readonly IUserRepository _userRepository;
-        private readonly ICourseUserRepository _courseUserRepository;
-        public UsersController(IUserRepository userRepository, ICourseUserRepository courseUserRepository)
+        public UsersController(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _courseUserRepository = courseUserRepository;
         }
 
         //GET: api/Users/All

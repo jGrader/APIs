@@ -2,8 +2,7 @@
 using System.Linq;
 using System.Web.Http;
 
-
-namespace GraderApi
+namespace GraderApi.Filters
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
     public class PermissionsAuthorize : AuthorizeAttribute

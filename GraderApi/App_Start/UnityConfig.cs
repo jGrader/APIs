@@ -1,13 +1,11 @@
 using System.Web.Http;
 using Microsoft.Practices.Unity;
+using GraderDataAccessLayer;
 using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Repositories;
 
 namespace GraderApi
 {
-    using System.Security.Cryptography;
-    using GraderDataAccessLayer;
-
     public static class UnityConfig
     {
         public static void RegisterComponents(DatabaseContext context)

@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Web.Http.Routing;
-using GraderDataAccessLayer.Interfaces;
-using GraderDataAccessLayer.Repositories;
-
-namespace GraderApi.Filters
+﻿namespace GraderApi.Filters
 {
     using GraderDataAccessLayer;
+    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer.Repositories;
+    using System;
+    using System.Collections.Generic;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+    using System.Web.Http.Routing;
 
     public class ApiRouteConstraints : IHttpRouteConstraint, IDisposable
     {
