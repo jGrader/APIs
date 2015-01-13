@@ -23,6 +23,7 @@
         private readonly IFileRepository _fileRepository;
         private readonly ISubmissionRepository _submissionRepository;
         private readonly ITaskRepository _taskRepository;
+        private readonly IGradeRepository _gradeRepository;
         private readonly UserModel _user;
 
         public CurrentUserController(
@@ -31,7 +32,8 @@
             IEntityRepository entityRepository,
             IFileRepository fileRepository,
             ISubmissionRepository submissionRepository,
-            ITaskRepository taskRepository
+            ITaskRepository taskRepository,
+            IGradeRepository gradeRepository
             )
         {
             _courseRepository = courseRepository;
@@ -40,6 +42,7 @@
             _fileRepository = fileRepository;
             _submissionRepository = submissionRepository;
             _taskRepository = taskRepository;
+            _gradeRepository = gradeRepository;
 
             var principal = HttpContext.Current.User as UserPrincipal;
             if (principal == null)
@@ -74,6 +77,22 @@
                 var submissions = await _submissionRepository.GetAllByUserId(_user.Id);
                 return Request.CreateResponse(HttpStatusCode.OK, submissions.ToJson());
 
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
+        }
+
+        [HttpGet]
+        public async Task<HttpResponseMessage> Grades(int courseId)
+        {
+            try
+            {
+                var entities = from e in (await _entityRepository.GetAllByCourseId(courseId)) select e.Id;
+                var grades = (await _gradeRepository.GetByUserId(_user.Id)).Where(g => entities.Contains(g.EntityId));
+
+                return Request.CreateResponse(HttpStatusCode.OK, grades.ToJson());
             }
             catch (Exception e)
             {
