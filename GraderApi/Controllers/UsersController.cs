@@ -3,14 +3,11 @@
     using Filters;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer.Interfaces;
-    using GraderDataAccessLayer.Models;
     using System;
-    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using System.Web.Http.Description;
 
     public class UsersController : ApiController
     {
@@ -22,7 +19,6 @@
 
         //GET: api/Users/All
         [HttpGet]
-        [ResponseType(typeof (IEnumerable<UserModel>))]
         [PermissionsAuthorize(SuperUserPermissions.CanSeeAllUsers)]
         public async Task<HttpResponseMessage> All()
         {

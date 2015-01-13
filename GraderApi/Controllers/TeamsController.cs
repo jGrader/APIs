@@ -52,6 +52,25 @@
             }
         }
 
+        // GET: api/Courses/{courseId}/Teams/Get/{teamId}
+        [HttpGet]
+        [PermissionsAuthorize(CoursePermissions.CanSeeGrades)]
+        public async Task<HttpResponseMessage> Get(int teamId)
+        {
+            try
+            {
+                var task = await _teamRepository.Get(teamId);
+
+                return task != null
+                    ? Request.CreateResponse(HttpStatusCode.Accepted, task.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
+        }
+
         // POST: api/Courses/{courseId}/Teams/Add
         [HttpPost]
         [ValidateModelState]

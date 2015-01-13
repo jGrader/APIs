@@ -25,7 +25,7 @@
             _taskRepository = taskRepository;
         }
 
-        // GET: api/Grades
+        // GET: api/Grades/All
         [HttpGet]
         [PermissionsAuthorize(SuperUserPermissions.CanSeeAllGrades)]
         public async Task<HttpResponseMessage> All()
@@ -41,7 +41,7 @@
             }
         }
 
-        // GET: api/Grades/5
+        // GET: api/Courses/{courseId}/Grades/All
         [HttpGet]
         [PermissionsAuthorize(CoursePermissions.CanSeeGrades)]
         public async Task<HttpResponseMessage> All(int courseId)
@@ -67,7 +67,26 @@
             }
         }
 
-        // POST: api/Grades
+        // GET: api/Courses/{courseId}/Grades/Get/{gradeId}
+        [HttpGet]
+        [PermissionsAuthorize(CoursePermissions.CanSeeGrades)]
+        public async Task<HttpResponseMessage> Get(int gradeId)
+        {
+            try
+            {
+                var task = await _gradeRepository.Get(gradeId);
+
+                return task != null
+                    ? Request.CreateResponse(HttpStatusCode.Accepted, task.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
+        }
+
+        // POST: api/Courses/{courseId}/Grades/Add
         [HttpPost]
         [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanGrade)]
@@ -94,7 +113,7 @@
             }
         }
 
-        // PUT: api/Grades/5
+        // PUT: api//Courses/{courseId}/Grades/Update/{gradeId}
         [HttpPut]
         [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanGrade)]
@@ -126,7 +145,7 @@
             }
         }
 
-        // DELETE: api/Grades/5
+        // DELETE: api//Courses/{courseId}/Grades/Delete/{gradeId}
         [HttpPut]
         [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanGrade)]
