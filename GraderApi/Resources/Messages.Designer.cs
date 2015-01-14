@@ -79,6 +79,15 @@ namespace GraderApi.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are no longer allowed to ask for extensions for this course!.
+        /// </summary>
+        internal static string ExtensionNumberExceeded {
+            get {
+                return ResourceManager.GetString("ExtensionNumberExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The uploaded files and the expected files to be uploaded ... IDK, something is wrong.
         /// </summary>
         internal static string FileNamesDoNotMatch {

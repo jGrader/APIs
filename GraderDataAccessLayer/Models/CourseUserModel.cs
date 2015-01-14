@@ -20,10 +20,10 @@
         public int Permissions { get; set; }
 
         [Required]
-        public int ExtensionLimit { get; set; }
+        public int ExtensionNumber { get; set; }
 
         [Required]
-        public int ExcuseLimit { get; set; }
+        public int ExcuseNumber { get; set; }
 
 
         //Navigation properties

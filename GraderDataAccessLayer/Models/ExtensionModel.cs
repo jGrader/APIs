@@ -21,6 +21,7 @@
         [Required]
         public int EntityId { get; set; }
 
+        public bool IsGranted { get; set; }
 
         [ForeignKey("UserId")]
         public virtual UserModel User { get; set; }

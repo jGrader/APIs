@@ -19,7 +19,9 @@
                 {"Year", cm.Year},
                 {"StartDate", cm.StartDate},
                 {"EndDate", cm.EndDate},
-                {"OwnerId", cm.OwnerId}
+                {"OwnerId", cm.OwnerId},
+                {"ExtensionLimit", cm.ExtensionLimit},
+                {"ExcuseLimit", cm.ExcuseLimit}
             };
 
             return result;
@@ -45,8 +47,8 @@
                 {"CourseId", cum.CourseId},
                 {"UserId", cum.UserId},
                 {"Permissions", cum.Permissions},
-                {"ExtensionLimit", cum.ExtensionLimit},
-                {"ExcuseLimit", cum.ExcuseLimit}
+                {"ExtensionNumber", cum.ExtensionNumber},
+                {"ExcuseNumber", cum.ExcuseNumber}
             };
 
             return result;

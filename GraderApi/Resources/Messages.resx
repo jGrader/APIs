@@ -123,6 +123,9 @@
   <data name="ExpiredSessionId" xml:space="preserve">
     <value>The provided session ID has expired. Please log in again.</value>
   </data>
+  <data name="ExtensionNumberExceeded" xml:space="preserve">
+    <value>You are no longer allowed to ask for extensions for this course!</value>
+  </data>
   <data name="FileNamesDoNotMatch" xml:space="preserve">
     <value>The uploaded files and the expected files to be uploaded ... IDK, something is wrong</value>
   </data>

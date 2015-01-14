@@ -21,6 +21,7 @@
         private ISubmissionRepository _submissionRepository;
         private ITeamRepository _teamRepository;
         private IGradeRepository _gradeRepository;
+        private IExtensionRepository _extensionRepository;
 
         public ApiRouteConstraints(DatabaseContext context)
         {
@@ -34,6 +35,7 @@
             _submissionRepository = new SubmissionRepository(context);
             _teamRepository = new TeamRepository(context);
             _gradeRepository = new GradeRepository(context);
+            _extensionRepository = new ExtensionRepository(context);
         }
         
         public bool Match(HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection)
@@ -188,6 +190,19 @@
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
+                case "extensionId":
+                {
+                    int extensionId;
+                    if (!int.TryParse(stringValue, out extensionId))
+                    {
+                        return false;
+                    }
+
+                    //
+                    var result = Task.Run(() => _extensionRepository.Get(extensionId));
+                    Task.WaitAll(result);
+                    return (result.Result != null);
+                }
             }
 
             return false;
@@ -215,6 +230,7 @@
             DisposeSubmissionRepository();
             DisposeTeamRepository();
             DisposeGradeRepository();
+            DisposeExtensionRepository();
         }
 
         private void DisposeGradeRepository()
@@ -316,6 +332,16 @@
 
             _teamRepository.Dispose();
             _teamRepository = null;
+        }
+        private void DisposeExtensionRepository()
+        {
+            if (_extensionRepository == null)
+            {
+                return;
+            }
+
+            _extensionRepository.Dispose();
+            _extensionRepository = null;
         }
         #endregion
     }

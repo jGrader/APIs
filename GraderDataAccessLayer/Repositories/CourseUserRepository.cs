@@ -41,16 +41,6 @@
             var searchResult = await Task.Run(() => _db.CourseUser.Where(w => w.UserId == userId));
             return searchResult;
         }
-        public async Task<IEnumerable<CourseUserModel>> GetAllByExtensionLimit(int extLimit)
-        {
-            var searchResult = await Task.Run(() => _db.CourseUser.Where(w => w.ExtensionLimit == extLimit));
-            return searchResult;
-        }
-        public async Task<IEnumerable<CourseUserModel>> GetAllByExcuseLimit(int excLimit)
-        {
-            var searchResult = await Task.Run(() => _db.CourseUser.Where(w => w.ExcuseLimit == excLimit));
-            return searchResult;
-        }
         public async Task<IEnumerable<CourseUserModel>> GetAllByPermissions(int permissions)
         {
             var searchResult = await Task.Run(() => _db.CourseUser.Where(w => w.Permissions == permissions));

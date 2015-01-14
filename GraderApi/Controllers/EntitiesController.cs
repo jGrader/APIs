@@ -38,10 +38,10 @@
             }
         }
 
-        // GET: api/Courses/{courseId}/Entities
+        // GET: api/Courses/{courseId}/Entities/All
         [HttpGet]
         [ValidateModelState]
-        [PermissionsAuthorize(CoursePermissions.CanSeeEntities)]
+        [PermissionsAuthorize(CoursePermissions.CanSeeExtensions)]
         public async Task<HttpResponseMessage> All(int courseId)
         {
             try

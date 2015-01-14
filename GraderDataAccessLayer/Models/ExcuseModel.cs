@@ -16,7 +16,8 @@
 
         [Required]
         public int EntityId { get; set; }
-        
+
+        public bool IsGranted { get; set; }
 
         [ForeignKey("EntityId")]
         public virtual EntityModel Entity { get; set; }

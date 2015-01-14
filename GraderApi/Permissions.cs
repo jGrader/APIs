@@ -12,7 +12,8 @@
         CanSeeAllSubmissions = 1 << 8,
         CanDeleteSubmission = 1 << 9,
         CanSeeAllTeams = 1 << 10,
-        CanSeeAllGrades = 1 << 11
+        CanSeeAllGrades = 1 << 11,
+        CanSeeAllExtensions = 1 << 12,
     }
 
     public enum AdminPermissions
@@ -58,5 +59,7 @@
         CanUpdateTeams = 1 << 19,
         CanDeleteTeams = 1 << 20,
         CanGrade = 1 << 21,
+        CanSeeExtensions = 1 << 22,
+        CanGrantExtensions = 1 << 23,
     }
 }

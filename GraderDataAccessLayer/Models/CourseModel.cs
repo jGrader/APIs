@@ -37,6 +37,12 @@
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
+        [Required]
+        public int ExtensionLimit { get; set; }
+
+        [Required]
+        public int ExcuseLimit { get; set; }
+
         //Navigation properties
         [Required]
         public int OwnerId { get; set; }
