@@ -2,6 +2,7 @@
 {
     using Filters;
     using Grader.JsonSerializer;
+    using GraderDataAccessLayer;
     using GraderDataAccessLayer.Interfaces;
     using System;
     using System.Net;
@@ -11,10 +12,10 @@
 
     public class UsersController : ApiController
     {
-        private readonly IUserRepository _userRepository;
-        public UsersController(IUserRepository userRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public UsersController(UnitOfWork unitOfWork)
         {
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
         }
 
         //GET: api/Users/All
@@ -24,7 +25,7 @@
         {
             try
             {
-                var result = await _userRepository.GetAll();
+                var result = await _unitOfWork.UserRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -49,7 +50,7 @@
         {
             try
             {
-                var result = await _userRepository.Delete(userId);
+                var result = await _unitOfWork.UserRepository.Delete(userId);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)

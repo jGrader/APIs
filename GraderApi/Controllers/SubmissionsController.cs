@@ -2,10 +2,10 @@
 {
     using Filters;
     using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
-    using Resources;
     using Newtonsoft.Json;
+    using Resources;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -19,12 +19,10 @@
 
     public class SubmissionsController : ApiController
     {
-        private readonly ISubmissionRepository _submissionRepository;
-        private readonly IEntityRepository _entityRepository;
-        public SubmissionsController(ISubmissionRepository submissionRepository, IEntityRepository entityRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public SubmissionsController(UnitOfWork unitOfWork)
         {
-            _submissionRepository = submissionRepository;
-            _entityRepository = entityRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Submissions/All
@@ -34,7 +32,7 @@
         {
             try
             {
-                var result = await _submissionRepository.GetAll();
+                var result = await _unitOfWork.SubmissionRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -51,7 +49,7 @@
         {
             try
             {
-                var result = await _submissionRepository.GetAllByCourseId(courseId);
+                var result = await _unitOfWork.SubmissionRepository.GetByCourseId(courseId);
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -60,7 +58,7 @@
             }
         }
 
-        // GET: api/Courses/{courseId}/Submissions/Get/{submissionId}
+        // GET: api/Courses/{courseId}/Submissions/GetByUserId/{submissionId}
         [HttpGet]
         [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanSeeSubmissions)]
@@ -68,7 +66,7 @@
         {
             try
             {
-                var submission = await _submissionRepository.Get(submissionId);
+                var submission = await _unitOfWork.SubmissionRepository.Get(submissionId);
                 if (submission == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -113,7 +111,7 @@
             var fileModelExtensions = fileModels as IList<FileModelExtension> ?? fileModels.ToList();
             foreach (var file in fileModelExtensions)
             {
-                file.Entity = await _entityRepository.Get(file.EntityId);
+                file.Entity = await _unitOfWork.EntityRepository.Get(file.EntityId);
             }
 
             var firstOrDefault = fileModelExtensions.FirstOrDefault();
@@ -198,7 +196,7 @@
                     foreach (var teamMember in currentTeam.TeamMembers)
                     {
                         // We have this for a weird possible bug between different versions of compiler
-                        // for the GetAllByLambda call not getting the value from an inner-scope variable
+                        // for the GetByExpression call not getting the value from an inner-scope variable
                         var member = teamMember; 
 
                         var finalPath = Path.Combine(fileSavePath, member.UserName);
@@ -219,14 +217,14 @@
 
                         // Now it's time to register a submission for this file in the Database
                         var submission = new SubmissionModel { FileId = fileModel.Id, FilePath = finalFilePath, TimeStamp = DateTime.UtcNow, UserId = member.Id };
-                        var query = (await _submissionRepository.GetAllByLambda(s => s.FileId == fileModel.Id && s.UserId == member.Id)).FirstOrDefault();
+                        var query = (await _unitOfWork.SubmissionRepository.GetByExpression(s => s.FileId == fileModel.Id && s.UserId == member.Id)).FirstOrDefault();
                         if (query != null)
                         {
                             // There exists an old submission for this file; update it!
                             backUpInformation.Add(new Tuple<SubmissionModel, string, string>(query, finalBackUpFilePath, finalFilePath));
 
                             submission.Id = query.Id;
-                            var updateResult = await _submissionRepository.Update(submission);
+                            var updateResult = await _unitOfWork.SubmissionRepository.Update(submission);
                             if (updateResult == null)
                             {
                                 Directory.Delete(tempPath);
@@ -239,7 +237,7 @@
                         else
                         {
                             // This is the very first submission
-                            var addResult = await _submissionRepository.Add(submission);
+                            var addResult = await _unitOfWork.SubmissionRepository.Add(submission);
                             if (addResult == null)
                             {
                                 Directory.Delete(tempPath);
@@ -272,7 +270,7 @@
         {
             foreach (var x in newlyAddedInformation)
             {
-                var result = await _submissionRepository.DeleteSubmission(x.Item1.Id);
+                var result = await _unitOfWork.SubmissionRepository.Delete(x.Item1.Id);
                 if (!result)
                 {
                     return HttpStatusCode.InternalServerError;
@@ -283,7 +281,7 @@
 
             foreach (var y in backUpInformation)
             {
-                var result = await _submissionRepository.Update(y.Item1);
+                var result = await _unitOfWork.SubmissionRepository.Update(y.Item1);
                 if (result == null)
                 {
                     return HttpStatusCode.InternalServerError;
@@ -307,7 +305,7 @@
         {
             try
             {
-                var existingSubmission = await _submissionRepository.Get(submissionId);
+                var existingSubmission = await _unitOfWork.SubmissionRepository.Get(submissionId);
                 if (existingSubmission == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -318,7 +316,7 @@
                 }
 
 
-                var result = await _submissionRepository.DeleteSubmission(submissionId);
+                var result = await _unitOfWork.SubmissionRepository.Delete(submissionId);
                 if (!result)
                 {
                     return Request.CreateResponse(HttpStatusCode.InternalServerError);

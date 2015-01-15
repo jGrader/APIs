@@ -2,7 +2,7 @@
 {
     using Filters;
     using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
     using Resources;
     using System;
@@ -14,12 +14,10 @@
 
     public class EntitiesController : ApiController
     {
-        private readonly IEntityRepository _entityRepository;
-        private readonly ITaskRepository _taskRepository;
-        public EntitiesController(IEntityRepository entityRepository, ITaskRepository taskRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public EntitiesController(UnitOfWork unitOfWork)
         {
-            _entityRepository = entityRepository;
-            _taskRepository = taskRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Entities/All
@@ -29,7 +27,7 @@
         {
             try
             {
-                var result = await _entityRepository.GetAll();
+                var result = await _unitOfWork.EntityRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -46,7 +44,7 @@
         {
             try
             {
-                var result = await _entityRepository.GetAllByCourseId(courseId);
+                var result = await _unitOfWork.EntityRepository.GetByCourseId(courseId);
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -55,7 +53,7 @@
             }
         }
 
-        // GET: api/Courses/{courseId}/Entities/Get/{entityId}
+        // GET: api/Courses/{courseId}/Entities/GetByUserId/{entityId}
         [HttpGet]
         [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanSeeEntities)]
@@ -63,7 +61,7 @@
         {
             try
             {
-                var entity = await _entityRepository.Get(entityId);
+                var entity = await _unitOfWork.EntityRepository.Get(entityId);
                 if (entity == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -87,7 +85,7 @@
         {
             try
             {
-                var entity = await _entityRepository.Get(entityId);
+                var entity = await _unitOfWork.EntityRepository.Get(entityId);
                 if (entity == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -109,7 +107,7 @@
         [PermissionsAuthorize(CoursePermissions.CanCreateEntities)]
         public async Task<HttpResponseMessage> Add(int courseId, [FromBody] EntityModel entity)
         {
-            entity.Task = await _taskRepository.Get(entity.TaskId);
+            entity.Task = await _unitOfWork.TaskRepository.Get(entity.TaskId);
             if (courseId != entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -117,7 +115,7 @@
 
             try
             {
-                var result = await _entityRepository.Add(entity);
+                var result = await _unitOfWork.EntityRepository.Add(entity);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
@@ -139,7 +137,7 @@
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
-            entity.Task = await _taskRepository.Get(entityId);
+            entity.Task = await _unitOfWork.TaskRepository.Get(entityId);
             if (courseId != entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -147,7 +145,7 @@
 
             try
             {
-                var result = await _entityRepository.Update(entity);
+                var result = await _unitOfWork.EntityRepository.Update(entity);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
@@ -167,7 +165,7 @@
         {
             try
             {
-                var existingEntity = await _entityRepository.Get(entityId);
+                var existingEntity = await _unitOfWork.EntityRepository.Get(entityId);
                 if (existingEntity == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -177,7 +175,7 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
                 }
 
-                var result = await _entityRepository.Delete(entityId);
+                var result = await _unitOfWork.EntityRepository.Delete(entityId);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)

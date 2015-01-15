@@ -2,7 +2,7 @@
 {
     using Filters;
     using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
     using Resources;
     using System;
@@ -16,14 +16,10 @@
 
     public class ExcusesController : ApiController
     {
-        private readonly IExcuseRepository _excuseRepository;
-        private readonly IEntityRepository _entityRepository;
-        private readonly ICourseUserRepository _courseUserRepository;
-        public ExcusesController(IExcuseRepository excuseRepository, IEntityRepository entityRepository, ICourseUserRepository courseUserRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public ExcusesController(UnitOfWork unitOfWork)
         {
-            _excuseRepository = excuseRepository;
-            _entityRepository = entityRepository;
-            _courseUserRepository = courseUserRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Excuses/All
@@ -33,7 +29,7 @@
         {
             try
             {
-                var result = await _excuseRepository.GetAll();
+                var result = await _unitOfWork.ExcuseRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -50,7 +46,7 @@
         {
             try
             {
-                var result = await _excuseRepository.GetAllByLambda(e => e.Entity.Task.CourseId == courseId);
+                var result = await _unitOfWork.ExcuseRepository.GetByExpression(e => e.Entity.Task.CourseId == courseId);
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -64,7 +60,7 @@
         [ValidateModelState]
         public async Task<HttpResponseMessage> Add(int courseId, [FromBody] ExcuseModel excuse)
         {
-            excuse.Entity = await _entityRepository.Get(excuse.EntityId);
+            excuse.Entity = await _unitOfWork.EntityRepository.Get(excuse.EntityId);
             if (courseId != excuse.Entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -78,7 +74,7 @@
 
             try
             {
-                var enrollment = await _courseUserRepository.GetAllByLambda(cu => cu.UserId == currentUser.User.Id && cu.CourseId == courseId);
+                var enrollment = await _unitOfWork.CourseUserRepository.GetByExpression(cu => cu.UserId == currentUser.User.Id && cu.CourseId == courseId);
                 var courseUserModels = enrollment as IList<CourseUserModel> ?? enrollment.ToList();
                 var firstOrDefault = courseUserModels.FirstOrDefault();
                 if (firstOrDefault == null)
@@ -92,7 +88,7 @@
                 }
 
                 excuse.IsGranted = false;
-                var result = await _excuseRepository.Add(excuse);
+                var result = await _unitOfWork.ExcuseRepository.Add(excuse);
                 if (result == null)
                 {
                     Request.CreateResponse(HttpStatusCode.InternalServerError);
@@ -100,13 +96,13 @@
 
                 // Update the number of Excuses asked for
                 firstOrDefault.ExcuseNumber += 1;
-                var query = await _courseUserRepository.Update(firstOrDefault);
+                var query = await _unitOfWork.CourseUserRepository.Update(firstOrDefault);
                 if (query == null)
                 {
                     // Revert the excuse request
                     if (result != null)
                     {
-                        await _excuseRepository.Delete(result.Id);
+                        await _unitOfWork.ExcuseRepository.Delete(result.Id);
                     }
                     return Request.CreateResponse(HttpStatusCode.InternalServerError);
                 }
@@ -129,7 +125,7 @@
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
-            excuse.Entity = await _entityRepository.Get(excuseId);
+            excuse.Entity = await _unitOfWork.EntityRepository.Get(excuseId);
             if (courseId != excuse.Entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -137,7 +133,7 @@
 
             try
             {
-                var result = await _excuseRepository.Update(excuse);
+                var result = await _unitOfWork.ExcuseRepository.Update(excuse);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
@@ -157,7 +153,7 @@
         {
             try
             {
-                var existingexcuse = await _excuseRepository.Get(excuseId);
+                var existingexcuse = await _unitOfWork.ExcuseRepository.Get(excuseId);
                 if (existingexcuse == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -167,7 +163,7 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
                 }
 
-                var result = await _excuseRepository.Delete(excuseId);
+                var result = await _unitOfWork.ExcuseRepository.Delete(excuseId);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)

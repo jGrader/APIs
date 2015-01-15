@@ -1,22 +1,22 @@
 ﻿namespace GraderApi.Controllers
 {
     using Filters;
+    using Grader.JsonSerializer;
+    using GraderDataAccessLayer;
+    using GraderDataAccessLayer.Models;
     using Resources;
     using System;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Interfaces;
-    using GraderDataAccessLayer.Models;
 
     public class TeamsController : ApiController
     {
-        private readonly ITeamRepository _teamRepository;
-        public TeamsController(ITeamRepository teamRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public TeamsController(UnitOfWork unitOfWork)
         {
-            _teamRepository = teamRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Teams/All
@@ -26,7 +26,7 @@
         {
             try
             {
-                var result = await _teamRepository.GetAll();
+                var result = await _unitOfWork.TeamRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -43,7 +43,7 @@
         {
             try
             {
-                var result = await _teamRepository.GetAllForCourse(courseId);
+                var result = await _unitOfWork.TeamRepository.GetByCoureId(courseId);
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -52,14 +52,14 @@
             }
         }
 
-        // GET: api/Courses/{courseId}/Teams/Get/{teamId}
+        // GET: api/Courses/{courseId}/Teams/GetByUserId/{teamId}
         [HttpGet]
         [PermissionsAuthorize(CoursePermissions.CanSeeGrades)]
         public async Task<HttpResponseMessage> Get(int teamId)
         {
             try
             {
-                var task = await _teamRepository.Get(teamId);
+                var task = await _unitOfWork.TeamRepository.Get(teamId);
 
                 return task != null
                     ? Request.CreateResponse(HttpStatusCode.Accepted, task.ToJson())
@@ -84,7 +84,7 @@
 
             try
             {
-                var result = await _teamRepository.Add(team);
+                var result = await _unitOfWork.TeamRepository.Add(team);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
@@ -113,7 +113,7 @@
 
             try
             {
-                var result = await _teamRepository.Update(team);
+                var result = await _unitOfWork.TeamRepository.Update(team);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
@@ -133,7 +133,7 @@
         {
             try
             {
-                var existingTeam = await _teamRepository.Get(teamId);
+                var existingTeam = await _unitOfWork.TeamRepository.Get(teamId);
                 if (existingTeam == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -143,7 +143,7 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
                 }
 
-                var result = await _teamRepository.Delete(teamId);
+                var result = await _unitOfWork.TeamRepository.Delete(teamId);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)

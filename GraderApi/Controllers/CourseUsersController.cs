@@ -2,7 +2,7 @@
 {
     using Filters;
     using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
     using Resources;
     using System;
@@ -13,10 +13,10 @@
 
     public class CourseUsersController : ApiController
     {
-        private readonly ICourseUserRepository _courseUserRepository;
-        public CourseUsersController(ICourseUserRepository courseUserRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public CourseUsersController(UnitOfWork unitOfWork)
         {
-            _courseUserRepository = courseUserRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/CourseUsers/All
@@ -26,7 +26,7 @@
         {
             try
             {
-                var result = await _courseUserRepository.GetAll();
+                var result = await _unitOfWork.CourseUserRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -42,7 +42,7 @@
         {
             try
             {
-                var result = await _courseUserRepository.GetAllByCourseId(courseId);
+                var result = await _unitOfWork.CourseUserRepository.GetByCourseId(courseId);
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -59,7 +59,7 @@
         {
             try
             {
-                var courseUser = await _courseUserRepository.Get(courseUserId);
+                var courseUser = await _unitOfWork.CourseUserRepository.Get(courseUserId);
                 if (courseUser == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -89,7 +89,7 @@
 
             try
             {
-                var result = await _courseUserRepository.Add(courseUser);
+                var result = await _unitOfWork.CourseUserRepository.Add(courseUser);
 
                 return result != null ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
                     : Request.CreateResponse(HttpStatusCode.InternalServerError);
@@ -117,7 +117,7 @@
 
             try
             {
-                var result = await _courseUserRepository.Update(courseUser);
+                var result = await _unitOfWork.CourseUserRepository.Update(courseUser);
 
                 return result != null ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
                     : Request.CreateResponse(HttpStatusCode.InternalServerError);
@@ -136,7 +136,7 @@
         {
             try
             {
-                var existingCourseUser = await _courseUserRepository.Get(courseUserId);
+                var existingCourseUser = await _unitOfWork.CourseUserRepository.Get(courseUserId);
                 if (existingCourseUser == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -146,7 +146,7 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
                 }
 
-                var result = await _courseUserRepository.Delete(courseUserId);
+                var result = await _unitOfWork.CourseUserRepository.Delete(courseUserId);
                 return Request.CreateResponse(!result ? HttpStatusCode.InternalServerError : HttpStatusCode.OK);
             }
             catch (Exception e)

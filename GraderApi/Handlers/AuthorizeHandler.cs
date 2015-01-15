@@ -1,9 +1,7 @@
 ﻿namespace GraderApi.Handlers
 {
     using GraderDataAccessLayer;
-    using GraderDataAccessLayer.Interfaces;
     using GraderDataAccessLayer.Models;
-    using GraderDataAccessLayer.Repositories;
     using Resources;
     using System;
     using System.Collections.Generic;
@@ -23,13 +21,11 @@
 
     public class AuthorizeHandler : DelegatingHandler
     {
-        private readonly IUserRepository _userRepository;
-        private readonly ISessionIdRepository _sessionIdRepository;
+        private readonly UnitOfWork _unitOfWork;
 
         public AuthorizeHandler()
         {
-            _userRepository = new UserRepository();
-            _sessionIdRepository = new SessionIdRepository();
+            _unitOfWork = new UnitOfWork();
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -49,14 +45,14 @@
                     return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidSessionId);
                 }
 
-                var searchResult = await _sessionIdRepository.GetBySesionId(new Guid(sessionId));
+                var searchResult = await _unitOfWork.SessionIdRepository.GetBySesionId(new Guid(sessionId));
                 if (searchResult == null)
                 {
                     // The sessionId is cannot be found in the database
                     return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidSessionId);
                 }
 
-                var isAuthorized = await _sessionIdRepository.IsAuthorized(searchResult);
+                var isAuthorized = await _unitOfWork.SessionIdRepository.IsAuthorized(searchResult);
                 if (!isAuthorized)
                 {
                     // The sessionId is expired
@@ -64,7 +60,7 @@
                 }
 
                 // The sessionId checks out
-                var user = await _userRepository.Get(searchResult.UserId);
+                var user = await _unitOfWork.UserRepository.Get(searchResult.UserId);
                 if (user == null)
                 {
                     return await CreateTask(request, HttpStatusCode.Unauthorized, Messages.UserNotFound);
@@ -111,16 +107,16 @@
                             Messages.InternalDatabaseError);
                     }
 
-                    var userId = -1;
+                    int userId;
                     //Now check if they are logging in for the first time or not
-                    var foundUser = await _userRepository.GetByUsername(credentials.Username);
+                    var foundUser = await _unitOfWork.UserRepository.GetByUsername(credentials.Username);
                     if (foundUser != null)
                     {
                         //If we reached this point, it's not the first time -- make sure the info is updated and move on
                         foundUser.Email = serverUser.Properties[LdapFields.Email].Value.ToString();
                         foundUser.GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString();
 
-                        var result = await _userRepository.Update(foundUser);
+                        var result = await _unitOfWork.UserRepository.Update(foundUser);
                         if (result == null)
                         {
                             return await CreateTask(request, HttpStatusCode.InternalServerError, 
@@ -141,7 +137,7 @@
                             GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString()
                         };
 
-                        var result = await _userRepository.Add(user);
+                        var result = await _unitOfWork.UserRepository.Add(user);
                         if (result == null)
                         {
                             // We failed to add the new user to the database
@@ -159,14 +155,14 @@
                     }
 
                     //At this point, the user certainly has a local account and his credentials check out
-                    var newSessionModel = await _sessionIdRepository.Add(userId);
+                    var newSessionModel = await _unitOfWork.SessionIdRepository.Add(userId);
                     if (newSessionModel.SessionId == Guid.Empty)
                     {
                         return await CreateTask(request, HttpStatusCode.InternalServerError,
                             Messages.InternalDatabaseError);
                     }
 
-                    var userDb = await _userRepository.Get(userId);
+                    var userDb = await _unitOfWork.UserRepository.Get(userId);
                     if (userDb == null)
                     {
                         return await CreateTask(request, HttpStatusCode.BadRequest, 
@@ -225,7 +221,7 @@
                 return null;
             }
 
-            return new Credentials() { Username = credentials[0], Password = credentials[1] };
+            return new Credentials { Username = credentials[0], Password = credentials[1] };
         }
 
         private static class ActiveDirectoryRoleProvider

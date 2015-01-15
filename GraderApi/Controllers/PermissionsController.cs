@@ -1,6 +1,9 @@
 ﻿namespace GraderApi.Controllers
 {
     using Filters;
+    using Grader.JsonSerializer;
+    using GraderDataAccessLayer;
+    using Newtonsoft.Json;
     using Resources;
     using System;
     using System.Collections.Generic;
@@ -9,16 +12,13 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Interfaces;
-    using Newtonsoft.Json;
 
     public class PermissionsController : ApiController
     {
-        private readonly ICourseUserRepository _courseUserRepository;
-        public PermissionsController(ICourseUserRepository courseUserRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public PermissionsController(UnitOfWork unitOfWork)
         {
-            _courseUserRepository = courseUserRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Permissions/All
@@ -36,7 +36,7 @@
         [PermissionsAuthorize(CourseOwnerPermissions.CanGrantPermissions)]
         public async Task<HttpResponseMessage> Set(int courseId, int userId, [FromBody] IEnumerable<string> permissions)
         {
-            var enrollment = await _courseUserRepository.GetAllByLambda(cu => cu.CourseId == courseId && cu.UserId == userId);
+            var enrollment = await _unitOfWork.CourseUserRepository.GetByExpression(cu => cu.CourseId == courseId && cu.UserId == userId);
             var firstOrDefault = enrollment.FirstOrDefault();
             if (firstOrDefault == null)
             {
@@ -47,7 +47,7 @@
             {
                 // SET THE PERMISSIONS
                 firstOrDefault.Permissions = GetUserPermissions(permissions);
-                var result = await _courseUserRepository.Update(firstOrDefault);
+                var result = await _unitOfWork.CourseUserRepository.Update(firstOrDefault);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, firstOrDefault.ToJson())

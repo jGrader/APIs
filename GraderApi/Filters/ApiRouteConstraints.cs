@@ -11,33 +11,11 @@
 
     public class ApiRouteConstraints : IHttpRouteConstraint, IDisposable
     {
-        private IUserRepository _userRepository;
-        private ICourseRepository _courseRepository;
-        private ICourseUserRepository _courseUserRepository;
-        private IGradeComponentRepository _gradeComponentRepository;
-        private ITaskRepository _taskRepository;
-        private IEntityRepository _entityRepository;
-        private IFileRepository _fileRepository;
-        private ISubmissionRepository _submissionRepository;
-        private ITeamRepository _teamRepository;
-        private IGradeRepository _gradeRepository;
-        private IExtensionRepository _extensionRepository;
-        private IExcuseRepository _excuseRepository;
+        private UnitOfWork _unitOfWork;
 
         public ApiRouteConstraints()
         {
-            _userRepository = new UserRepository();
-            _courseRepository = new CourseRepository();
-            _courseUserRepository = new CourseUserRepository();
-            _gradeComponentRepository = new GradeComponentRepository();
-            _taskRepository = new TaskRepository();
-            _entityRepository = new EntityRepository();
-            _fileRepository = new FileRepository();
-            _submissionRepository = new SubmissionRepository();
-            _teamRepository = new TeamRepository();
-            _gradeRepository = new GradeRepository();
-            _extensionRepository = new ExtensionRepository();
-            _excuseRepository = new ExcuseRepository();
+            _unitOfWork = new UnitOfWork();
         }
         
         public bool Match(HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection)
@@ -67,8 +45,8 @@
                         return false;
                     }
 
-                    // Get the user with that Id; if null, then route is invalid
-                    var result = Task.Run(() => _userRepository.Get(userId));
+                    // GetByUserId the user with that Id; if null, then route is invalid
+                    var result = Task.Run(() => _unitOfWork.UserRepository.Get(userId));
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
@@ -81,8 +59,8 @@
                         return false;
                     }
 
-                    // Get the course with that Id; if null, then route is invalid
-                    var result = Task.Run(() => _courseRepository.Get(courseId));
+                    // GetByUserId the course with that Id; if null, then route is invalid
+                    var result = Task.Run(() => _unitOfWork.CourseRepository.Get(courseId));
                     Task.WaitAll(result); // That is an async operation in a synchronous environment - 'await' for it
                     return (result.Result != null);
                 }
@@ -95,8 +73,8 @@
                         return false;
                     }
 
-                    //Get the courseUserwith that Id; if null, then route is invalid
-                    var result = Task.Run(() => _courseUserRepository.Get(courseUserId));
+                    //GetByUserId the courseUserwith that Id; if null, then route is invalid
+                    var result = Task.Run(() => _unitOfWork.CourseUserRepository.Get(courseUserId));
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
@@ -109,8 +87,8 @@
                         return false;
                     }
 
-                    // Get the gradeComponent with that Id; if null, then route is invalid
-                    var result = Task.Run(() => _gradeComponentRepository.Get(gradeComponentId));
+                    // GetByUserId the gradeComponent with that Id; if null, then route is invalid
+                    var result = Task.Run(() => _unitOfWork.GradeComponentRepository.Get(gradeComponentId));
                     Task.WaitAll(result); // That is an async operation in a synchronous environment - 'await' for it
                     return (result.Result != null);
                 }
@@ -123,7 +101,7 @@
                     }
 
                     //
-                    var result = Task.Run(() => _taskRepository.Get(taskId));
+                    var result = Task.Run(() => _unitOfWork.TaskRepository.Get(taskId));
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
@@ -136,7 +114,7 @@
                     }
 
                     //
-                    var result = Task.Run(() => _entityRepository.Get(entityId));
+                    var result = Task.Run(() => _unitOfWork.EntityRepository.Get(entityId));
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
@@ -149,7 +127,7 @@
                     }
 
                     //
-                    var result = Task.Run(() => _submissionRepository.Get(submissionId));
+                    var result = Task.Run(() => _unitOfWork.SubmissionRepository.Get(submissionId));
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
@@ -162,7 +140,7 @@
                     }
 
                     //
-                    var result = Task.Run(() => _fileRepository.Get(fileId));
+                    var result = Task.Run(() => _unitOfWork.FileRepository.Get(fileId));
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
@@ -175,7 +153,7 @@
                     }
 
                     //
-                    var result = Task.Run(() => _teamRepository.Get(teamId));
+                    var result = Task.Run(() => _unitOfWork.TeamRepository.Get(teamId));
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
@@ -188,7 +166,7 @@
                     }
 
                     //
-                    var result = Task.Run(() => _gradeRepository.Get(gradeId));
+                    var result = Task.Run(() => _unitOfWork.GradeRepository.Get(gradeId));
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
@@ -201,7 +179,7 @@
                     }
 
                     //
-                    var result = Task.Run(() => _extensionRepository.Get(extensionId));
+                    var result = Task.Run(() => _unitOfWork.ExtensionRepository.Get(extensionId));
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
@@ -214,7 +192,7 @@
                     }
 
                     //
-                    var result = Task.Run(() => _excuseRepository.Get(excuseId));
+                    var result = Task.Run(() => _unitOfWork.ExcuseRepository.Get(excuseId));
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
@@ -235,139 +213,7 @@
             {
                 return;
             }
-            DisposeUserRepository();
-            DisposeCourseRepository();
-            DisposeCourseUserRepository();
-            DisposeGradeComponentRepository();
-            DisposeTaskRepository();
-            DisposeEntityRepository();
-            DisposeFileRepository();
-            DisposeSubmissionRepository();
-            DisposeTeamRepository();
-            DisposeGradeRepository();
-            DisposeExtensionRepository();
-            DisposeExcuseRepository();
-        }
-
-        private void DisposeGradeRepository()
-        {
-            if (_gradeRepository == null)
-            {
-                return;
-            }
-
-            _gradeRepository.Dispose();
-            _gradeRepository = null;
-        }
-        private void DisposeUserRepository()
-        {
-            if (_userRepository == null)
-            {
-                return;
-            }
-
-            _userRepository.Dispose();
-            _userRepository = null;
-        }
-        private void DisposeCourseRepository()
-        {
-            if (_courseRepository == null)
-            {
-                return;
-            }
-
-            _courseRepository.Dispose();
-            _courseRepository = null;
-        }
-        private void DisposeCourseUserRepository()
-        {
-            if (_courseUserRepository == null)
-            {
-                return;
-            }
-
-            _courseUserRepository.Dispose();
-            _courseUserRepository = null;
-        }
-        private void DisposeGradeComponentRepository()
-        {
-            if (_gradeComponentRepository == null)
-            {
-                return;
-            }
-
-            _gradeComponentRepository.Dispose();
-            _gradeComponentRepository = null;
-        }
-        private void DisposeTaskRepository()
-        {
-            if (_taskRepository == null)
-            {
-                return;
-            }
-
-            _taskRepository.Dispose();
-            _taskRepository = null;
-        }
-        private void DisposeEntityRepository()
-        {
-            if (_entityRepository == null)
-            {
-                return;
-            }
-
-            _entityRepository.Dispose();
-            _entityRepository = null;
-        }
-        private void DisposeFileRepository()
-        {
-            if (_fileRepository == null)
-            {
-                return;
-            }
-
-            _fileRepository.Dispose();
-            _fileRepository = null;
-        }
-        private void DisposeSubmissionRepository()
-        {
-            if (_submissionRepository == null)
-            {
-                return;
-            }
-
-            _submissionRepository.Dispose();
-            _submissionRepository = null;
-        }
-        private void DisposeTeamRepository()
-        {
-            if (_teamRepository == null)
-            {
-                return;
-            }
-
-            _teamRepository.Dispose();
-            _teamRepository = null;
-        }
-        private void DisposeExtensionRepository()
-        {
-            if (_extensionRepository == null)
-            {
-                return;
-            }
-
-            _extensionRepository.Dispose();
-            _extensionRepository = null;
-        }
-        private void DisposeExcuseRepository()
-        {
-            if (_excuseRepository == null)
-            {
-                return;
-            }
-
-            _excuseRepository.Dispose();
-            _excuseRepository = null;
+            _unitOfWork.Dispose();
         }
         #endregion
     }

@@ -285,7 +285,7 @@
 
             $.ajax(
             {
-                url: "api/Courses/" + courseId + "/Files/Get/" + fileId,
+                url: "api/Courses/" + courseId + "/Files/GetByUserId/" + fileId,
                 headers: headers,
                 type: 'GET',
                 success: function (data) {

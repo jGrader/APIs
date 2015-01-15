@@ -5,16 +5,9 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public interface ITeamRepository : IDisposable
+    public interface ITeamRepository : IGenericRepository<TeamModel>, IDisposable
     {
-        Task<TeamModel> Get(int teamId);
-
-        Task<IEnumerable<TeamModel>> GetAll();
-        Task<IEnumerable<TeamModel>> GetAllForEntity(int entityId);
-        Task<IEnumerable<TeamModel>> GetAllForCourse(int courseId);
-
-        Task<TeamModel> Add(TeamModel item);
-        Task<TeamModel> Update(TeamModel item);
-        Task<bool> Delete(int teamId);
+        Task<IEnumerable<TeamModel>> GetByEntityId(int entityId);
+        Task<IEnumerable<TeamModel>> GetByCoureId(int courseId);
     }
 }

@@ -5,20 +5,14 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public interface IEntityRepository : IDisposable
+    public interface IEntityRepository : IGenericRepository<EntityModel>, IDisposable
     {
-        Task<EntityModel> Get(int id);
+        Task<IEnumerable<EntityModel>> GetByTask(int taskId);
+        Task<IEnumerable<EntityModel>> GetByName(string name);
+        Task<IEnumerable<EntityModel>> GetByCourseId(int courseId);
+        Task<IEnumerable<EntityModel>> GetByOpenDate(DateTime openTime);
+        Task<IEnumerable<EntityModel>> GetByCloseDate(DateTime closeTime);
+        Task<IEnumerable<EntityModel>> GetActiveBetween(DateTime time1, DateTime time2);
 
-        Task<IEnumerable<EntityModel>> GetAll();
-        Task<IEnumerable<EntityModel>> GetAllForTask(int taskId);
-        Task<IEnumerable<EntityModel>> GetAllByName(string name);
-        Task<IEnumerable<EntityModel>> GetAllByCourseId(int courseId);
-        Task<IEnumerable<EntityModel>> GetAllByOpenDate(DateTime openTime);
-        Task<IEnumerable<EntityModel>> GetAllByCloseDate(DateTime closeTime);
-        Task<IEnumerable<EntityModel>> GetAllActiveBetweenDates(DateTime time1, DateTime time2);
-
-        Task<EntityModel> Add(EntityModel item);
-        Task<EntityModel> Update(EntityModel item);
-        Task<bool> Delete(int id);
     }
 }

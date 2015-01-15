@@ -2,7 +2,7 @@
 {
     using Filters;
     using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
     using Resources;
     using System;
@@ -13,10 +13,10 @@
 
     public class TasksController : ApiController
     {
-        private readonly ITaskRepository _taskRepository;
-        public TasksController(ITaskRepository taskRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public TasksController(UnitOfWork unitOfWork)
         {
-            _taskRepository = taskRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Tasks/All
@@ -26,7 +26,7 @@
         {
             try
             {
-                var result = await _taskRepository.GetAll();
+                var result = await _unitOfWork.TaskRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -43,7 +43,7 @@
         {
             try
             {
-                var result = await _taskRepository.GetAllByCourse(courseId);
+                var result = await _unitOfWork.TaskRepository.GetByCourseId(courseId);
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -60,7 +60,7 @@
         {
             try
             {
-                var task = await _taskRepository.Get(taskId);
+                var task = await _unitOfWork.TaskRepository.Get(taskId);
 
                 return task != null
                     ? Request.CreateResponse(HttpStatusCode.Accepted, task.ToJson())
@@ -80,7 +80,7 @@
         {
             try
             {
-                var task = await _taskRepository.Get(taskId);
+                var task = await _unitOfWork.TaskRepository.Get(taskId);
                 if (task == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -109,7 +109,7 @@
 
             try
             {
-                var result = await _taskRepository.Add(task);
+                var result = await _unitOfWork.TaskRepository.Add(task);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
@@ -138,7 +138,7 @@
 
             try
             {
-                var result = await _taskRepository.Update(task);
+                var result = await _unitOfWork.TaskRepository.Update(task);
 
                 return result != null 
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson()) 
@@ -158,7 +158,7 @@
         {
             try
             {
-                var existingTask = await _taskRepository.Get(taskId);
+                var existingTask = await _unitOfWork.TaskRepository.Get(taskId);
                 if (existingTask == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -168,7 +168,7 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
                 }
 
-                var result = await _taskRepository.Delete(taskId);
+                var result = await _unitOfWork.TaskRepository.Delete(taskId);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)

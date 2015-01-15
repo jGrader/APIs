@@ -2,7 +2,7 @@
 {
     using Filters;
     using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
     using System;
     using System.Net;
@@ -12,10 +12,10 @@
 
     public class CoursesController : ApiController
     {
-        private readonly ICourseRepository _courseRepository;
-        public CoursesController(ICourseRepository courseRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public CoursesController(UnitOfWork unitOfWork)
         {
-            _courseRepository = courseRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Courses
@@ -24,7 +24,7 @@
         {
             try
             {
-                var result = await _courseRepository.GetAll();
+                var result = await _unitOfWork.CourseRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -40,7 +40,7 @@
         {
             try
             {
-                var course = await _courseRepository.Get(courseId);
+                var course = await _unitOfWork.CourseRepository.Get(courseId);
 
                 return (course != null) ? Request.CreateResponse(HttpStatusCode.OK, course.ToJson()) : 
                     Request.CreateResponse(HttpStatusCode.NotFound);
@@ -59,7 +59,7 @@
         {
             try
             {
-                var result = await _courseRepository.Add(course);
+                var result = await _unitOfWork.CourseRepository.Add(course);
 
                 return result != null ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson()) : 
                     Request.CreateResponse(HttpStatusCode.InternalServerError);
@@ -83,7 +83,7 @@
 
             try
             {
-                var result = await _courseRepository.Update(course);
+                var result = await _unitOfWork.CourseRepository.Update(course);
 
                 return result != null ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson()) : 
                     Request.CreateResponse(HttpStatusCode.InternalServerError);
@@ -102,7 +102,7 @@
         {
             try
             {
-                var result = await _courseRepository.Delete(courseId);
+                var result = await _unitOfWork.CourseRepository.Delete(courseId);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)

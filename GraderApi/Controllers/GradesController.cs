@@ -2,7 +2,7 @@
 {
     using Filters;
     using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
     using Newtonsoft.Json.Linq;
     using Resources;
@@ -15,14 +15,10 @@
 
     public class GradesController : ApiController
     {
-        private readonly IGradeRepository _gradeRepository;
-        private readonly IEntityRepository _entityRepository;
-        private readonly ITaskRepository _taskRepository;
-        public GradesController(IGradeRepository gradeRepository, IEntityRepository entityRepository, ITaskRepository taskRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public GradesController(UnitOfWork unitOfWork)
         {
-            _gradeRepository = gradeRepository;
-            _entityRepository = entityRepository;
-            _taskRepository = taskRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Grades/All
@@ -32,7 +28,7 @@
         {
             try
             {
-                var result = await _gradeRepository.GetAll();
+                var result = await _unitOfWork.GradeRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -49,10 +45,10 @@
             try
             {
                 var res = new List<IEnumerable<GradeModel>>();
-                var entities = (await _entityRepository.GetAllByCourseId(courseId));
+                var entities = (await _unitOfWork.EntityRepository.GetByCourseId(courseId));
                 foreach (var entity in entities)
                 {
-                    var tmp = await _gradeRepository.GetGradesByEntityId(entity.Id);
+                    var tmp = await _unitOfWork.GradeRepository.GetByEntityId(entity.Id);
                     res.Add(tmp);
                 }
 
@@ -67,14 +63,14 @@
             }
         }
 
-        // GET: api/Courses/{courseId}/Grades/Get/{gradeId}
+        // GET: api/Courses/{courseId}/Grades/GetByUserId/{gradeId}
         [HttpGet]
         [PermissionsAuthorize(CoursePermissions.CanSeeGrades)]
         public async Task<HttpResponseMessage> Get(int gradeId)
         {
             try
             {
-                var task = await _gradeRepository.Get(gradeId);
+                var task = await _unitOfWork.GradeRepository.Get(gradeId);
 
                 return task != null
                     ? Request.CreateResponse(HttpStatusCode.Accepted, task.ToJson())
@@ -92,8 +88,8 @@
         [PermissionsAuthorize(CoursePermissions.CanGrade)]
         public async Task<HttpResponseMessage> Add(int courseId, [FromBody] GradeModel grade)
         {
-            grade.Entity = await _entityRepository.Get(grade.EntityId);
-            grade.Entity.Task = await _taskRepository.Get(grade.Entity.TaskId);
+            grade.Entity = await _unitOfWork.EntityRepository.Get(grade.EntityId);
+            grade.Entity.Task = await _unitOfWork.TaskRepository.Get(grade.Entity.TaskId);
             if (courseId != grade.Entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -101,7 +97,7 @@
 
             try
             {
-                var result = await _gradeRepository.Add(grade);
+                var result = await _unitOfWork.GradeRepository.Add(grade);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
@@ -124,8 +120,8 @@
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
 
-            grade.Entity = await _entityRepository.Get(grade.EntityId);
-            grade.Entity.Task = await _taskRepository.Get(grade.Entity.TaskId);
+            grade.Entity = await _unitOfWork.EntityRepository.Get(grade.EntityId);
+            grade.Entity.Task = await _unitOfWork.TaskRepository.Get(grade.Entity.TaskId);
             if (courseId != grade.Entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -133,7 +129,7 @@
 
             try
             {
-                var result = await _gradeRepository.Update(grade);
+                var result = await _unitOfWork.GradeRepository.Update(grade);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
@@ -153,7 +149,7 @@
         {
             try
             {
-                var existingGrade = await _gradeRepository.Get(gradeId);
+                var existingGrade = await _unitOfWork.GradeRepository.Get(gradeId);
                 if (existingGrade == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -163,7 +159,7 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
                 }
 
-                var result = await _entityRepository.Delete(gradeId);
+                var result = await _unitOfWork.EntityRepository.Delete(gradeId);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)

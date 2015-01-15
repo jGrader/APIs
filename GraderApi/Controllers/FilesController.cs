@@ -1,22 +1,22 @@
 ﻿namespace GraderApi.Controllers
 {
     using Filters;
+    using Grader.JsonSerializer;
+    using GraderDataAccessLayer;
+    using GraderDataAccessLayer.Models;
     using Resources;
     using System;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
-    using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Interfaces;
-    using GraderDataAccessLayer.Models;
 
     public class FilesController : ApiController
     {
-        private readonly IFileRepository _fileRepository;
-        public FilesController(IFileRepository fileRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public FilesController(UnitOfWork unitOfWork)
         {
-            _fileRepository = fileRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Files/All
@@ -26,7 +26,7 @@
         {
             try
             {
-                var result = await _fileRepository.GetAll();
+                var result = await _unitOfWork.FileRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -43,7 +43,7 @@
         {
             try
             {
-                var result = await _fileRepository.GetAllByCourseId(courseId);
+                var result = await _unitOfWork.FileRepository.GetByCourseId(courseId);
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -60,7 +60,7 @@
         {
             try
             {
-                var file = await _fileRepository.Get(fileId);
+                var file = await _unitOfWork.FileRepository.Get(fileId);
                 if (file == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -89,7 +89,7 @@
 
             try
             {
-                var result = await _fileRepository.Add(file);
+                var result = await _unitOfWork.FileRepository.Add(file);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
@@ -118,7 +118,7 @@
 
             try
             {
-                var result = await _fileRepository.Update(file);
+                var result = await _unitOfWork.FileRepository.Update(file);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
@@ -138,7 +138,7 @@
         {
             try
             {
-                var existingfile = await _fileRepository.Get(fileId);
+                var existingfile = await _unitOfWork.FileRepository.Get(fileId);
                 if (existingfile == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -148,7 +148,7 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
                 }
 
-                var result = await _fileRepository.Delete(fileId);
+                var result = await _unitOfWork.FileRepository.Delete(fileId);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)

@@ -3,22 +3,13 @@
     using Models;
     using System;
     using System.Collections.Generic;
-    using System.Linq.Expressions;
     using System.Threading.Tasks;
 
 
-    public interface ICourseUserRepository : IDisposable
+    public interface ICourseUserRepository : IGenericRepository<CourseUserModel>, IDisposable
     {
-        Task<CourseUserModel> Get(int id);
-
-        Task<IEnumerable<CourseUserModel>> GetAll();
-        Task<IEnumerable<CourseUserModel>> GetAllByCourseId(int courseId);
-        Task<IEnumerable<CourseUserModel>> GetAllByUser(int userId);
-        Task<IEnumerable<CourseUserModel>> GetAllByPermissions(int permissions);
-        Task<IEnumerable<CourseUserModel>> GetAllByLambda(Expression<Func<CourseUserModel, bool>> exp);
-
-        Task<CourseUserModel> Add(CourseUserModel item);
-        Task<CourseUserModel> Update(CourseUserModel item);
-        Task<bool> Delete(int id);
+        Task<IEnumerable<CourseUserModel>> GetByCourseId(int courseId);
+        Task<IEnumerable<CourseUserModel>> GetByUserId(int userId);
+        Task<IEnumerable<CourseUserModel>> GetByPermissions(int permissions);
     } 
 }

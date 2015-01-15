@@ -2,7 +2,7 @@
 {
     using Filters;
     using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
     using Resources;
     using System;
@@ -16,14 +16,10 @@
 
     public class ExtensionsController : ApiController
     {
-        private readonly IExtensionRepository _extensionRepository;
-        private readonly IEntityRepository _entityRepository;
-        private readonly ICourseUserRepository _courseUserRepository;
-        public ExtensionsController(IExtensionRepository extensionRepository, IEntityRepository entityRepository, ICourseUserRepository courseUserRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public ExtensionsController(UnitOfWork unitOfWork)
         {
-            _extensionRepository = extensionRepository;
-            _entityRepository = entityRepository;
-            _courseUserRepository = courseUserRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Extensions/All
@@ -33,7 +29,7 @@
         {
             try
             {
-                var result = await _extensionRepository.GetAll();
+                var result = await _unitOfWork.ExtensionRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -50,7 +46,7 @@
         {
             try
             {
-                var result = await _extensionRepository.GetAllByLambda(e => e.Entity.Task.CourseId == courseId);
+                var result = await _unitOfWork.ExtensionRepository.GetByExpression(e => e.Entity.Task.CourseId == courseId);
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -64,7 +60,7 @@
         [ValidateModelState]
         public async Task<HttpResponseMessage> Add(int courseId, [FromBody] ExtensionModel extension)
         {
-            extension.Entity = await _entityRepository.Get(extension.EntityId);
+            extension.Entity = await _unitOfWork.EntityRepository.Get(extension.EntityId);
             if (courseId != extension.Entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -78,7 +74,7 @@
 
             try
             {
-                var enrollment = await _courseUserRepository.GetAllByLambda(cu => cu.UserId == currentUser.User.Id && cu.CourseId == courseId);
+                var enrollment = await _unitOfWork.CourseUserRepository.GetByExpression(cu => cu.UserId == currentUser.User.Id && cu.CourseId == courseId);
                 var courseUserModels = enrollment as IList<CourseUserModel> ?? enrollment.ToList();
                 var firstOrDefault = courseUserModels.FirstOrDefault();
                 if (firstOrDefault == null)
@@ -92,7 +88,7 @@
                 }
 
                 extension.IsGranted = false;
-                var result = await _extensionRepository.Add(extension);
+                var result = await _unitOfWork.ExtensionRepository.Add(extension);
                 if (result == null)
                 {
                     Request.CreateResponse(HttpStatusCode.InternalServerError);
@@ -100,13 +96,13 @@
 
                 // Update the number of extensions asked for
                 firstOrDefault.ExtensionNumber += 1;
-                var query = await _courseUserRepository.Update(firstOrDefault);
+                var query = await _unitOfWork.CourseUserRepository.Update(firstOrDefault);
                 if (query == null)
                 {
                     // Revert the extension request
                     if (result != null)
                     {
-                        await _extensionRepository.Delete(result.Id);
+                        await _unitOfWork.ExtensionRepository.Delete(result.Id);
                     }
                     return Request.CreateResponse(HttpStatusCode.InternalServerError);
                 }
@@ -129,7 +125,7 @@
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
-            extension.Entity = await _entityRepository.Get(extensionId);
+            extension.Entity = await _unitOfWork.EntityRepository.Get(extensionId);
             if (courseId != extension.Entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -137,7 +133,7 @@
 
             try
             {
-                var result = await _extensionRepository.Update(extension);
+                var result = await _unitOfWork.ExtensionRepository.Update(extension);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
@@ -157,7 +153,7 @@
         {
             try
             {
-                var existingExtension = await _extensionRepository.Get(extensionId);
+                var existingExtension = await _unitOfWork.ExtensionRepository.Get(extensionId);
                 if (existingExtension == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -167,7 +163,7 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
                 }
 
-                var result = await _extensionRepository.Delete(extensionId);
+                var result = await _unitOfWork.ExtensionRepository.Delete(extensionId);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)

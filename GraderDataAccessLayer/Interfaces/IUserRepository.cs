@@ -5,18 +5,12 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public interface IUserRepository : IDisposable
+    public interface IUserRepository : IGenericRepository<UserModel>, IDisposable
     {
-        Task<UserModel> Get(int id);
         Task<UserModel> GetByUsername(string username);
 
-        Task<IEnumerable<UserModel>> GetAll();
         Task<IEnumerable<UserModel>> GetAllByGraduationYear(string year);
         
         Task<string> GetEmail(int id);
-
-        Task<UserModel> Add(UserModel item);
-        Task<UserModel> Update(UserModel item);
-        Task<bool> Delete(int userId);
     }
 }

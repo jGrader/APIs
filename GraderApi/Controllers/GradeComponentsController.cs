@@ -2,7 +2,7 @@
 {
     using Filters;
     using Grader.JsonSerializer;
-    using GraderDataAccessLayer.Interfaces;
+    using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
     using Resources;
     using System;
@@ -13,10 +13,10 @@
 
     public class GradeComponentsController : ApiController
     {
-        private readonly IGradeComponentRepository _gradeComponentRepository;
-        public GradeComponentsController(IGradeComponentRepository gradeComponentRepository)
+        private readonly UnitOfWork _unitOfWork;
+        public GradeComponentsController(UnitOfWork unitOfWork)
         {
-            _gradeComponentRepository = gradeComponentRepository;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/GradeComponents/All
@@ -26,7 +26,7 @@
         {
             try
             {
-                var result = await _gradeComponentRepository.GetAll();
+                var result = await _unitOfWork.GradeComponentRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -43,7 +43,7 @@
         {
             try
             {
-                var result = await _gradeComponentRepository.GetAllByCourse(courseId);
+                var result = await _unitOfWork.GradeComponentRepository.GetByCourseId(courseId);
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -60,7 +60,7 @@
         {
             try
             {
-                var gradeComponent = await _gradeComponentRepository.Get(gradeComponentId);
+                var gradeComponent = await _unitOfWork.GradeComponentRepository.Get(gradeComponentId);
                 if (gradeComponent == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);   
@@ -89,7 +89,7 @@
 
             try
             {
-                var result = await _gradeComponentRepository.Add(gradeComponent);
+                var result = await _unitOfWork.GradeComponentRepository.Add(gradeComponent);
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
                     : Request.CreateResponse(HttpStatusCode.InternalServerError);
@@ -117,7 +117,7 @@
 
             try
             {
-                var result = await _gradeComponentRepository.Update(gradeComponent);
+                var result = await _unitOfWork.GradeComponentRepository.Update(gradeComponent);
 
                 return result != null 
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson()) 
@@ -137,7 +137,7 @@
         {
             try
             {
-                var existingGradeComponent = await _gradeComponentRepository.Get(gradeComponentId);
+                var existingGradeComponent = await _unitOfWork.GradeComponentRepository.Get(gradeComponentId);
                 if (existingGradeComponent == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -147,7 +147,7 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
                 }
 
-                var result = await _gradeComponentRepository.Delete(gradeComponentId);
+                var result = await _unitOfWork.GradeComponentRepository.Delete(gradeComponentId);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)

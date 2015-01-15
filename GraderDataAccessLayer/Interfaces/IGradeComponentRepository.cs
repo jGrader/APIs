@@ -6,14 +6,8 @@
     using System.Collections.Generic;
 
 
-    public interface IGradeComponentRepository : IDisposable
+    public interface IGradeComponentRepository : IGenericRepository<GradeComponentModel>, IDisposable
     {
-        Task<GradeComponentModel> Get(int id);
-        Task<IEnumerable<GradeComponentModel>> GetAll();
-        Task<IEnumerable<GradeComponentModel>> GetAllByCourse(int courseId);
-        
-        Task<GradeComponentModel> Add(GradeComponentModel item);
-        Task<GradeComponentModel> Update(GradeComponentModel item);
-        Task<bool> Delete(int id);
+        Task<IEnumerable<GradeComponentModel>> GetByCourseId(int courseId);
     }
 }
