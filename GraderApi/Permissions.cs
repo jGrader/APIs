@@ -33,6 +33,7 @@
         CanAddEnrollment = 1 << 5,
         CanUpdateEnrollment = 1 << 6,
         CanDeleteEnrollment = 1 << 7,
+        CanGrantPermissions = 1 << 8
     }
 
     public enum CoursePermissions

@@ -20,7 +20,6 @@ namespace GraderApi
             config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/plain"));
             config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("multipart/form-data"));
 
-
             // Web API routes
             config.MapHttpAttributeRoutes();
 
@@ -124,7 +123,15 @@ namespace GraderApi
                 name: "ExcuseRoute",
                 routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{excuseId}",
                 defaults: new { excuseId = UrlParameter.Optional },
-                constraints: new { controller = "Excuses", courseId = new ApiRouteConstraints(context), extensionId = new ApiRouteConstraints(context) },
+                constraints: new { controller = "Excuses", courseId = new ApiRouteConstraints(context), excuseId = new ApiRouteConstraints(context) },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration, context)
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "PermissionRoute",
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{userId}",
+                defaults: new { userId = UrlParameter.Optional },
+                constraints: new { controller = "Permissions", courseId = new ApiRouteConstraints(context), userId = new ApiRouteConstraints(context) },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration, context)
             );
 

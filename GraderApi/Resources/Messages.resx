@@ -186,4 +186,7 @@
   <data name="UserNotFound" xml:space="preserve">
     <value>The user was not found in the system</value>
   </data>
+  <data name="PermissionsParseError" xml:space="preserve">
+    <value>Cannot convert one of the strings to enum</value>
+  </data>
 </root>

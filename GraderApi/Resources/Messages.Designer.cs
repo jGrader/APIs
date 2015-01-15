@@ -250,6 +250,15 @@ namespace GraderApi.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot convert one of the strings to enum.
+        /// </summary>
+        internal static string PermissionsParseError {
+            get {
+                return ResourceManager.GetString("PermissionsParseError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The request does not have mime/form-data enctype!.
         /// </summary>
         internal static string UnsupportedMediaType {
