@@ -27,12 +27,6 @@
 
         public async Task<SessionIdModel> Add(int userId)
         {
-            var dbUser = await dbSet.FirstOrDefaultAsync(u => u.Id == userId);
-            if (dbUser == null)
-            {
-                throw new ArgumentNullException("userId");
-            }
-
             try
             {
                 var newSession = new SessionIdModel(userId);
