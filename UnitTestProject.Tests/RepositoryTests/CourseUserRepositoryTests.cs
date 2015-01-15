@@ -69,31 +69,19 @@ namespace UnitTestProject.Tests.RepositoryTests
         [TestMethod]
         public async Task TestGetByCourseId()
         {
-            var res = await _cur.GetAllByCourseId(1);
+            var res = await _cur.GetByCourseId(1);
             Assert.AreEqual(2, res.Count(), "#CUR04");
         }
         [TestMethod]
         public async Task TestGetByUser()
         {
-            var res = await _cur.GetAllByUser(1);
+            var res = await _cur.GetByUserId(1);
             Assert.AreEqual(1, res.Count(), "#CUR05");
-        }
-        [TestMethod]
-        public async Task TestGetByExtensionLimit()
-        {
-            var res = await _cur.GetAllByExtensionLimit(1);
-            Assert.AreEqual(2, res.Count(), "#CUR06");
-        }
-        [TestMethod]
-        public async Task TestGetByExcuseLimit()
-        {
-            var res = await _cur.GetAllByExcuseLimit(1);
-            Assert.AreEqual(2, res.Count(), "#CUR07");
         }
         [TestMethod]
         public async Task TestGetByPermissions()
         {
-            var res = await _cur.GetAllByPermissions(700);
+            var res = await _cur.GetByPermissions(700);
             Assert.AreEqual(2, res.Count(), "#CUR08");
         }
 
@@ -101,7 +89,7 @@ namespace UnitTestProject.Tests.RepositoryTests
         [TestMethod]
         public async Task TestAdd()
         {
-            var res = await _cur.Add(new CourseUserModel { UserId = 2, CourseId = 1, ExcuseLimit = 2, ExtensionLimit = 3, Permissions = 1500 });
+            var res = await _cur.Add(new CourseUserModel { UserId = 2, CourseId = 1, ExcuseNumber = 2, ExtensionNumber = 3, Permissions = 1500 });
             Assert.IsNotNull(res, "#CUR09");
             Assert.IsTrue(res.Id > 0, "#CUR10");
 
@@ -156,11 +144,11 @@ namespace UnitTestProject.Tests.RepositoryTests
         public async Task TestRemove()
         {
             // Arrange
-            var res = await _cur.Add(new CourseUserModel { UserId = 2, CourseId = 1, ExcuseLimit = 2, ExtensionLimit = 3, Permissions = 1500 });
+            var res = await _cur.Add(new CourseUserModel { UserId = 2, CourseId = 1, ExcuseNumber = 2, ExtensionNumber = 3, Permissions = 1500 });
             Assert.IsNotNull(res, "#CUR09");
             Assert.IsTrue(res.Id > 0, "#CUR10");
 
-            var existingObject = (await _cur.GetAllByPermissions(1500)).ToList();
+            var existingObject = (await _cur.GetByPermissions(1500)).ToList();
             Assert.IsNotNull(existingObject, "#CUR15");
             Assert.IsTrue(existingObject.Any(), "#CUR16");
 
