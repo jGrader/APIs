@@ -12,8 +12,8 @@
         var models = new Array();
         $form = $("<form></form>");
 
-        models["Courses"] = ["Name", "CourseNumber", "ShortName", "Semester", "Year", "StartDate", "EndDate", "OwnerId"];
-        models["CourseUsers"] = ["CourseId", "UserId", "Permissions", "ExtensionLimit", "ExcuseLimit"];
+        models["Courses"] = ["Name", "CourseNumber", "ShortName", "Semester", "Year", "StartDate", "EndDate", "OwnerId", "ExtensionLimit", "ExcuseLimit"];
+        models["CourseUsers"] = ["CourseId", "UserId", "Permissions"];
         models["Entities"] = ["Name", "Points", "BonusPoints", "OpenTime", "CloseTime", "TaskId"];
         models["Files"] = ["FileName", "Extension", "EntityId"];
         models["GradeComponents"] = ["Name", "Percentage", "CourseId"];
@@ -171,6 +171,8 @@
                     }
                     $("#Form").empty();
                     $("#Form").append($form);
+                } else {
+                    $("#Form").empty();
                 }
             });
 
