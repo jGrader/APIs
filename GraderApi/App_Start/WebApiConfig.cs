@@ -121,6 +121,14 @@ namespace GraderApi
             );
 
             config.Routes.MapHttpRoute(
+                name: "ExcuseRoute",
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{excuseId}",
+                defaults: new { excuseId = UrlParameter.Optional },
+                constraints: new { controller = "Excuses", courseId = new ApiRouteConstraints(context), extensionId = new ApiRouteConstraints(context) },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration, context)
+            );
+
+            config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{action}/{id}",
                 defaults: new { id = RouteParameter.Optional },

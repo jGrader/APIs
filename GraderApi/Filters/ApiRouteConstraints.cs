@@ -22,6 +22,7 @@
         private ITeamRepository _teamRepository;
         private IGradeRepository _gradeRepository;
         private IExtensionRepository _extensionRepository;
+        private IExcuseRepository _excuseRepository;
 
         public ApiRouteConstraints(DatabaseContext context)
         {
@@ -36,6 +37,7 @@
             _teamRepository = new TeamRepository(context);
             _gradeRepository = new GradeRepository(context);
             _extensionRepository = new ExtensionRepository(context);
+            _excuseRepository = new ExcuseRepository(context);
         }
         
         public bool Match(HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection)
@@ -203,6 +205,19 @@
                     Task.WaitAll(result);
                     return (result.Result != null);
                 }
+                case "excuseId":
+                {
+                    int excuseId;
+                    if (!int.TryParse(stringValue, out excuseId))
+                    {
+                        return false;
+                    }
+
+                    //
+                    var result = Task.Run(() => _excuseRepository.Get(excuseId));
+                    Task.WaitAll(result);
+                    return (result.Result != null);
+                }
             }
 
             return false;
@@ -231,6 +246,7 @@
             DisposeTeamRepository();
             DisposeGradeRepository();
             DisposeExtensionRepository();
+            DisposeExcuseRepository();
         }
 
         private void DisposeGradeRepository()
@@ -342,6 +358,16 @@
 
             _extensionRepository.Dispose();
             _extensionRepository = null;
+        }
+        private void DisposeExcuseRepository()
+        {
+            if (_excuseRepository == null)
+            {
+                return;
+            }
+
+            _excuseRepository.Dispose();
+            _excuseRepository = null;
         }
         #endregion
     }

@@ -14,6 +14,7 @@
         CanSeeAllTeams = 1 << 10,
         CanSeeAllGrades = 1 << 11,
         CanSeeAllExtensions = 1 << 12,
+        CanSeeAllExcuses = 1 << 13
     }
 
     public enum AdminPermissions
@@ -61,5 +62,6 @@
         CanGrade = 1 << 21,
         CanSeeExtensions = 1 << 22,
         CanGrantExtensions = 1 << 23,
+        CanGrantExcuses = 1 << 24
     }
 }

@@ -70,6 +70,15 @@ namespace GraderApi.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are no longer allowed to ask for excuses for this course!.
+        /// </summary>
+        internal static string ExcuseNumberExceeded {
+            get {
+                return ResourceManager.GetString("ExcuseNumberExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The provided session ID has expired. Please log in again..
         /// </summary>
         internal static string ExpiredSessionId {

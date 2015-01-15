@@ -231,6 +231,7 @@
     <Compile Include="Controllers\CourseUsersController.cs" />
     <Compile Include="Controllers\CurrentUserController.cs" />
     <Compile Include="Controllers\EntitiesController.cs" />
+    <Compile Include="Controllers\ExcusesController.cs" />
     <Compile Include="Controllers\ExtensionsController.cs" />
     <Compile Include="Controllers\FilesController.cs" />
     <Compile Include="Controllers\GradeComponentsController.cs" />

@@ -14,26 +14,26 @@
     using System.Web;
     using System.Web.Http;
 
-    public class ExtensionsController : ApiController
+    public class ExcusesController : ApiController
     {
-        private readonly IExtensionRepository _extensionRepository;
+        private readonly IExcuseRepository _excuseRepository;
         private readonly IEntityRepository _entityRepository;
         private readonly ICourseUserRepository _courseUserRepository;
-        public ExtensionsController(IExtensionRepository extensionRepository, IEntityRepository entityRepository, ICourseUserRepository courseUserRepository)
+        public ExcusesController(IExcuseRepository excuseRepository, IEntityRepository entityRepository, ICourseUserRepository courseUserRepository)
         {
-            _extensionRepository = extensionRepository;
+            _excuseRepository = excuseRepository;
             _entityRepository = entityRepository;
             _courseUserRepository = courseUserRepository;
         }
 
-        // GET: api/Extensions/All
+        // GET: api/Excuses/All
         [HttpGet]
-        [PermissionsAuthorize(SuperUserPermissions.CanSeeAllExtensions)]
+        [PermissionsAuthorize(SuperUserPermissions.CanSeeAllExcuses)]
         public async Task<HttpResponseMessage> All()
         {
             try
             {
-                var result = await _extensionRepository.GetAll();
+                var result = await _excuseRepository.GetAll();
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -42,15 +42,15 @@
             }
         }
 
-        // GET: api/Courses/{courseId}/Extensions/All
+        // GET: api/Courses/{courseId}/Excuses/All
         [HttpGet]
         [ValidateModelState]
-        [PermissionsAuthorize(CoursePermissions.CanGrantExtensions)]
+        [PermissionsAuthorize(CoursePermissions.CanGrantExcuses)]
         public async Task<HttpResponseMessage> All(int courseId)
         {
             try
             {
-                var result = await _extensionRepository.GetAllByLambda(e => e.Entity.Task.CourseId == courseId);
+                var result = await _excuseRepository.GetAllByLambda(e => e.Entity.Task.CourseId == courseId);
                 return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
             }
             catch (Exception e)
@@ -59,13 +59,13 @@
             }
         }
 
-        // POST: api/Courses/{courseId}/Extensions/Add
+        // POST: api/Courses/{courseId}/Excuses/Add
         [HttpPost]
         [ValidateModelState]
-        public async Task<HttpResponseMessage> Add(int courseId, [FromBody] ExtensionModel extension)
+        public async Task<HttpResponseMessage> Add(int courseId, [FromBody] ExcuseModel excuse)
         {
-            extension.Entity = await _entityRepository.Get(extension.EntityId);
-            if (courseId != extension.Entity.Task.CourseId)
+            excuse.Entity = await _entityRepository.Get(excuse.EntityId);
+            if (courseId != excuse.Entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
@@ -85,28 +85,28 @@
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidEnrollment);
                 }
-                if (firstOrDefault.ExtensionNumber >= extension.Entity.Task.Course.ExtensionLimit)
+                if (firstOrDefault.ExcuseNumber >= excuse.Entity.Task.Course.ExcuseLimit)
                 {
-                    // The user already reached the maximum number of allowed extensions
-                    return Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ExtensionNumberExceeded);
+                    // The user already reached the maximum number of allowed Excuses
+                    return Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ExcuseNumberExceeded);
                 }
 
-                extension.IsGranted = false;
-                var result = await _extensionRepository.Add(extension);
+                excuse.IsGranted = false;
+                var result = await _excuseRepository.Add(excuse);
                 if (result == null)
                 {
                     Request.CreateResponse(HttpStatusCode.InternalServerError);
                 }
 
-                // Update the number of extensions asked for
-                firstOrDefault.ExtensionNumber += 1;
+                // Update the number of Excuses asked for
+                firstOrDefault.ExcuseNumber += 1;
                 var query = await _courseUserRepository.Update(firstOrDefault);
                 if (query == null)
                 {
-                    // Revert the extension request
+                    // Revert the excuse request
                     if (result != null)
                     {
-                        await _extensionRepository.Delete(result.Id);
+                        await _excuseRepository.Delete(result.Id);
                     }
                     return Request.CreateResponse(HttpStatusCode.InternalServerError);
                 }
@@ -119,25 +119,25 @@
             }
         }
 
-        // PUT: api/Courses/{courseId}/Extensions/{extensionId}
+        // PUT: api/Courses/{courseId}/Excuses/{excuseId}
         [HttpPut]
         [ValidateModelState]
-        [PermissionsAuthorize(CoursePermissions.CanGrantExtensions)]
-        public async Task<HttpResponseMessage> Update(int courseId, int extensionId, [FromBody] ExtensionModel extension)
+        [PermissionsAuthorize(CoursePermissions.CanGrantExcuses)]
+        public async Task<HttpResponseMessage> Update(int courseId, int excuseId, [FromBody] ExcuseModel excuse)
         {
-            if (extensionId != extension.Id)
+            if (excuseId != excuse.Id)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
-            extension.Entity = await _entityRepository.Get(extensionId);
-            if (courseId != extension.Entity.Task.CourseId)
+            excuse.Entity = await _entityRepository.Get(excuseId);
+            if (courseId != excuse.Entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
 
             try
             {
-                var result = await _extensionRepository.Update(extension);
+                var result = await _excuseRepository.Update(excuse);
 
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
@@ -149,25 +149,25 @@
             }
         }
 
-        // DELETE: api/Courses/{courseId}/Extensions/{extensionId}
+        // DELETE: api/Courses/{courseId}/Excuses/{excuseId}
         [HttpDelete]
         [ValidateModelState]
-        [PermissionsAuthorize(CoursePermissions.CanGrantExtensions)]
-        public async Task<HttpResponseMessage> Delete(int courseId, int extensionId)
+        [PermissionsAuthorize(CoursePermissions.CanGrantExcuses)]
+        public async Task<HttpResponseMessage> Delete(int courseId, int excuseId)
         {
             try
             {
-                var existingExtension = await _extensionRepository.Get(extensionId);
-                if (existingExtension == null)
+                var existingexcuse = await _excuseRepository.Get(excuseId);
+                if (existingexcuse == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
                 }
-                if (existingExtension.Entity.Task.CourseId != courseId)
+                if (existingexcuse.Entity.Task.CourseId != courseId)
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
                 }
 
-                var result = await _extensionRepository.Delete(extensionId);
+                var result = await _excuseRepository.Delete(excuseId);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)
