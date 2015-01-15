@@ -26,10 +26,10 @@
         private readonly IUserRepository _userRepository;
         private readonly ISessionIdRepository _sessionIdRepository;
 
-        public AuthorizeHandler(DatabaseContext context)
+        public AuthorizeHandler()
         {
-            _userRepository = new UserRepository(context);
-            _sessionIdRepository = new SessionIdRepository(context);
+            _userRepository = new UserRepository();
+            _sessionIdRepository = new SessionIdRepository();
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

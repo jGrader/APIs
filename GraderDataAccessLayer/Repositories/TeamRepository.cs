@@ -14,9 +14,9 @@
     {
         private DatabaseContext _db;
 
-        public TeamRepository(DatabaseContext db)
+        public TeamRepository()
         {
-            _db = db;
+            _db = new DatabaseContext();
         }
       
         public async Task<TeamModel> Get(int teamId)

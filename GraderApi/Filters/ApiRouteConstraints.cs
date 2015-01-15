@@ -24,20 +24,20 @@
         private IExtensionRepository _extensionRepository;
         private IExcuseRepository _excuseRepository;
 
-        public ApiRouteConstraints(DatabaseContext context)
+        public ApiRouteConstraints()
         {
-            _userRepository = new UserRepository(context);
-            _courseRepository = new CourseRepository(context);
-            _courseUserRepository = new CourseUserRepository(context);
-            _gradeComponentRepository = new GradeComponentRepository(context);
-            _taskRepository = new TaskRepository(context);
-            _entityRepository = new EntityRepository(context);
-            _fileRepository = new FileRepository(context);
-            _submissionRepository = new SubmissionRepository(context);
-            _teamRepository = new TeamRepository(context);
-            _gradeRepository = new GradeRepository(context);
-            _extensionRepository = new ExtensionRepository(context);
-            _excuseRepository = new ExcuseRepository(context);
+            _userRepository = new UserRepository();
+            _courseRepository = new CourseRepository();
+            _courseUserRepository = new CourseUserRepository();
+            _gradeComponentRepository = new GradeComponentRepository();
+            _taskRepository = new TaskRepository();
+            _entityRepository = new EntityRepository();
+            _fileRepository = new FileRepository();
+            _submissionRepository = new SubmissionRepository();
+            _teamRepository = new TeamRepository();
+            _gradeRepository = new GradeRepository();
+            _extensionRepository = new ExtensionRepository();
+            _excuseRepository = new ExcuseRepository();
         }
         
         public bool Match(HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection)

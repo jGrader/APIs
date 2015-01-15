@@ -14,9 +14,9 @@
     {
         private DatabaseContext _db;
 
-        public FileRepository(DatabaseContext db)
+        public FileRepository()
         {
-            _db = db;
+            _db = new DatabaseContext();
         }
 
         public async Task<FileModel> Get(int id)

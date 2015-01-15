@@ -14,9 +14,9 @@
     public class ExtensionRepository : IExtensionRepository
     {
         private DatabaseContext _db;
-        public ExtensionRepository(DatabaseContext db)
+        public ExtensionRepository()
         {
-            _db = db;
+            _db = new DatabaseContext();
         }
 
 

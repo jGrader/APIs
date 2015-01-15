@@ -16,9 +16,9 @@
     {
         private DatabaseContext _db;
 
-        public CourseUserRepository(DatabaseContext db)
+        public CourseUserRepository()
         {
-            _db = db;
+            _db = new DatabaseContext();
         }
 
         public async Task<CourseUserModel> Get(int id)

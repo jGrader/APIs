@@ -14,9 +14,9 @@
     public class ExcuseRepository : IExcuseRepository
     {
         private DatabaseContext _db;
-        public ExcuseRepository(DatabaseContext db)
+        public ExcuseRepository()
         {
-            _db = db;
+            _db = new DatabaseContext();
         }
 
 

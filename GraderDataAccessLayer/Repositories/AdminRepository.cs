@@ -13,9 +13,9 @@
     {
         private DatabaseContext _db;
 
-        public AdminRepository(DatabaseContext db)
+        public AdminRepository()
         {
-            _db = db;
+            _db = new DatabaseContext();
         }
         public async Task<AdminModel> Get(int id)
         {

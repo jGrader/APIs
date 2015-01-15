@@ -14,9 +14,9 @@
     public class CourseRepository : ICourseRepository
     {
         private DatabaseContext _db;
-        public CourseRepository(DatabaseContext db)
+        public CourseRepository()
         {
-            _db = db;
+            _db = new DatabaseContext();
         }
 
 

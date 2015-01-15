@@ -15,9 +15,9 @@
     {
         private DatabaseContext _db;
 
-        public EntityRepository(DatabaseContext db)
+        public EntityRepository()
         {
-            _db = db;
+            _db = new DatabaseContext();
         }
         public async Task<EntityModel> Get(int id)
         {

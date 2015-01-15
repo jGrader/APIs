@@ -15,9 +15,9 @@
     {
         private DatabaseContext _db;
 
-        public GradeRepository(DatabaseContext db)
+        public GradeRepository()
         {
-            _db = db;
+            _db = new DatabaseContext();
         }
 
         public async Task<GradeModel> Get(int id)

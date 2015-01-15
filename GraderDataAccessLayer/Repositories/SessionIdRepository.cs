@@ -14,9 +14,9 @@
     {
         private DatabaseContext _db;
 
-        public SessionIdRepository(DatabaseContext db)
+        public SessionIdRepository()
         {
-            _db = db;
+            _db = new DatabaseContext();
         }
 
         public async Task<IEnumerable<SessionIdModel>> GetAll()

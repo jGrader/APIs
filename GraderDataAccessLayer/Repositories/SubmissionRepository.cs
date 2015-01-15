@@ -15,9 +15,9 @@
     {
         private DatabaseContext _db;
 
-        public SubmissionRepository(DatabaseContext db)
+        public SubmissionRepository()
         {
-            _db = db;
+            _db = new DatabaseContext();
         }
 
         public async Task<SubmissionModel> Get(int id)

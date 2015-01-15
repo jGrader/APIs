@@ -17,9 +17,9 @@ namespace GraderDataAccessLayer.Repositories
     {
         private DatabaseContext _db;
 
-        public GradeComponentRepository(DatabaseContext db)
+        public GradeComponentRepository()
         {
-            _db = db;
+            _db = new DatabaseContext();
         }
 
         public async Task<GradeComponentModel> Get(int id)
