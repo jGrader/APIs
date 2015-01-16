@@ -1,4 +1,8 @@
-﻿namespace GraderApi.Controllers
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace GraderApi.Controllers
 {
     using Filters;
     using Grader.JsonSerializer;
@@ -11,7 +15,6 @@
     using System.Threading.Tasks;
     using System.Web.Http;
     using Services;
-    using WebGrease.Activities;
 
     public class CourseUsersController : ApiController
     {
@@ -40,7 +43,7 @@
             }
         }
 
-        // GET: api/Courses/{courseId}/CourseUsers
+        // GET: api/Courses/{courseId}/CourseUsers/All
         [HttpGet]
         [ValidateModelState]
         public async Task<HttpResponseMessage> All(int courseId)
@@ -57,7 +60,7 @@
             }
         }
 
-        // GET: api/Courses/{courseId}/CourseUsers/{courseUserId}
+        // GET: api/Courses/{courseId}/CourseUsers/Get/{courseUserId}
         [HttpGet]
         [ValidateModelState]
         [PermissionsAuthorize(CourseOwnerPermissions.CanSeeEnrollment)]
@@ -73,7 +76,7 @@
 
 
                 return courseId == courseUser.CourseId
-                    ? Request.CreateResponse(HttpStatusCode.Accepted, courseUser.ToJson())
+                    ? Request.CreateResponse(HttpStatusCode.OK, courseUser.ToJson())
                     : Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
             catch (Exception e)
@@ -83,7 +86,71 @@
             }
         }
 
-        // POST: api/Courses/{courseId}/CourseUsers
+        // GET: api/Courses/{courseId}/CourseUsers/{courseUserId}
+        [HttpGet]
+        [ValidateModelState]
+        [PermissionsAuthorize(CourseOwnerPermissions.CanSeeEnrollment)]
+        public async Task<HttpResponseMessage> GetEnrollmentGrade(int courseId, int courseUserId)
+        {
+            try
+            {
+                var courseUser = await _unitOfWork.CourseUserRepository.Get(courseUserId);
+                if (courseUser == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                }
+                if (courseUser.CourseId != courseId)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest);
+                }
+
+                var currentUser = HttpContext.Current.User as UserPrincipal;
+                if (currentUser == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.UserNotFound);
+                }
+
+                //
+                var gradeComponents = await _unitOfWork.GradeComponentRepository.GetByCourseId(courseId);
+                var entities = await _unitOfWork.EntityRepository.GetByCourseId(courseId);
+                var entityModels = entities as IList<EntityModel> ?? entities.ToList();
+
+                var finalGrade = 0;
+                foreach (var gradeComponent in gradeComponents)
+                {
+                    var sum = 0;
+                    var count = 0;
+
+                    var component = gradeComponent; // If this isn't here, we might get a bug depending on compiler version
+                    var filteredEntities = entityModels.Where(e => e.Task.GradeComponentId == component.Id);
+
+                    foreach (var entity in filteredEntities)
+                    {
+                        var entity1 = entity; // If this isn't here, we might get a bug depending on compiler version
+                        var grade = await _unitOfWork.GradeRepository.GetByExpression(g => g.EntityId == entity1.Id && g.UserId == currentUser.User.Id);
+                        var firstOrDefault = grade.FirstOrDefault();
+                        if (firstOrDefault == null)
+                        {
+                            continue;
+                        }
+
+                        count++;
+                        sum += firstOrDefault.Grade + firstOrDefault.BonusGrade;
+                    }
+
+                    finalGrade += (sum / count);
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, finalGrade);
+            }
+            catch (Exception e)
+            {
+                _logger.Log(e);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
+        }
+
+        // POST: api/Courses/{courseId}/CourseUsers/Add
         [HttpPost]
         [ValidateModelState]
         [PermissionsAuthorize(CourseOwnerPermissions.CanAddEnrollment)]
@@ -108,7 +175,7 @@
             }
         }
 
-        // PUT: api/Courses/{courseId}/CourseUsers/{courseUserId}
+        // PUT: api/Courses/{courseId}/CourseUsers/Update/{courseUserId}
         [HttpPut]
         [ValidateModelState]
         [PermissionsAuthorize(CourseOwnerPermissions.CanUpdateEnrollment)]
@@ -137,7 +204,7 @@
             }
         }
 
-        // DELETE: api/Courses/{courseId}/CourseUsers/{courseUserId}
+        // DELETE: api/Courses/{courseId}/CourseUsers/Delete/{courseUserId}
         [HttpDelete]
         [ValidateModelState]
         [PermissionsAuthorize(CourseOwnerPermissions.CanDeleteEnrollment)]
