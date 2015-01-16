@@ -5,18 +5,21 @@
     using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
     using Resources;
+    using Services;
     using System;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
 
-
     public class EntitiesController : ApiController
     {
         private readonly UnitOfWork _unitOfWork;
-        public EntitiesController(UnitOfWork unitOfWork)
+        private readonly Logger _logger;
+
+        public EntitiesController(UnitOfWork unitOfWork, Logger log)
         {
+            _logger = log;
             _unitOfWork = unitOfWork;
         }
 
@@ -32,6 +35,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -49,6 +53,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -73,6 +78,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -97,6 +103,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -123,6 +130,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -153,6 +161,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -180,6 +189,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }

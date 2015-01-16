@@ -6,6 +6,7 @@
     using GraderDataAccessLayer.Models;
     using Newtonsoft.Json;
     using Resources;
+    using Services;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -20,8 +21,11 @@
     public class SubmissionsController : ApiController
     {
         private readonly UnitOfWork _unitOfWork;
-        public SubmissionsController(UnitOfWork unitOfWork)
+        private readonly Logger _logger;
+
+        public SubmissionsController(UnitOfWork unitOfWork, Logger log)
         {
+            _logger = log;
             _unitOfWork = unitOfWork;
         }
 
@@ -37,6 +41,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -54,6 +59,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -78,6 +84,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -258,6 +265,8 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
+
                 Directory.Delete(tempPath);
                 var revertResult = Task.Run(() => RevertFailedSubmisionChanges(backUpInformation, newlyAddedInformation));
                 Task.WaitAll(revertResult);
@@ -332,6 +341,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }

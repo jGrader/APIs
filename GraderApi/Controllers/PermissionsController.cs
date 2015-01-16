@@ -5,6 +5,7 @@
     using GraderDataAccessLayer;
     using Newtonsoft.Json;
     using Resources;
+    using Services;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -16,8 +17,11 @@
     public class PermissionsController : ApiController
     {
         private readonly UnitOfWork _unitOfWork;
-        public PermissionsController(UnitOfWork unitOfWork)
+        private readonly Logger _logger;
+
+        public PermissionsController(UnitOfWork unitOfWork, Logger log)
         {
+            _logger = log;
             _unitOfWork = unitOfWork;
         }
 
@@ -55,6 +59,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }

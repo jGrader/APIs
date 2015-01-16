@@ -5,6 +5,7 @@
     using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
     using Resources;
+    using Services;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -17,8 +18,11 @@
     public class ExtensionsController : ApiController
     {
         private readonly UnitOfWork _unitOfWork;
-        public ExtensionsController(UnitOfWork unitOfWork)
+        private readonly Logger _logger;
+
+        public ExtensionsController(UnitOfWork unitOfWork, Logger log)
         {
+            _logger = log;
             _unitOfWork = unitOfWork;
         }
 
@@ -34,6 +38,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -51,6 +56,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -111,6 +117,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -141,6 +148,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -168,6 +176,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }

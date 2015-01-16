@@ -3,7 +3,7 @@
     using Filters;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer;
-    using GraderDataAccessLayer.Interfaces;
+    using Services;
     using System;
     using System.Net;
     using System.Net.Http;
@@ -13,8 +13,11 @@
     public class UsersController : ApiController
     {
         private readonly UnitOfWork _unitOfWork;
-        public UsersController(UnitOfWork unitOfWork)
+        private readonly Logger _logger;
+
+        public UsersController(UnitOfWork unitOfWork, Logger log)
         {
+            _logger = log;
             _unitOfWork = unitOfWork;
         }
 
@@ -30,6 +33,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -55,6 +59,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
