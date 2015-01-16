@@ -1,9 +1,7 @@
 ﻿using GraderApi.Controllers;
 using GraderApi.Filters;
 using GraderDataAccessLayer;
-using GraderDataAccessLayer.Interfaces;
 using GraderDataAccessLayer.Models;
-using GraderDataAccessLayer.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;
@@ -21,8 +19,7 @@ namespace UnitTestProject.Tests.ControllersTests
     public class CoursesControllerTests
     {
         #region Initialization and Cleanup
-        private DatabaseContext _context = new DatabaseContext();
-        private static ICourseRepository Cr;
+        private static UnitOfWork _uow;
         private CoursesController _cc;
 
         [ClassInitialize]
@@ -44,8 +41,8 @@ namespace UnitTestProject.Tests.ControllersTests
         [TestInitialize]
         public void Initialize()
         {
-            Cr = new CourseRepository(_context);
-            _cc = new CoursesController(Cr);
+           _uow = new UnitOfWork();
+            _cc = new CoursesController(_uow);
 
             _cc.Configuration = new HttpConfiguration();
 
@@ -53,7 +50,7 @@ namespace UnitTestProject.Tests.ControllersTests
                name: "CourseRoute",
                 routeTemplate: "api/{controller}/{action}/{courseId}",
                 defaults: new { },
-                constraints: new { controller = "Courses", courseId = new ApiRouteConstraints(_context) }
+                constraints: new { controller = "Courses", courseId = new ApiRouteConstraints() }
                );
 
             _cc.Configuration.Routes.MapHttpRoute(
@@ -66,7 +63,6 @@ namespace UnitTestProject.Tests.ControllersTests
         [TestCleanup]
         public void Clean()
         {
-            Cr.Dispose();
             _cc.Dispose();
         }
         [TestMethod]
@@ -84,7 +80,7 @@ namespace UnitTestProject.Tests.ControllersTests
             var responseJson = await response.Content.ReadAsStringAsync();
             var courses = JsonConvert.DeserializeObject<IEnumerable<CourseModel>>(responseJson);
 
-            var all = (await Cr.GetAll()).Count();
+            var all = (await _uow.CourseRepository.GetAll()).Count();
             Assert.AreEqual(all, courses.Count(), "#CC02");
         }
 
@@ -114,7 +110,7 @@ namespace UnitTestProject.Tests.ControllersTests
             // Act
             var course = new CourseModel()
             {
-                Name = "General Procrastination 2",
+                Name = "General Pro_uow.CourseRepositoryastination 2",
                 CourseNumber = "52101",
                 StartDate = new DateTime(2014, 10, 22),
                 EndDate = new DateTime(2014, 11, 23),
@@ -161,7 +157,7 @@ namespace UnitTestProject.Tests.ControllersTests
             _cc.Configuration = new HttpConfiguration();
 
             // Act
-            var existingItem = await Cr.Get(1);
+            var existingItem = await _uow.CourseRepository.Get(1);
             var oldValue = existingItem.Semester;
             existingItem.Semester = 2500;
 
@@ -174,7 +170,7 @@ namespace UnitTestProject.Tests.ControllersTests
 
             // Revert
             existingItem.Semester = oldValue;
-            var res = await Cr.Update(existingItem);
+            var res = await _uow.CourseRepository.Update(existingItem);
             Assert.IsNotNull(res);
         }
         [TestMethod]
@@ -185,7 +181,7 @@ namespace UnitTestProject.Tests.ControllersTests
             _cc.Configuration = new HttpConfiguration();
 
             // Act
-            var existingItem = await Cr.Get(1);
+            var existingItem = await _uow.CourseRepository.Get(1);
             existingItem.Name = null;
 
             var response = await _cc.Update(existingItem.Id, existingItem);
@@ -201,7 +197,7 @@ namespace UnitTestProject.Tests.ControllersTests
             _cc.Configuration = new HttpConfiguration();
 
             // Act
-            var existingItem = await Cr.Get(1);
+            var existingItem = await _uow.CourseRepository.Get(1);
             var response = await _cc.Update(2, existingItem);
 
             // Assert
@@ -219,7 +215,7 @@ namespace UnitTestProject.Tests.ControllersTests
             // Act
             var course = new CourseModel()
             {
-                Name = "General Procrastination 2",
+                Name = "General Pro_uow.CourseRepositoryastination 2",
                 CourseNumber = "52101",
                 StartDate = new DateTime(2014, 10, 22),
                 EndDate = new DateTime(2014, 11, 23),
@@ -228,10 +224,10 @@ namespace UnitTestProject.Tests.ControllersTests
                 Year = 2015,
                 OwnerId = 1
             };
-            var response = await Cr.Add(course);
+            var response = await _uow.CourseRepository.Add(course);
             Assert.IsNotNull(response);
 
-            var dbItem = await Cr.Get(response.Id);
+            var dbItem = await _uow.CourseRepository.Get(response.Id);
             Assert.IsNotNull(dbItem);
 
             var res = await _cc.Delete(response.Id);
@@ -239,7 +235,7 @@ namespace UnitTestProject.Tests.ControllersTests
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, res.StatusCode);
 
-            dbItem = await Cr.Get(response.Id);
+            dbItem = await _uow.CourseRepository.Get(response.Id);
             Assert.IsNull(dbItem);
         }
         [TestMethod]
