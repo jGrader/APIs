@@ -10,13 +10,17 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
+    using Services;
+    using WebGrease.Activities;
 
     public class CourseUsersController : ApiController
     {
         private readonly UnitOfWork _unitOfWork;
-        public CourseUsersController(UnitOfWork unitOfWork)
+        private readonly Logger _logger;
+        public CourseUsersController(UnitOfWork unitOfWork, Logger logger)
         {
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         // GET: api/CourseUsers/All
@@ -31,6 +35,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -47,6 +52,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -72,6 +78,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -96,6 +103,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -124,6 +132,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -151,6 +160,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }

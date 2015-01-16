@@ -1,26 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Services.Logger
+﻿namespace Services
 {
+    using System;
+    using System.IO;
     public class Logger
     {
-        private readonly string _pathName;
+        private string _pathName;
 
-        public Logger()
-        {
-            _pathName = ConfigurationManager.AppSettings["pathName"];
-        }
         public void Log(Exception e)
         {
-            using (var s = File.AppendText(String.Format(_pathName, DateTime.Now.ToShortDateString())))
+            var tmp = DateTime.Now.ToShortDateString();
+            tmp = tmp.Replace(':', '-');
+            tmp = tmp.Replace('/', '-');
+            _pathName = Path.Combine(Directory.GetCurrentDirectory(), "\\App_Data\\Logs\\");
+            Directory.CreateDirectory(_pathName);
+            using (var s = File.AppendText(_pathName + tmp + ".log"))
             {
-                s.Write(DateTime.Now.ToLocalTime());
+                s.Write(DateTime.Now.ToLocalTime() + " ");
+                s.WriteLine(e.ToString());
             }
         }
     }

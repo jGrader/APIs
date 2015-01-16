@@ -9,13 +9,17 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
+    using Services;
 
     public class CoursesController : ApiController
     {
         private readonly UnitOfWork _unitOfWork;
-        public CoursesController(UnitOfWork unitOfWork)
+        private readonly Logger _logger;
+
+        public CoursesController(UnitOfWork unitOfWork, Logger log)
         {
             _unitOfWork = unitOfWork;
+            _logger = log;
         }
 
         // GET: api/Courses
@@ -29,6 +33,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -47,6 +52,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -66,6 +72,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -90,6 +97,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
@@ -107,6 +115,7 @@
             }
             catch (Exception e)
             {
+                _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
