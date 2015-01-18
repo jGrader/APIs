@@ -1,5 +1,6 @@
 ﻿namespace GraderDataAccessLayer.Repositories
 {
+    using System.Linq;
     using Interfaces;
     using Models;
     using System;
@@ -63,6 +64,19 @@
                 return true;
             }
             catch (DbException)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> Delete(int userId)
+        {
+            try
+            {
+                var model = await dbSet.FirstOrDefaultAsync(s => s.UserId == userId);
+                return await Delete(model);
+            }
+            catch (Exception e)
             {
                 return false;
             }
