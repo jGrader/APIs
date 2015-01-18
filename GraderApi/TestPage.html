@@ -30,7 +30,7 @@
         $(document).ready(function () {
             
             $("button#login").click(function() {
-                var url = "api/Users/Authentication";
+                var url = "api/Users/Login";
                 var headers = new Array();
                 headers["Authorization"] = "Basic" + " " + btoa($("input#username").val() + ":" + $("#password").val()); //Base64 encoding
 

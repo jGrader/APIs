@@ -329,9 +329,9 @@
       <Project>{fd18aff1-e18c-48e1-8952-f7c343d1c5c5}</Project>
       <Name>JsonSerializer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Services.cs\Services.cs.csproj">
+    <ProjectReference Include="..\Services.cs\Services.csproj">
       <Project>{eb402009-5a3b-418a-b52b-ef579349fd56}</Project>
-      <Name>Services.cs</Name>
+      <Name>Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
