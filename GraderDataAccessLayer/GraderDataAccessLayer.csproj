@@ -84,6 +84,7 @@
     <Compile Include="Models\FileModel.cs" />
     <Compile Include="Models\GradeComponentModel.cs" />
     <Compile Include="Models\GradeModel.cs" />
+    <Compile Include="Models\MessageModel.cs" />
     <Compile Include="Models\SessionIdModel.cs" />
     <Compile Include="Models\SshKeyModel.cs" />
     <Compile Include="Models\SubmissionModel.cs" />
