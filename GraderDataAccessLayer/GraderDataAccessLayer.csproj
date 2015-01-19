@@ -65,6 +65,7 @@
     <Compile Include="Interfaces\IFileRepository.cs" />
     <Compile Include="Interfaces\IGenericRepository.cs" />
     <Compile Include="Interfaces\IGradeRepository.cs" />
+    <Compile Include="Interfaces\IMessageRepository.cs" />
     <Compile Include="Interfaces\ISessionIdRepository.cs" />
     <Compile Include="Interfaces\ISshKeyRepository.cs" />
     <Compile Include="Interfaces\ISubmissionRepository.cs" />
@@ -73,6 +74,10 @@
     <Compile Include="Migrations\201501172201390_Initial.cs" />
     <Compile Include="Migrations\201501172201390_Initial.Designer.cs">
       <DependentUpon>201501172201390_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201501190925442_AddedMessages.cs" />
+    <Compile Include="Migrations\201501190925442_AddedMessages.Designer.cs">
+      <DependentUpon>201501190925442_AddedMessages.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdminModel.cs" />
@@ -84,6 +89,7 @@
     <Compile Include="Models\FileModel.cs" />
     <Compile Include="Models\GradeComponentModel.cs" />
     <Compile Include="Models\GradeModel.cs" />
+    <Compile Include="Models\MessageModel.cs" />
     <Compile Include="Models\SessionIdModel.cs" />
     <Compile Include="Models\SshKeyModel.cs" />
     <Compile Include="Models\SubmissionModel.cs" />
@@ -103,6 +109,7 @@
     <Compile Include="Interfaces\IGradeComponentRepository.cs" />
     <Compile Include="Interfaces\ITaskRepository.cs" />
     <Compile Include="Repositories\GradeRepository.cs" />
+    <Compile Include="Repositories\MessageRepository.cs" />
     <Compile Include="Repositories\SessionIdRepository.cs" />
     <Compile Include="Repositories\SubmissionRepository.cs" />
     <Compile Include="Repositories\TaskRepository.cs" />
@@ -118,6 +125,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201501172201390_Initial.resx">
       <DependentUpon>201501172201390_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201501190925442_AddedMessages.resx">
+      <DependentUpon>201501190925442_AddedMessages.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

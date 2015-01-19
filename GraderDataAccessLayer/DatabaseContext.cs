@@ -147,8 +147,8 @@
 
             var grades = new List<GradeModel>
             {
-                new GradeModel { UserId = 1, EntityId = 2, Grade = 10, BonusGrade = 0, GraderId = 1, TimeStamp = DateTime.Now, Comment = "This is what you got. Congratulations"},
-                new GradeModel { UserId = 1, EntityId = 3, Grade = 10, BonusGrade = 0, GraderId = 1, TimeStamp = DateTime.Now, Comment = "This is what you got again. Congratulations"}
+                new GradeModel { UserId = 1, EntityId = 2, Grade = 10, BonusGrade = 0, GraderId = 1, TimeStamp = DateTime.Now},
+                new GradeModel { UserId = 1, EntityId = 3, Grade = 10, BonusGrade = 0, GraderId = 1, TimeStamp = DateTime.Now}
             };
 
             grades.ForEach(g => context.Grade.Add(g));
