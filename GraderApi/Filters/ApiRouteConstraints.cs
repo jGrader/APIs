@@ -1,8 +1,7 @@
 ﻿namespace GraderApi.Filters
 {
     using GraderDataAccessLayer;
-    using GraderDataAccessLayer.Interfaces;
-    using GraderDataAccessLayer.Repositories;
+    using Services;
     using System;
     using System.Collections.Generic;
     using System.Net.Http;
@@ -12,10 +11,12 @@
     public class ApiRouteConstraints : IHttpRouteConstraint, IDisposable
     {
         private UnitOfWork _unitOfWork;
+        private readonly Logger _logger;
 
         public ApiRouteConstraints()
         {
             _unitOfWork = new UnitOfWork();
+            _logger = new Logger();
         }
         
         public bool Match(HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection)
@@ -34,170 +35,102 @@
                 return true;
             }
 
-            switch (parameterName)
+            int parameterId;
+            if (!int.TryParse(stringValue, out parameterId))
             {
-                case "userId":
-                {
-                    int userId;
-                    if (!int.TryParse(stringValue, out userId))
-                    {
-                        //Validate that userId is truly an integer number
-                        return false;
-                    }
-
-                    // GetByUserId the user with that Id; if null, then route is invalid
-                    var result = Task.Run(() => _unitOfWork.UserRepository.Get(userId));
-                    Task.WaitAll(result);
-                    return (result.Result != null);
-                }
-                case "courseId":
-                {
-                    int courseId;
-                    if (!int.TryParse(stringValue, out courseId))
-                    {
-                        // Validate that the courseId is truly an integer number
-                        return false;
-                    }
-
-                    // GetByUserId the course with that Id; if null, then route is invalid
-                    var result = Task.Run(() => _unitOfWork.CourseRepository.Get(courseId));
-                    Task.WaitAll(result); // That is an async operation in a synchronous environment - 'await' for it
-                    return (result.Result != null);
-                }
-                case "courseUserId":
-                {
-                    int courseUserId;
-                    if (!int.TryParse(stringValue, out courseUserId))
-                    {
-                        // Validate that the courseUserId is truly an integer number
-                        return false;
-                    }
-
-                    //GetByUserId the courseUserwith that Id; if null, then route is invalid
-                    var result = Task.Run(() => _unitOfWork.CourseUserRepository.Get(courseUserId));
-                    Task.WaitAll(result);
-                    return (result.Result != null);
-                }
-                case "gradeComponentId":
-                {
-                    int gradeComponentId;
-                    if (!int.TryParse(stringValue, out gradeComponentId))
-                    {
-                        // Validate that the gradeComponentId is truly an integer number
-                        return false;
-                    }
-
-                    // GetByUserId the gradeComponent with that Id; if null, then route is invalid
-                    var result = Task.Run(() => _unitOfWork.GradeComponentRepository.Get(gradeComponentId));
-                    Task.WaitAll(result); // That is an async operation in a synchronous environment - 'await' for it
-                    return (result.Result != null);
-                }
-                case "taskId":
-                {
-                    int taskId;
-                    if (!int.TryParse(stringValue, out taskId))
-                    {
-                        return false;
-                    }
-
-                    //
-                    var result = Task.Run(() => _unitOfWork.TaskRepository.Get(taskId));
-                    Task.WaitAll(result);
-                    return (result.Result != null);
-                }
-                case "entityId":
-                {
-                    int entityId;
-                    if (!int.TryParse(stringValue, out entityId))
-                    {
-                        return false;
-                    }
-
-                    //
-                    var result = Task.Run(() => _unitOfWork.EntityRepository.Get(entityId));
-                    Task.WaitAll(result);
-                    return (result.Result != null);
-                }
-                case "submissionId":
-                {
-                    int submissionId;
-                    if (!int.TryParse(stringValue, out submissionId))
-                    {
-                        return false;
-                    }
-
-                    //
-                    var result = Task.Run(() => _unitOfWork.SubmissionRepository.Get(submissionId));
-                    Task.WaitAll(result);
-                    return (result.Result != null);
-                }
-                case "fileId":
-                {
-                    int fileId;
-                    if (!int.TryParse(stringValue, out fileId))
-                    {
-                        return false;
-                    }
-
-                    //
-                    var result = Task.Run(() => _unitOfWork.FileRepository.Get(fileId));
-                    Task.WaitAll(result);
-                    return (result.Result != null);
-                }
-                case "teamId":
-                {
-                    int teamId;
-                    if (!int.TryParse(stringValue, out teamId))
-                    {
-                        return false;
-                    }
-
-                    //
-                    var result = Task.Run(() => _unitOfWork.TeamRepository.Get(teamId));
-                    Task.WaitAll(result);
-                    return (result.Result != null);
-                }
-                case "gradeId":
-                {
-                    int gradeId;
-                    if (!int.TryParse(stringValue, out gradeId))
-                    {
-                        return false;
-                    }
-
-                    //
-                    var result = Task.Run(() => _unitOfWork.GradeRepository.Get(gradeId));
-                    Task.WaitAll(result);
-                    return (result.Result != null);
-                }
-                case "extensionId":
-                {
-                    int extensionId;
-                    if (!int.TryParse(stringValue, out extensionId))
-                    {
-                        return false;
-                    }
-
-                    //
-                    var result = Task.Run(() => _unitOfWork.ExtensionRepository.Get(extensionId));
-                    Task.WaitAll(result);
-                    return (result.Result != null);
-                }
-                case "excuseId":
-                {
-                    int excuseId;
-                    if (!int.TryParse(stringValue, out excuseId))
-                    {
-                        return false;
-                    }
-
-                    //
-                    var result = Task.Run(() => _unitOfWork.ExcuseRepository.Get(excuseId));
-                    Task.WaitAll(result);
-                    return (result.Result != null);
-                }
+                //Validate that stringValue is truly an integer number
+                return false;
             }
 
+            try
+            {
+                // If the result of the Get is null, then route is invalid
+                switch (parameterName)
+                {
+                    case "userId":
+                    {
+
+                        var result = Task.Run(() => _unitOfWork.UserRepository.Get(parameterId));
+                        Task.WaitAll(result);
+                        return (result.Result != null);
+                    }
+                    case "courseId":
+                    {
+                        var result = Task.Run(() => _unitOfWork.CourseRepository.Get(parameterId));
+                        Task.WaitAll(result);
+                        return (result.Result != null);
+                    }
+                    case "courseUserId":
+                    {
+                        var result = Task.Run(() => _unitOfWork.CourseUserRepository.Get(parameterId));
+                        Task.WaitAll(result);
+                        return (result.Result != null);
+                    }
+                    case "gradeComponentId":
+                    {
+                        var result = Task.Run(() => _unitOfWork.GradeComponentRepository.Get(parameterId));
+                        Task.WaitAll(result);
+                        return (result.Result != null);
+                    }
+                    case "taskId":
+                    {
+                        var result = Task.Run(() => _unitOfWork.TaskRepository.Get(parameterId));
+                        Task.WaitAll(result);
+                        return (result.Result != null);
+                    }
+                    case "entityId":
+                    {
+                        var result = Task.Run(() => _unitOfWork.EntityRepository.Get(parameterId));
+                        Task.WaitAll(result);
+                        return (result.Result != null);
+                    }
+                    case "submissionId":
+                    {
+                        var result = Task.Run(() => _unitOfWork.SubmissionRepository.Get(parameterId));
+                        Task.WaitAll(result);
+                        return (result.Result != null);
+                    }
+                    case "fileId":
+                    {
+                        var result = Task.Run(() => _unitOfWork.FileRepository.Get(parameterId));
+                        Task.WaitAll(result);
+                        return (result.Result != null);
+                    }
+                    case "teamId":
+                    {
+                        var result = Task.Run(() => _unitOfWork.TeamRepository.Get(parameterId));
+                        Task.WaitAll(result);
+                        return (result.Result != null);
+                    }
+                    case "gradeId":
+                    {
+                        var result = Task.Run(() => _unitOfWork.GradeRepository.Get(parameterId));
+                        Task.WaitAll(result);
+                        return (result.Result != null);
+                    }
+                    case "extensionId":
+                    {
+                        var result = Task.Run(() => _unitOfWork.ExtensionRepository.Get(parameterId));
+                        Task.WaitAll(result);
+                        return (result.Result != null);
+                    }
+                    case "excuseId":
+                    {
+                        var result = Task.Run(() => _unitOfWork.ExcuseRepository.Get(parameterId));
+                        Task.WaitAll(result);
+                        return (result.Result != null);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                // Unexpected error
+                _logger.Log(e);
+                return false;
+            }
+
+            // SOMEONE PROBABLY FORGOT TO UPDATE THIS FILE
+            // WITH THE LATEST ADDED ROUTES
             return false;
         }
 
@@ -213,7 +146,14 @@
             {
                 return;
             }
+
+            if (_unitOfWork == null)
+            {
+                return;
+            }
+
             _unitOfWork.Dispose();
+            _unitOfWork = null;
         }
         #endregion
     }

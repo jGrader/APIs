@@ -1,8 +1,8 @@
-﻿using System.Security.Principal;
-using GraderDataAccessLayer.Models;
-
-namespace GraderApi
+﻿namespace GraderApi.Extensions
 {
+    using System.Security.Principal;
+    using GraderDataAccessLayer.Models;
+
     public class UserPrincipal : GenericPrincipal
     {
         public UserModel User;

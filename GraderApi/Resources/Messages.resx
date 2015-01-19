@@ -189,4 +189,7 @@
   <data name="PermissionsParseError" xml:space="preserve">
     <value>Cannot convert one of the strings to enum</value>
   </data>
+  <data name="UnexpectedError" xml:space="preserve">
+    <value>An unexpected error turned up. Please try again!</value>
+  </data>
 </root>

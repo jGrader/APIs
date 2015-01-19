@@ -1,9 +1,11 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Extensions;
     using Filters;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
+    using Resources;
     using Services;
     using System;
     using System.Linq;
@@ -27,7 +29,7 @@
             var principal = HttpContext.Current.User as UserPrincipal;
             if (principal == null)
             {
-                throw new NullReferenceException("Something went wrong");
+                throw new NullReferenceException(Messages.UnexpectedError);
             }
             _user = principal.User;
         }

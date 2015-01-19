@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+
     public class Logger
     {
         private string _pathName;

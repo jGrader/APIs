@@ -1,5 +1,6 @@
 ﻿namespace GraderApi.Controllers
 {
+    using Extensions;
     using Filters;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer;

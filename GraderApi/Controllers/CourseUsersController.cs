@@ -1,25 +1,26 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace GraderApi.Controllers
+﻿namespace GraderApi.Controllers
 {
+    using Extensions;
     using Filters;
     using Grader.JsonSerializer;
     using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
     using Resources;
+    using Services;
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using System.Web;
     using System.Web.Http;
-    using Services;
 
     public class CourseUsersController : ApiController
     {
         private readonly UnitOfWork _unitOfWork;
         private readonly Logger _logger;
+
         public CourseUsersController(UnitOfWork unitOfWork, Logger logger)
         {
             _unitOfWork = unitOfWork;

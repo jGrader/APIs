@@ -249,7 +249,7 @@
     <Compile Include="Controllers\SubmissionsController.cs" />
     <Compile Include="Controllers\TasksController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
-    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Extensions\ExtensionMethods.cs" />
     <Compile Include="Filters\ValidateMimeMultipartContentAttribute.cs" />
     <Compile Include="Filters\ValidateModelStateAttribute.cs" />
     <Compile Include="Resources\Messages.Designer.cs">
@@ -258,7 +258,6 @@
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
     <Compile Include="Permissions.cs" />
-    <Compile Include="DependencyResolver.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -276,7 +275,7 @@
     </Compile>
     <Compile Include="Filters\PermissionsAuthorize.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="UserPrincipal.cs" />
+    <Compile Include="Extensions\UserPrincipal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

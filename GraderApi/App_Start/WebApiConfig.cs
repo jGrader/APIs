@@ -1,6 +1,5 @@
 ﻿using GraderApi.Filters;
 using GraderApi.Handlers;
-using GraderDataAccessLayer;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -23,13 +22,7 @@ namespace GraderApi
             // Web API routes
             config.MapHttpAttributeRoutes();
 
-            config.Routes.MapHttpRoute(
-                name: "GradeRoute",
-                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{gradeId}",
-                defaults: new { gradeId = UrlParameter.Optional },
-                constraints: new { controller = "Grades", courseId = new ApiRouteConstraints(), gradeId = new ApiRouteConstraints() },
-                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
-            );
+            #region ROUTES WHICH DON'T HAVE THE {courseId} PARAMETER
 
             config.Routes.MapHttpRoute(
                 name: "CurrentUserRoute",
@@ -52,6 +45,17 @@ namespace GraderApi
                 routeTemplate: "api/{controller}/{action}/{courseId}",
                 defaults: new { courseId = UrlParameter.Optional },
                 constraints: new { controller = "Courses", courseId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
+            );
+
+            #endregion
+
+
+            config.Routes.MapHttpRoute(
+                name: "GradeRoute",
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{gradeId}",
+                defaults: new { gradeId = UrlParameter.Optional },
+                constraints: new { controller = "Grades", courseId = new ApiRouteConstraints(), gradeId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
@@ -135,6 +139,9 @@ namespace GraderApi
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
+
+            // IF NOTHING ELSE FITS, THIS GETS CALLED; 
+            // TRY NOT TO REACH THIS POINT
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{action}/{id}",

@@ -23,19 +23,16 @@ namespace GraderApi
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            //
-            
         }
 
-        void Application_Error(object sender, EventArgs e)
+        protected void Application_Error(object sender, EventArgs e)
         {
             // Code that runs when an unhandled error occurs
 
             // Get the exception object.
-            Exception exc = Server.GetLastError();
+            var exc = Server.GetLastError();
 
             var logger = new Logger();
-
             logger.Log(exc);
 
             // Clear the error from the server

@@ -259,6 +259,15 @@ namespace GraderApi.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An unexpected error turned up. Please try again!.
+        /// </summary>
+        internal static string UnexpectedError {
+            get {
+                return ResourceManager.GetString("UnexpectedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The request does not have mime/form-data enctype!.
         /// </summary>
         internal static string UnsupportedMediaType {
