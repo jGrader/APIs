@@ -120,7 +120,7 @@
         // PUT: api//Courses/{courseId}/Grades/Update/{gradeId}
         [HttpPut]
         [ValidateModelState]
-        [PermissionsAuthorize(CoursePermissions.CanGrade)]
+        [PermissionsAuthorize(CoursePermissions.CanUpdateGrade)]
         public async Task<HttpResponseMessage> Update(int courseId, int gradeId, [FromBody] GradeModel grade)
         {
             if (gradeId != grade.Id)
@@ -153,7 +153,7 @@
         // DELETE: api//Courses/{courseId}/Grades/Delete/{gradeId}
         [HttpPut]
         [ValidateModelState]
-        [PermissionsAuthorize(CoursePermissions.CanGrade)]
+        [PermissionsAuthorize(CoursePermissions.CanDeleteGrade)]
         public async Task<HttpResponseMessage> Delete(int courseId, int gradeId)
         {
             try

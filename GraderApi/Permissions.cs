@@ -61,9 +61,11 @@
         CanUpdateTeams = 1 << 19,
         CanDeleteTeams = 1 << 20,
         CanGrade = 1 << 21,
-        CanSeeExtensions = 1 << 22,
-        CanGrantExtensions = 1 << 23,
-        CanGrantExcuses = 1 << 24,
-        CanSeeFinalGrades = 1 << 25
+        CanUpdateGrade = 1 << 22,
+        CanDeleteGrade = 1 << 23,
+        CanSeeExtensions = 1 << 24,
+        CanGrantExtensions = 1 << 25,
+        CanGrantExcuses = 1 << 26,
+        CanSeeFinalGrades = 1 << 27
     }
 }
