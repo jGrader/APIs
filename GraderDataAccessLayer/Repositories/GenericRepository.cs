@@ -5,6 +5,7 @@ namespace GraderDataAccessLayer.Repositories
     using System.Data.Common;
     using System.Data.Entity.Migrations;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using Interfaces;
     using System;
@@ -50,6 +51,23 @@ namespace GraderDataAccessLayer.Repositories
 
             try
             {
+                var properties = entity.GetType().GetProperties().Where(p => !p.GetGetMethod().IsVirtual);
+
+                var tmp = dbSet.AsEnumerable();
+                foreach (PropertyInfo prop in properties)
+                {
+                    if (prop.Name == "Id")
+                    {
+                        continue;
+                    }
+                    var property = prop; // Something in the compiler makes this necessary
+                    tmp = tmp.Where(p => property.GetValue(p).Equals(property.GetValue(entity)));
+                }
+
+                if (tmp.Any())
+                {
+                    return tmp.FirstOrDefault();
+                }
                 dbSet.AddOrUpdate(entity);
                 await context.SaveChangesAsync();
                 return entity;
