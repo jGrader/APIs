@@ -1,6 +1,5 @@
 ﻿namespace GraderApi.Controllers
 {
-    using Extensions;
     using Filters;
     using Grader.ExtensionMethods;
     using GraderDataAccessLayer;
@@ -13,7 +12,6 @@
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using System.Web;
     using System.Web.Http;
 
     public class ExtensionsController : ApiController
@@ -62,10 +60,11 @@
             }
         }
 
-        // POST: api/Courses/{courseId}/Extensions/Add
+        // POST: api/Courses/{courseId}/Extensions/Add?userId={int value}
         [HttpPost]
         [ValidateModelState]
-        public async Task<HttpResponseMessage> Add(int courseId, [FromBody] ExtensionModel extension)
+        [PermissionsAuthorize(CoursePermissions.CanGrantExtensions)]
+        public async Task<HttpResponseMessage> Add(int courseId, int userId, [FromBody] ExtensionModel extension)
         {
             extension.Entity = await _unitOfWork.EntityRepository.Get(extension.EntityId);
             if (courseId != extension.Entity.Task.CourseId)
@@ -73,15 +72,15 @@
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
 
-            var currentUser = HttpContext.Current.User as UserPrincipal;
-            if (currentUser == null)
+            var user = await _unitOfWork.UserRepository.Get(userId);
+            if (user == null)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.UserNotFound);
             }
 
             try
             {
-                var enrollment = await _unitOfWork.CourseUserRepository.GetByExpression(cu => cu.UserId == currentUser.User.Id && cu.CourseId == courseId);
+                var enrollment = await _unitOfWork.CourseUserRepository.GetByExpression(cu => cu.UserId == user.Id && cu.CourseId == courseId);
                 var courseUserModels = enrollment as IList<CourseUserModel> ?? enrollment.ToList();
                 var firstOrDefault = courseUserModels.FirstOrDefault();
                 if (firstOrDefault == null)
@@ -94,7 +93,9 @@
                     return Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ExtensionNumberExceeded);
                 }
 
-                extension.IsGranted = false;
+                // This extension can only be added directly by someone with permission
+                // So they obviously want it to be granted
+                extension.IsGranted = true;
                 var result = await _unitOfWork.ExtensionRepository.Add(extension);
                 if (result == null)
                 {

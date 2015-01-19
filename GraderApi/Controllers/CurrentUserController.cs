@@ -153,5 +153,115 @@
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
+
+        // POST: api/CurrentUser/ExtensionRequest/{courseId}
+        [HttpPost]
+        [ValidateModelState]
+        public async Task<HttpResponseMessage> ExtensionRequest(int courseId, [FromBody] ExtensionModel extension)
+        {
+            extension.Entity = await _unitOfWork.EntityRepository.Get(extension.EntityId);
+            if (courseId != extension.Entity.Task.CourseId)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
+            }
+
+            try
+            {
+                var enrollment = await _unitOfWork.CourseUserRepository.GetByExpression(cu => cu.UserId == _user.Id && cu.CourseId == courseId);
+                var courseUserModels = enrollment as IList<CourseUserModel> ?? enrollment.ToList();
+                var firstOrDefault = courseUserModels.FirstOrDefault();
+                if (firstOrDefault == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidEnrollment);
+                }
+                if (firstOrDefault.ExtensionNumber >= extension.Entity.Task.Course.ExtensionLimit)
+                {
+                    // The user already reached the maximum number of allowed extensions
+                    return Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ExtensionNumberExceeded);
+                }
+
+                extension.IsGranted = false;
+                var result = await _unitOfWork.ExtensionRepository.Add(extension);
+                if (result == null)
+                {
+                    Request.CreateResponse(HttpStatusCode.InternalServerError);
+                }
+
+                // Update the number of extensions asked for
+                firstOrDefault.ExtensionNumber += 1;
+                var query = await _unitOfWork.CourseUserRepository.Update(firstOrDefault);
+                if (query == null)
+                {
+                    // Revert the extension request
+                    if (result != null)
+                    {
+                        await _unitOfWork.ExtensionRepository.Delete(result.Id);
+                    }
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            }
+            catch (Exception e)
+            {
+                _logger.Log(e);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
+        }
+
+        // POST: api/CurrentUser/ExcuseRequest/{courseId}
+        [HttpPost]
+        [ValidateModelState]
+        public async Task<HttpResponseMessage> ExcuseRequest(int courseId, [FromBody] ExcuseModel excuse)
+        {
+            excuse.Entity = await _unitOfWork.EntityRepository.Get(excuse.EntityId);
+            if (courseId != excuse.Entity.Task.CourseId)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
+            }
+
+            try
+            {
+                var enrollment = await _unitOfWork.CourseUserRepository.GetByExpression(cu => cu.UserId == _user.Id && cu.CourseId == courseId);
+                var courseUserModels = enrollment as IList<CourseUserModel> ?? enrollment.ToList();
+                var firstOrDefault = courseUserModels.FirstOrDefault();
+                if (firstOrDefault == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidEnrollment);
+                }
+                if (firstOrDefault.ExcuseNumber >= excuse.Entity.Task.Course.ExcuseLimit)
+                {
+                    // The user already reached the maximum number of allowed Excuses
+                    return Request.CreateResponse(HttpStatusCode.Forbidden, Messages.ExcuseNumberExceeded);
+                }
+
+                excuse.IsGranted = false;
+                var result = await _unitOfWork.ExcuseRepository.Add(excuse);
+                if (result == null)
+                {
+                    Request.CreateResponse(HttpStatusCode.InternalServerError);
+                }
+
+                // Update the number of Excuses asked for
+                firstOrDefault.ExcuseNumber += 1;
+                var query = await _unitOfWork.CourseUserRepository.Update(firstOrDefault);
+                if (query == null)
+                {
+                    // Revert the excuse request
+                    if (result != null)
+                    {
+                        await _unitOfWork.ExcuseRepository.Delete(result.Id);
+                    }
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, result.ToJson());
+            }
+            catch (Exception e)
+            {
+                _logger.Log(e);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
+        }
     }
 }
