@@ -90,8 +90,8 @@
         // GET: api/Courses/{courseId}/CourseUsers/{courseUserId}
         [HttpGet]
         [ValidateModelState]
-        [PermissionsAuthorize(CourseOwnerPermissions.CanSeeEnrollment)]
-        public async Task<HttpResponseMessage> GetEnrollmentGrade(int courseId, int courseUserId)
+        [PermissionsAuthorize(CoursePermissions.CanSeeFinalGrades)]
+        public async Task<HttpResponseMessage> GetEnrollmentGrade(int courseId, int courseUserId, [FromBody] bool isPredicted)
         {
             try
             {
@@ -103,12 +103,6 @@
                 if (courseUser.CourseId != courseId)
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest);
-                }
-
-                var currentUser = HttpContext.Current.User as UserPrincipal;
-                if (currentUser == null)
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.UserNotFound);
                 }
 
                 //
@@ -123,12 +117,13 @@
                     var count = 0;
 
                     var component = gradeComponent; // If this isn't here, we might get a bug depending on compiler version
-                    var filteredEntities = entityModels.Where(e => e.Task.GradeComponentId == component.Id);
+                    var filteredEntitiesByGradeComponent = entityModels.Where(e => e.Task.GradeComponentId == component.Id);
+                    var entitiesByGradeComponent = filteredEntitiesByGradeComponent as IList<EntityModel> ?? filteredEntitiesByGradeComponent.ToList();
 
-                    foreach (var entity in filteredEntities)
+                    foreach (var entity in entitiesByGradeComponent)
                     {
                         var entity1 = entity; // If this isn't here, we might get a bug depending on compiler version
-                        var grade = await _unitOfWork.GradeRepository.GetByExpression(g => g.EntityId == entity1.Id && g.UserId == currentUser.User.Id);
+                        var grade = await _unitOfWork.GradeRepository.GetByExpression(g => g.EntityId == entity1.Id && g.UserId == courseUser.UserId);
                         var firstOrDefault = grade.FirstOrDefault();
                         if (firstOrDefault == null)
                         {
@@ -139,7 +134,14 @@
                         sum += firstOrDefault.Grade + firstOrDefault.BonusGrade;
                     }
 
-                    finalGrade += (sum / count);
+                    if (isPredicted)
+                    {
+                        finalGrade += (sum / count);
+                    }
+                    else
+                    {
+                        finalGrade += (sum / entitiesByGradeComponent.Count());
+                    }
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK, finalGrade);

@@ -63,6 +63,7 @@
         CanGrade = 1 << 21,
         CanSeeExtensions = 1 << 22,
         CanGrantExtensions = 1 << 23,
-        CanGrantExcuses = 1 << 24
+        CanGrantExcuses = 1 << 24,
+        CanSeeFinalGrades = 1 << 25
     }
 }
