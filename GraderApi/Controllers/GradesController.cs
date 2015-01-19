@@ -167,7 +167,8 @@
                 var addedGrades = new List<GradeModel>();
                 foreach (var tm in firstOrDefaultTeam.TeamMembers)
                 {
-                    var oldGrade = await _unitOfWork.GradeRepository.GetByExpression(g => g.EntityId == grade.EntityId && g.UserId == tm.Id);
+                    var tm1 = tm;
+                    var oldGrade = await _unitOfWork.GradeRepository.GetByExpression(g => g.EntityId == grade.EntityId && g.UserId == tm1.Id);
                     var firstOrDefaultOldGrade = oldGrade.FirstOrDefault();
                     if (firstOrDefaultOldGrade != null)
                     {
@@ -178,10 +179,10 @@
 
                         if (result == null)
                         {
-                            var revertResult = await UndoChangedGrades(backUpValues);
-                            return Request.CreateResponse(revertResult == HttpStatusCode.OK
-                                ? HttpStatusCode.NotModified
-                                : HttpStatusCode.InternalServerError);
+                            var revertResult1 = await UndoChangedGrades(backUpValues);
+                            var revertResult2 = await DeleteAddedGrades(addedGrades);
+                            return Request.CreateResponse(revertResult1 == HttpStatusCode.OK && revertResult2 == HttpStatusCode.OK
+                                ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
                         }
                     }
                     else
@@ -191,8 +192,9 @@
 
                         if (result == null)
                         {
-                            var revertResult = await DeleteAddedGrades(addedGrades);
-                            return Request.CreateResponse(revertResult == HttpStatusCode.OK 
+                            var revertResult1 = await UndoChangedGrades(backUpValues);
+                            var revertResult2 = await DeleteAddedGrades(addedGrades);
+                            return Request.CreateResponse(revertResult1 == HttpStatusCode.OK && revertResult2 == HttpStatusCode.OK
                                 ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
                         }
 
