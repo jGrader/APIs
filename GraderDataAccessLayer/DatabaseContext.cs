@@ -25,6 +25,7 @@
         public DbSet<FileModel> File { get; set; }
         public DbSet<GradeComponentModel> GradeComponent { get; set; }
         public DbSet<GradeModel> Grade { get; set; }
+        public DbSet<MessageModel> Message { get; set; }
         public DbSet<SshKeyModel> SshKey { get; set; }
         public DbSet<SubmissionModel> Submission { get; set; }
         public DbSet<TaskModel> Task { get; set; }

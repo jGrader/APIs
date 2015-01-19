@@ -1,6 +1,7 @@
 ﻿namespace GraderDataAccessLayer.Repositories
 {
     using System.Data.Common;
+    using System.Data.Entity.Migrations;
     using System.Linq;
     using System.Threading.Tasks;
     using Interfaces;
@@ -46,7 +47,7 @@
             }
             try
             {
-                dbSet.Add(entity);
+                dbSet.AddOrUpdate(entity);
                 await context.SaveChangesAsync();
                 return entity;
             }

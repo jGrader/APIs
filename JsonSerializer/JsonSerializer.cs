@@ -117,7 +117,21 @@
                 {"EntityId", gm.EntityId},
                 {"Grade", gm.Grade},
                 {"BonusGrade", gm.BonusGrade},
-                {"Comment", gm.Comment}
+            };
+
+            return result;
+        }
+
+        public static JObject ToJson(this MessageModel mm)
+        {
+            var result = new JObject
+            {
+                {"Id", mm.Id},
+                {"UserId", mm.Id},
+                {"GradeId", mm.GradeId},
+                {"ParentMessage", mm.MessageId},
+                {"TimeStamp", mm.TimeStamp},
+                {"Contents", mm.Contents},
             };
 
             return result;
@@ -260,6 +274,13 @@
         }
 
         public static JArray ToJson(this IEnumerable<GradeModel> cm)
+        {
+            var query = (from c in cm select c.ToJson());
+            var result = new JArray(query);
+            return result;
+        }
+
+        public static JArray ToJson(this IEnumerable<MessageModel> cm)
         {
             var query = (from c in cm select c.ToJson());
             var result = new JArray(query);
