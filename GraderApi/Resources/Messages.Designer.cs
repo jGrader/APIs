@@ -223,6 +223,15 @@ namespace GraderApi.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user is not part of any team!.
+        /// </summary>
+        internal static string NoTeamFound {
+            get {
+                return ResourceManager.GetString("NoTeamFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to HTTPS is required for accessing this resource.
         /// </summary>
         internal static string NotHttps {

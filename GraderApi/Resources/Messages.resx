@@ -192,4 +192,7 @@
   <data name="UnexpectedError" xml:space="preserve">
     <value>An unexpected error turned up. Please try again!</value>
   </data>
+  <data name="NoTeamFound" xml:space="preserve">
+    <value>The user is not part of any team!</value>
+  </data>
 </root>

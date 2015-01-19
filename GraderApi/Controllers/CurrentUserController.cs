@@ -91,10 +91,10 @@
             }
         }
 
-        // GET: api/CurrentUser/CourseGrade/{courseId}
+        // GET: api/CurrentUser/CourseGrade/{courseId}?isPredicted={true/false}
         [HttpGet]
         [ValidateModelState]
-        public async Task<HttpResponseMessage> CourseGrade(int courseId, [FromBody] bool isPredicted)
+        public async Task<HttpResponseMessage> CourseGrade(int courseId, bool isPredicted)
         {
             try
             {

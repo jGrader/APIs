@@ -19,6 +19,7 @@
         models["GradeComponents"] = ["Name", "Percentage", "CourseId"];
         models["Tasks"] = ["Name", "CourseId", "GradeComponentId"];
         models["Users"] = ["Name", "Surname", "Email", "UserName", "GraduationYear"];
+        models["Grades"] = ["EntityId", "Grade", "BonusGrade", "TimeStamp", "UserId", "GraderId"];
 
         var sessionId = sessionStorage.getItem("sessionId");
         if (sessionId == null) {

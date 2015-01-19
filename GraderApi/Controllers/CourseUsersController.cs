@@ -89,7 +89,7 @@
         [HttpGet]
         [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanSeeFinalGrades)]
-        public async Task<HttpResponseMessage> GetEnrollmentGrade(int courseId, int courseUserId, [FromBody] bool isPredicted)
+        public async Task<HttpResponseMessage> GetEnrollmentGrade(int courseId, int courseUserId, bool isPredicted)
         {
             try
             {
