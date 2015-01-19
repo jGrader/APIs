@@ -1,4 +1,4 @@
-﻿namespace GraderApi.Extensions
+﻿namespace Grader.ExtensionMethods
 {
     using System;
 

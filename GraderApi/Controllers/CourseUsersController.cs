@@ -1,8 +1,7 @@
 ﻿namespace GraderApi.Controllers
 {
-    using Extensions;
     using Filters;
-    using Grader.JsonSerializer;
+    using Grader.ExtensionMethods;
     using GraderDataAccessLayer;
     using GraderDataAccessLayer.Models;
     using Resources;
@@ -13,7 +12,6 @@
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using System.Web;
     using System.Web.Http;
 
     public class CourseUsersController : ApiController

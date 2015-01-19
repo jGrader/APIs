@@ -1,6 +1,7 @@
 ﻿namespace GraderApi.Handlers
 {
-    using GraderApi.Extensions;
+    using Extensions;
+    using Grader.ExtensionMethods;
     using GraderDataAccessLayer;
     using Resources;
     using Services;

@@ -7,8 +7,8 @@
     <ProjectGuid>{FD18AFF1-E18C-48E1-8952-F7C343D1C5C5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Grader.JsonSerializer</RootNamespace>
-    <AssemblyName>JsonSerializer</AssemblyName>
+    <RootNamespace>Grader.ExtensionMethods</RootNamespace>
+    <AssemblyName>ExtensionMethods</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -43,8 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GeneralExtensionMethods.cs" />
     <Compile Include="JsonSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestForUniqueness.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

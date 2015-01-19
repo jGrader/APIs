@@ -1,7 +1,7 @@
 ﻿namespace GraderApi.Controllers
 {
     using Filters;
-    using Grader.JsonSerializer;
+    using Grader.ExtensionMethods;
     using GraderDataAccessLayer;
     using Newtonsoft.Json;
     using Resources;

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraderApi", "GraderApi\GraderApi.csproj", "{466C080B-062C-4AA3-80D1-5585391A1FB1}"
 EndProject
@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraderDataAccessLayer", "Gr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services.cs\Services.csproj", "{EB402009-5A3B-418A-B52B-EF579349FD56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonSerializer", "JsonSerializer\JsonSerializer.csproj", "{FD18AFF1-E18C-48E1-8952-F7C343D1C5C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionMethods", "JsonSerializer\ExtensionMethods.csproj", "{FD18AFF1-E18C-48E1-8952-F7C343D1C5C5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject.Tests", "UnitTestProject.Tests\UnitTestProject.Tests.csproj", "{1A026D99-DD76-401D-A071-7BFA9DE45357}"
 EndProject

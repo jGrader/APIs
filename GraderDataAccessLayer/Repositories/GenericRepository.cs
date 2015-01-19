@@ -1,4 +1,6 @@
-﻿namespace GraderDataAccessLayer.Repositories
+﻿using GraderDataAccessLayer.Models;
+
+namespace GraderDataAccessLayer.Repositories
 {
     using System.Data.Common;
     using System.Data.Entity.Migrations;
@@ -45,6 +47,7 @@
             {
                 throw new ArgumentNullException("entity");
             }
+
             try
             {
                 dbSet.AddOrUpdate(entity);

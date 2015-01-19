@@ -1,9 +1,9 @@
-﻿namespace Grader.JsonSerializer
+﻿namespace Grader.ExtensionMethods
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Newtonsoft.Json.Linq;
     using GraderDataAccessLayer.Models;
+    using Newtonsoft.Json.Linq;
 
     public static class JsonSerializer
     {
