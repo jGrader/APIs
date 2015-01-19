@@ -154,6 +154,32 @@
             }
         }
 
+        // GET: api/CurrentUser/ExtensionRequests/{courseId}
+        [HttpGet]
+        [ValidateModelState]
+        public async Task<HttpResponseMessage> ExtensionRequests(int courseId)
+        {
+            try
+            {
+                var enrollments = await _unitOfWork.CourseUserRepository.GetByExpression(cu => cu.CourseId == courseId & cu.UserId == _user.Id);
+                var firstOrDefaultEnrollment = enrollments.FirstOrDefault();
+                if (firstOrDefaultEnrollment == null)
+                {
+                    // The user is not enrolled in this course
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidEnrollment);
+                }
+
+                // The user is enrolled in this course
+                var extensions = await _unitOfWork.ExtensionRepository.GetByExpression(e => e.UserId == _user.Id && e.Entity.Task.CourseId == courseId);
+                return Request.CreateResponse(HttpStatusCode.OK, extensions.ToJson());
+            }
+            catch (Exception e)
+            {
+                _logger.Log(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, Messages.UnexpectedError);
+            }
+        }
+
         // POST: api/CurrentUser/ExtensionRequest/{courseId}
         [HttpPost]
         [ValidateModelState]
@@ -206,6 +232,32 @@
             {
                 _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+            }
+        }
+
+        // GET: api/CurrentUser/ExcuseRequests/{courseId}
+        [HttpGet]
+        [ValidateModelState]
+        public async Task<HttpResponseMessage> ExcuseRequests(int courseId)
+        {
+            try
+            {
+                var enrollments = await _unitOfWork.CourseUserRepository.GetByExpression(cu => cu.CourseId == courseId & cu.UserId == _user.Id);
+                var firstOrDefaultEnrollment = enrollments.FirstOrDefault();
+                if (firstOrDefaultEnrollment == null)
+                {
+                    // The user is not enrolled in this course
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidEnrollment);
+                }
+
+                // The user is enrolled in this course
+                var excuses = await _unitOfWork.ExcuseRepository.GetByExpression(e => e.UserId == _user.Id && e.Entity.Task.CourseId == courseId);
+                return Request.CreateResponse(HttpStatusCode.OK, excuses.ToJson());
+            }
+            catch (Exception e)
+            {
+                _logger.Log(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, Messages.UnexpectedError);
             }
         }
 
