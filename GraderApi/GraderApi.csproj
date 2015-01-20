@@ -251,6 +251,11 @@
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Filters\ValidateMimeMultipartContentAttribute.cs" />
     <Compile Include="Filters\ValidateModelStateAttribute.cs" />
+    <Compile Include="Resources\DatabaseConnections.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DatabaseConnections.resx</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Messages.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -333,6 +338,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\DatabaseConnections.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DatabaseConnections.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\HeaderConstants.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>HeaderConstants.Designer.cs</LastGenOutput>

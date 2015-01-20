@@ -11,8 +11,8 @@
     [DbConfigurationType(typeof(MySqlEFConfiguration))]
     public class DatabaseContext : DbContext
     {
-        public DatabaseContext()
-            : base("name=DefaultMySqlConnection")
+        public DatabaseContext(string connectionString)
+            : base(connectionString)
         {
         }
 

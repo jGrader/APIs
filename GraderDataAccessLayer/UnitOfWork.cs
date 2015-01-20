@@ -21,9 +21,9 @@
         private TeamRepository _teamRepository;
         private UserRepository _userRepository;
 
-        public UnitOfWork()
+        public UnitOfWork(string connectionString)
         {
-            _context = new DatabaseContext();
+            _context = new DatabaseContext(connectionString);
         }
 
         public AdminRepository AdminRepository

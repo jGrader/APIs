@@ -1,6 +1,8 @@
 ﻿namespace GraderApi.Filters
 {
+    using System.Configuration;
     using GraderDataAccessLayer;
+    using Resources;
     using Services;
     using System;
     using System.Collections.Generic;
@@ -15,7 +17,7 @@
 
         public ApiRouteConstraints()
         {
-            _unitOfWork = new UnitOfWork();
+            _unitOfWork = new UnitOfWork(ConfigurationManager.ConnectionStrings[DatabaseConnections.MySQL].ConnectionString);
             _logger = new Logger();
         }
         

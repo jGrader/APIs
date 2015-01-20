@@ -28,7 +28,7 @@
 
         public AuthorizeHandler()
         {
-            _unitOfWork = new UnitOfWork();
+            _unitOfWork = new UnitOfWork(ConfigurationManager.ConnectionStrings[DatabaseConnections.MySQL].ConnectionString);
             _logger = new Logger();
         }
 

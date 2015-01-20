@@ -1,5 +1,6 @@
 ﻿namespace GraderApi.Handlers
 {
+    using System.Configuration;
     using Extensions;
     using Grader.ExtensionMethods;
     using GraderDataAccessLayer;
@@ -29,7 +30,7 @@
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            using (var unitOfWork = new UnitOfWork())
+            using (var unitOfWork = new UnitOfWork(ConfigurationManager.ConnectionStrings[DatabaseConnections.MySQL].ConnectionString))
             {
                 var currentUser = HttpContext.Current.User as UserPrincipal;
                 if (currentUser == null)
@@ -184,7 +185,7 @@
             var names = Enum.GetNames(typeof (CoursePermissions));
 
             //Search through all the permissions which are not 'Nothing'
-            foreach (var permission in names.Where(permission => (uint) Enum.Parse(typeof (CoursePermissions), permission) != 0))
+            foreach (var permission in names.Where(permission => (long) Enum.Parse(typeof (CoursePermissions), permission) != 0))
             {
                 if (permissions % 2 == 1)
                 {

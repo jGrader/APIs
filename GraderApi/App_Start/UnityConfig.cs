@@ -1,7 +1,9 @@
 namespace GraderApi
 {
+    using System.Configuration;
     using GraderDataAccessLayer;
     using Microsoft.Practices.Unity;
+    using Resources;
     using Services;
     using System;
     using System.Collections.Generic;
@@ -15,7 +17,7 @@ namespace GraderApi
 			var container = new UnityContainer();
 
             container.RegisterType<UnitOfWork>();
-            container.RegisterInstance(new UnitOfWork());
+            container.RegisterInstance(new UnitOfWork(ConfigurationManager.ConnectionStrings[DatabaseConnections.MySQL].ConnectionString));
 
             container.RegisterType<Logger>(new ContainerControlledLifetimeManager());
             container.RegisterInstance(new Logger());
