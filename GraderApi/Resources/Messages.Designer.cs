@@ -61,6 +61,15 @@ namespace GraderApi.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You cannot change the scope of this team! Please delete it and create a new one for the intended entity..
+        /// </summary>
+        internal static string CannotChangeEntityForTeam {
+            get {
+                return ResourceManager.GetString("CannotChangeEntityForTeam", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The server was unable to establish a connection to LDAP.
         /// </summary>
         internal static string CannotConnectToLdap {

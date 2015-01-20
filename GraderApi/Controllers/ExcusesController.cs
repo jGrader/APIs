@@ -60,7 +60,7 @@
             }
         }
 
-        // POST: api/Courses/{courseId}/Excuses/Add?userId={int value}
+        // POST: api/Courses/{courseId}/Excuses/Add/{userId}
         [HttpPost]
         [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanGrantExcuses)]

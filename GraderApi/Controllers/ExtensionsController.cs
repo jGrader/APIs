@@ -60,7 +60,7 @@
             }
         }
 
-        // POST: api/Courses/{courseId}/Extensions/Add?userId={int value}
+        // POST: api/Courses/{courseId}/Extensions/Add/{userId}
         [HttpPost]
         [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanGrantExtensions)]

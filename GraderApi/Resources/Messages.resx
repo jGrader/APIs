@@ -201,4 +201,7 @@
   <data name="CannotDeleteAllMembers" xml:space="preserve">
     <value>You cannot remove all members of the old team!</value>
   </data>
+  <data name="CannotChangeEntityForTeam" xml:space="preserve">
+    <value>You cannot change the scope of this team! Please delete it and create a new one for the intended entity.</value>
+  </data>
 </root>

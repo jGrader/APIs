@@ -91,7 +91,7 @@
             }
         }
 
-        // POST: api/Courses/{courseId}/Grades/Add?wholeTeam={true/false}
+        // POST: api/Courses/{courseId}/Grades/Add/{wholeTeam}
         [HttpPost]
         [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanGrade)]
@@ -137,7 +137,7 @@
             }
         }
         
-        // PUT: api//Courses/{courseId}/Grades/Update/{gradeId}?wholeTeam={true/false}
+        // PUT: api//Courses/{courseId}/Grades/Update/{wholeTeam}/{gradeId}
         [HttpPut]
         [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanUpdateGrade)]
@@ -211,7 +211,7 @@
             }
         }
 
-        // DELETE: api//Courses/{courseId}/Grades/Delete/{gradeId}?wholeTeam={true/false}
+        // DELETE: api//Courses/{courseId}/Grades/Delete/{wholeTeam}/{gradeId}
         [HttpPut]
         [ValidateModelState]
         [PermissionsAuthorize(CoursePermissions.CanDeleteGrade)]

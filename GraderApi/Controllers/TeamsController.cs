@@ -140,8 +140,6 @@
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
             }
-            team.Entity = await _unitOfWork.EntityRepository.Get(team.EntityId);
-            team.Entity.Task = await _unitOfWork.TaskRepository.Get(team.Entity.TaskId);
             if (courseId != team.Entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -149,6 +147,21 @@
 
             try
             {
+                var oldTeam = await _unitOfWork.TeamRepository.Get(team.Id);
+                if (oldTeam == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, Messages.NoTeamFound);
+                }
+                if (oldTeam.EntityId != team.EntityId)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.CannotChangeEntityForTeam);
+                }
+                var deletedMembers = oldTeam.TeamMembers.Where(tm => !team.TeamMembers.Contains(tm)).ToList();
+                if (deletedMembers.Count == oldTeam.TeamMembers.Count)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.CannotDeleteAllMembers);
+                }
+
                 foreach (var tm in team.TeamMembers)
                 {
                     // Make sure that the team members are not already members of other teams
@@ -158,17 +171,6 @@
                     {
                         return Request.CreateResponse(HttpStatusCode.BadRequest, String.Format(Messages.TeamMemberAlreadyInTeam, tm1.UserName));
                     }
-                }
-
-                var oldTeam = await _unitOfWork.TeamRepository.Get(team.Id);
-                if (oldTeam == null)
-                {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, Messages.NoTeamFound);
-                }
-                var deletedMembers = oldTeam.TeamMembers.Where(tm => ! team.TeamMembers.Contains(tm)).ToList();
-                if (deletedMembers.Count == oldTeam.TeamMembers.Count)
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.CannotDeleteAllMembers);
                 }
 
                 var result = await _unitOfWork.TeamRepository.Update(team);

@@ -33,6 +33,14 @@ namespace GraderApi
             );
 
             config.Routes.MapHttpRoute(
+                name: "CurrentUserGradesRoute",
+                routeTemplate: "api/{controller}/{action}/{courseId}/{isPredicted}",
+                defaults: new { },
+                constraints: new { controller = "CurrentUser", courseId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
+            );
+
+            config.Routes.MapHttpRoute(
                 name: "UserRoute",
                 routeTemplate: "api/{controller}/{action}/{userId}",
                 defaults: new { userId = UrlParameter.Optional },
@@ -55,6 +63,14 @@ namespace GraderApi
                 name: "GradeRoute",
                 routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{gradeId}",
                 defaults: new { gradeId = UrlParameter.Optional },
+                constraints: new { controller = "Grades", courseId = new ApiRouteConstraints(), gradeId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "GradeTeamRoute",
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{wholeTeam}/{gradeId}",
+                defaults: new { gradeId = UrlParameter.Optional, wholeTeam = false },
                 constraints: new { controller = "Grades", courseId = new ApiRouteConstraints(), gradeId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
@@ -128,6 +144,14 @@ namespace GraderApi
                 routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{excuseId}",
                 defaults: new { excuseId = UrlParameter.Optional },
                 constraints: new { controller = "Excuses", courseId = new ApiRouteConstraints(), excuseId = new ApiRouteConstraints() },
+                handler: new PermissionsHandler(GlobalConfiguration.Configuration)
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "CustomExtensionAndExcusesRoute",
+                routeTemplate: "api/Courses/{courseId}/{controller}/{action}/{userId}",
+                defaults: new { },
+                constraints: new { controller = "/^(Extensions|Excuses)$/", courseId = new ApiRouteConstraints(), userId = new ApiRouteConstraints() },
                 handler: new PermissionsHandler(GlobalConfiguration.Configuration)
             );
 
