@@ -70,6 +70,15 @@ namespace GraderApi.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You cannot remove all members of the old team!.
+        /// </summary>
+        internal static string CannotDeleteAllMembers {
+            get {
+                return ResourceManager.GetString("CannotDeleteAllMembers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are no longer allowed to ask for excuses for this course!.
         /// </summary>
         internal static string ExcuseNumberExceeded {

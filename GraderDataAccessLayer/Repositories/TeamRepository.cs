@@ -4,6 +4,7 @@
     using Models;
     using System;
     using System.Collections.Generic;
+    using System.Data.Entity;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -22,6 +23,180 @@
         {
             var searchResult = await Task.Run(() => DbSet.Where(e => e.Entity.Task.CourseId == courseId));
             return searchResult;
+        }
+
+        public override async Task<TeamModel> Add(TeamModel team)
+        {
+            if (team == null)
+            {
+                throw new ArgumentNullException("team");
+            }
+
+            using (var dbContextTransaction = Context.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var tm in team.TeamMembers)
+                    {
+                        // In case one of the users in the team already has 
+                        // a submission, excuse, or extension for this entity, delete ALL of them
+                        var tm1 = tm;
+                        var submissions = Context.Submission.Where(e => e.File.EntityId == team.EntityId && e.UserId == tm1.Id);
+                        foreach (var s in submissions)
+                        {
+                            Context.Entry(s).State = EntityState.Deleted;
+                        }
+
+                        var extensions = Context.Extension.Where(e => e.EntityId == team.EntityId && e.UserId == tm1.Id);
+                        foreach (var e in extensions)
+                        {
+                            Context.Entry(e).State = EntityState.Deleted;
+                        }
+
+                        var excuses = Context.Excuse.Where(e => e.EntityId == team.EntityId && e.UserId == tm1.Id);
+                        foreach (var e in excuses)
+                        {
+                            Context.Entry(e).State = EntityState.Deleted;
+                        }
+                    }
+
+                    Context.Entry(team).State = EntityState.Added;
+                    await Context.SaveChangesAsync();
+                    dbContextTransaction.Commit();
+                    return team;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(e);
+                    dbContextTransaction.Rollback();
+                    return null;
+                }
+            }
+        }
+
+        public override async Task<TeamModel> Update(TeamModel team)
+        {
+            if (team == null)
+            {
+                throw new ArgumentNullException("team");
+            }
+
+            using (var dbContextTransaction = Context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var oldTeam = await Context.Team.FirstOrDefaultAsync(f => f.Id == team.Id);
+                    var deletedMembers = oldTeam.TeamMembers.Where(tm => !team.TeamMembers.Contains(tm)).ToList();
+                    var addedMembers = team.TeamMembers.Where(tm => !oldTeam.TeamMembers.Contains(tm)).ToList();
+
+                    foreach (var tm in deletedMembers)
+                    {
+                        // Delete all submission, extensions, excuses of this team for the deleted team members
+                        var tm1 = tm;
+                        var submissions = Context.Submission.Where(e => e.File.EntityId == team.EntityId && e.UserId == tm1.Id);
+                        foreach (var s in submissions)
+                        {
+                            Context.Entry(s).State = EntityState.Deleted;
+                        }
+
+                        var extensions = Context.Extension.Where(e => e.EntityId == team.EntityId && e.UserId == tm1.Id);
+                        foreach (var e in extensions)
+                        {
+                            Context.Entry(e).State = EntityState.Deleted;
+                        }
+
+                        var excuses = Context.Extension.Where(e => e.EntityId == team.EntityId && e.UserId == tm1.Id);
+                        foreach (var e in excuses)
+                        {
+                            Context.Entry(e).State = EntityState.Deleted;
+                        }
+                    }
+
+                    var constantMember = oldTeam.TeamMembers.FirstOrDefault(tm => !deletedMembers.Contains(tm));
+                    var teamSubmissions = Context.Submission.Where(e => e.File.EntityId == team.EntityId && e.UserId == constantMember.Id);
+                    var teamExtensions = Context.Extension.Where(e => e.EntityId == team.EntityId && e.UserId == constantMember.Id);
+                    var teamExcuses = Context.Excuse.Where(e => e.EntityId == team.EntityId && e.UserId == constantMember.Id);
+                    foreach (var tm in addedMembers)
+                    {
+                        // Add all submissions, extensions, excuses of the team to the new team members
+                        var tm1 = tm;
+                        foreach (var s in teamSubmissions)
+                        {
+                            // TODO: Copy the files also and change the FilePath
+                            var newSubmission = new SubmissionModel { FileId = s.FileId, FilePath = s.FilePath, TimeStamp = s.TimeStamp, UserId = tm1.Id };
+                            Context.Entry(newSubmission).State = EntityState.Added;
+                        }
+
+                        foreach (var newExtensions in teamExtensions.Select(e => new ExtensionModel { EntityId = e.EntityId, IsGranted = e.IsGranted, NewDeadline = e.NewDeadline, UserId = tm1.Id }))
+                        {
+                            Context.Entry(newExtensions).State = EntityState.Added;
+                        }
+
+                        foreach (var newExcuse in teamExcuses.Select(e => new ExcuseModel { EntityId = e.EntityId, IsGranted = e.IsGranted, UserId = tm1.Id }))
+                        {
+                            Context.Entry(newExcuse).State = EntityState.Added;
+                        }
+                    }
+
+                    await Context.SaveChangesAsync();
+                    dbContextTransaction.Commit();
+                    return team;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(e);
+                    dbContextTransaction.Rollback();
+                    return null;
+                }
+            }
+        }
+
+        public override async Task<bool> Delete(TeamModel team)
+        {
+            if (team == null)
+            {
+                throw new ArgumentNullException("team");
+            }
+
+            using (var dbContextTransaction = Context.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var tm in team.TeamMembers)
+                    {
+                        // Delete all submissions, extensions, excuses this team had
+                        var tm1 = tm;
+                        // TODO: Also delete the files themselves
+                        var submissions = Context.Submission.Where(s => s.File.EntityId == team.EntityId && s.UserId == tm1.Id);
+                        foreach (var s in submissions)
+                        {
+                            Context.Entry(s).State = EntityState.Deleted;
+                        }
+
+                        var extensions = Context.Extension.Where(e => e.EntityId == team.EntityId && e.UserId == tm1.Id);
+                        foreach (var e in extensions)
+                        {
+                            Context.Entry(e).State = EntityState.Deleted;
+                        }
+
+                        var excuses = Context.Excuse.Where(e => e.EntityId == team.EntityId && e.UserId == tm1.Id);
+                        foreach (var e in excuses)
+                        {
+                            Context.Entry(e).State = EntityState.Deleted;
+                        }
+                    }
+
+                    await Context.SaveChangesAsync();
+                    dbContextTransaction.Commit();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(e);
+                    dbContextTransaction.Rollback();
+                    return false;
+                }
+            }
         }
 
         public void Dispose()

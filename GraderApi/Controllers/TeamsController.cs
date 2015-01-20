@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using Microsoft.Ajax.Utilities;
-
-namespace GraderApi.Controllers
+﻿namespace GraderApi.Controllers
 {
     using Filters;
     using Grader.ExtensionMethods;
@@ -11,6 +6,8 @@ namespace GraderApi.Controllers
     using GraderDataAccessLayer.Models;
     using Resources;
     using Services;
+    using System.Data.Entity;
+    using System.Linq;
     using System;
     using System.Net;
     using System.Net.Http;
@@ -92,7 +89,7 @@ namespace GraderApi.Controllers
             }
         }
 
-        #region UNSAFE - Context used directly
+
         // POST: api/Courses/{courseId}/Teams/Add
         [HttpPost]
         [ValidateModelState]
@@ -123,34 +120,10 @@ namespace GraderApi.Controllers
                     }
                 }
 
-                foreach (var tm in team.TeamMembers)
-                {
-                    // In case one of the users in the team already has 
-                    // a submission, excuse, or extension for this entity, delete ALL of them
-                    var tm1 = tm;
-                    var submissions = await _unitOfWork.SubmissionRepository.GetByExpression(e => e.File.EntityId == team.EntityId && e.UserId == tm1.Id);
-                    foreach (var s in submissions)
-                    {
-                        _unitOfWork.Context.Entry(s).State = EntityState.Deleted;
-                    }
-
-                    var extensions = await _unitOfWork.ExtensionRepository.GetByExpression(e => e.EntityId == team.EntityId && e.UserId == tm1.Id);
-                    foreach (var e in extensions)
-                    {
-                        _unitOfWork.Context.Entry(e).State = EntityState.Deleted;
-                    }
-
-                    var excuses = await _unitOfWork.ExcuseRepository.GetByExpression(e => e.EntityId == team.EntityId && e.UserId == tm1.Id);
-                    foreach (var e in excuses)
-                    {
-                        _unitOfWork.Context.Entry(e).State = EntityState.Deleted;
-                    }
-                }
-
-                _unitOfWork.Context.Entry(team).State = EntityState.Added;
-                await _unitOfWork.Context.SaveChangesAsync();
-                
-                return Request.CreateResponse(HttpStatusCode.OK, team.ToJson());
+                var result = await _unitOfWork.TeamRepository.Add(team);
+                return result != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
             catch (Exception e)
             {
@@ -178,55 +151,6 @@ namespace GraderApi.Controllers
 
             try
             {
-                var oldTeam = await _unitOfWork.TeamRepository.Get(team.Id);
-                var deletedMembers = oldTeam.TeamMembers.Where(tm => ! team.TeamMembers.Contains(tm)).ToList();
-                if (deletedMembers.Count == oldTeam.TeamMembers.Count)
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, "You cannot remove all members of the old team!");
-                }
-                var addedMembers = team.TeamMembers.Where(tm => !oldTeam.TeamMembers.Contains(tm)).ToList();
-
-                foreach (var tm in deletedMembers)
-                {
-                    // Delete all submission, extensions, excuses of this team for the deleted team members
-                    var tm1 = tm;
-                    var submissions = await _unitOfWork.SubmissionRepository.GetByExpression(e => e.File.EntityId == team.EntityId && e.UserId == tm1.Id);
-                    foreach (var s in submissions)
-                    {
-                        _unitOfWork.Context.Entry(s).State = EntityState.Deleted;
-                    }
-
-                    var extensions = await _unitOfWork.ExtensionRepository.GetByExpression(e => e.EntityId == team.EntityId && e.UserId == tm1.Id);
-                    foreach (var e in extensions)
-                    {
-                        _unitOfWork.Context.Entry(e).State = EntityState.Deleted;
-                    }
-
-                    var excuses = await _unitOfWork.ExcuseRepository.GetByExpression(e => e.EntityId == team.EntityId && e.UserId == tm1.Id);
-                    foreach (var e in excuses)
-                    {
-                        _unitOfWork.Context.Entry(e).State = EntityState.Deleted;
-                    }
-                }
-
-                var constantMember = oldTeam.TeamMembers.FirstOrDefault(tm => !deletedMembers.Contains(tm));
-                var teamSubmissions = await _unitOfWork.SubmissionRepository.GetByExpression(e => e.File.EntityId == team.EntityId && e.UserId == constantMember.Id);
-                var teamExtensions = await _unitOfWork.ExtensionRepository.GetByExpression(e => e.EntityId == team.EntityId && e.UserId == constantMember.Id);
-                var teamExcuses = await _unitOfWork.ExcuseRepository.GetByExpression(e => e.EntityId == team.EntityId && e.UserId == constantMember.Id);
-                foreach (var tm in addedMembers)
-                {
-                    // Add all submissions, extensions, excuses of the team to the new team members
-                    var tm1 = tm;
-                    foreach (var s in teamSubmissions)
-                    {
-                        s.UserId = tm1.Id;
-                        s.Id = new int();
-                       
-                        _unitOfWork.Context.Entry(s).State = EntityState.Added;
-                    }
-                    
-                }
-
                 foreach (var tm in team.TeamMembers)
                 {
                     // Make sure that the team members are not already members of other teams
@@ -238,8 +162,18 @@ namespace GraderApi.Controllers
                     }
                 }
 
-                var result = await _unitOfWork.TeamRepository.Update(team);
+                var oldTeam = await _unitOfWork.TeamRepository.Get(team.Id);
+                if (oldTeam == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, Messages.NoTeamFound);
+                }
+                var deletedMembers = oldTeam.TeamMembers.Where(tm => ! team.TeamMembers.Contains(tm)).ToList();
+                if (deletedMembers.Count == oldTeam.TeamMembers.Count)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.CannotDeleteAllMembers);
+                }
 
+                var result = await _unitOfWork.TeamRepository.Update(team);
                 return result != null
                     ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
                     : Request.CreateResponse(HttpStatusCode.InternalServerError);
@@ -269,7 +203,7 @@ namespace GraderApi.Controllers
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
                 }
 
-                var result = await _unitOfWork.TeamRepository.Delete(teamId);
+                var result = await _unitOfWork.TeamRepository.Delete(existingTeam);
                 return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)
@@ -278,6 +212,5 @@ namespace GraderApi.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
-        #endregion
     }
 }

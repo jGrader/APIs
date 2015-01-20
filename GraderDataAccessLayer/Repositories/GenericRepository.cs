@@ -87,11 +87,11 @@
                 }
                 return entity;
             }
-            catch (DbException)
+            catch (DbException e)
             {
+                Logger.Log(e);
                 return null;
             }
-            
         }
 
         public async virtual Task<TEntity> Update(TEntity entity)
@@ -107,11 +107,11 @@
                 await Context.SaveChangesAsync();
                 return entity;
             }
-            catch (DbException)
+            catch (DbException e)
             {
+                Logger.Log(e);
                 return null;
             }
-            
         }
 
         public async virtual Task<bool> Delete(object id)
@@ -121,8 +121,9 @@
                 var entity = DbSet.Find(id);
                 return await Delete(entity);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.Log(e);
                 return false;
             }
         }
@@ -139,8 +140,9 @@
                 await Context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.Log(e);
                 return false;
             }
         }
