@@ -51,10 +51,10 @@
 
             try
             {
-                var properties = entity.GetType().GetProperties().Where(p => !p.GetGetMethod().IsVirtual);
+                var nonVirtualProperties = entity.GetType().GetProperties().Where(p => !p.GetGetMethod().IsVirtual);
 
                 var tmp = DbSet.AsEnumerable();
-                foreach (var prop in properties)
+                foreach (var prop in nonVirtualProperties)
                 {
                     if (prop.Name == "Id")
                     {
@@ -72,6 +72,19 @@
 
                 DbSet.AddOrUpdate(entity);
                 await Context.SaveChangesAsync();
+
+                var virtualProperties = entity.GetType().GetProperties().Where(p => p.GetGetMethod().IsVirtual);
+                foreach (var property in virtualProperties)
+                {
+                    if (property.PropertyType.Name == "ICollection`1")
+                    {
+                        Context.Entry(entity).Collection(property.Name).Load();
+                    }
+                    else
+                    {
+                        Context.Entry(entity).Reference(property.Name).Load();
+                    }
+                }
                 return entity;
             }
             catch (DbException)
