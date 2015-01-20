@@ -74,7 +74,6 @@
                 }
             }
         }
-
         public override async Task<TeamModel> Update(TeamModel team)
         {
             if (team == null)
@@ -171,7 +170,6 @@
                 }
             }
         }
-
         public override async Task<bool> Delete(TeamModel team)
         {
             if (team == null)

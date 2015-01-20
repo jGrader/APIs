@@ -104,9 +104,9 @@
             Directory.CreateDirectory(tempPath);
            
             var streamProvider = new MultipartFormDataStreamProvider(tempPath);
-            var result = await Request.Content.ReadAsMultipartAsync(streamProvider);
+            var readResult = await Request.Content.ReadAsMultipartAsync(streamProvider);
 
-            if (result.FormData[paramName] == null)
+            if (readResult.FormData[paramName] == null)
             {
                 // We don't have the FileModels ... delete the TempFiles and return BadRequest
                 Directory.Delete(tempPath, true);
@@ -115,7 +115,7 @@
 
             // The files have been successfully saved in a TempLocation and the FileModels are not null
             // Validate that everything else is fine with this command
-            var fileModels = JsonConvert.DeserializeObject<IEnumerable<FileModelExtension>>(result.FormData[paramName]);
+            var fileModels = JsonConvert.DeserializeObject<IEnumerable<FileModelExtension>>(readResult.FormData[paramName]);
             var fileModelExtensions = fileModels as IList<FileModelExtension> ?? fileModels.ToList();
             foreach (var file in fileModelExtensions)
             {
@@ -153,7 +153,7 @@
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, Messages.FileNumberDoesNotMatch);
             }
 
-            foreach (var tempFile in result.FileData)
+            foreach (var tempFile in readResult.FileData)
             {
                 var originalFileName = tempFile.Headers.ContentDisposition.FileName.Replace("\"", string.Empty);
                 var fileModel = fileModelExtensions.FirstOrDefault(f => f.OriginalFileName == originalFileName);
@@ -188,119 +188,33 @@
             var fileSavePath = Path.Combine(HttpContext.Current.Server.MapPath("~/Content/UploadedFiles/"), task.CourseId + "_" + task.Course.Name,
                 task.Id + "_" + task.Name, firstOrDefault.Entity.Id + "_" + firstOrDefault.Entity.Name);
 
-            // These variables are where we store old info in case smtg goes wrong to be able to revert
-            var backUpInformation = new List<Tuple<SubmissionModel, string, string>>();
-            var newlyAddedInformation = new List<Tuple<SubmissionModel, string>>();
-
             try
             {
-                // Everything is awesome !!!
                 // Start copying the files to their final location
-                foreach (var tempFile in result.FileData)
+                var addedSubmissions = new List<SubmissionModel>();
+                foreach (var tempFile in readResult.FileData)
                 {
                     var originalFileName = tempFile.Headers.ContentDisposition.FileName.Replace("\"", string.Empty);
                     var fileModel = fileModelExtensions.First(f => f.OriginalFileName == originalFileName);
 
-                    foreach (var teamMember in currentTeam.TeamMembers)
+                    var result = await _unitOfWork.SubmissionRepository.AddSubmissionToTeam(fileSavePath, tempFile.LocalFileName, fileModel, currentTeam.TeamMembers);
+                    if (result != null)
                     {
-                        // We have this for a weird possible bug between different versions of compiler
-                        // for the GetByExpression call not getting the value from an inner-scope variable
-                        var member = teamMember; 
-
-                        var finalPath = Path.Combine(fileSavePath, member.UserName);
-                        Directory.CreateDirectory(finalPath);
-
-                        // Copy the file to the correct location with the correct name
-                        var tempFilePath = tempFile.LocalFileName;
-                        var finalFilePath = finalPath + "\\" + (fileModel.FileName + fileModel.Extension);
-                        var backUpPath = finalPath + "\\Backup";
-                        var finalBackUpFilePath = backUpPath + "\\" + (fileModel.FileName + fileModel.Extension);
-                        if (File.Exists(finalFilePath))
-                        {
-                            //First make a backup
-                            Directory.CreateDirectory(backUpPath);
-                            File.Copy(finalFilePath, finalBackUpFilePath, true);
-                        }
-                        File.Copy(tempFilePath, finalFilePath, true);
-
-                        // Now it's time to register a submission for this file in the Database
-                        var submission = new SubmissionModel { FileId = fileModel.Id, FilePath = finalFilePath, TimeStamp = DateTime.UtcNow, UserId = member.Id };
-                        var query = (await _unitOfWork.SubmissionRepository.GetByExpression(s => s.FileId == fileModel.Id && s.UserId == member.Id)).FirstOrDefault();
-                        if (query != null)
-                        {
-                            // There exists an old submission for this file; update it!
-                            backUpInformation.Add(new Tuple<SubmissionModel, string, string>(query, finalBackUpFilePath, finalFilePath));
-
-                            submission.Id = query.Id;
-                            var updateResult = await _unitOfWork.SubmissionRepository.Update(submission);
-                            if (updateResult == null)
-                            {
-                                Directory.Delete(tempPath);
-                                var revertResult =
-                                    await RevertFailedSubmisionChanges(backUpInformation, newlyAddedInformation);
-
-                                return Request.CreateResponse(revertResult == HttpStatusCode.OK ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
-                            }
-                        }
-                        else
-                        {
-                            // This is the very first submission
-                            var addResult = await _unitOfWork.SubmissionRepository.Add(submission);
-                            if (addResult == null)
-                            {
-                                Directory.Delete(tempPath);
-                                var revertResult =
-                                    await RevertFailedSubmisionChanges(backUpInformation, newlyAddedInformation);
-
-                                return Request.CreateResponse(revertResult == HttpStatusCode.OK ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
-                            }
-
-                            newlyAddedInformation.Add(new Tuple<SubmissionModel, string>(addResult, finalFilePath));
-                        }
+                        addedSubmissions.AddRange(result);
                     }
                 }
 
                 // Nothing went wrong; just delete the TempFolder and exit
                 Directory.Delete(tempPath, true);
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.OK, addedSubmissions.ToJson());
             }
             catch (Exception e)
             {
                 _logger.Log(e);
 
                 Directory.Delete(tempPath);
-                var revertResult = Task.Run(() => RevertFailedSubmisionChanges(backUpInformation, newlyAddedInformation));
-                Task.WaitAll(revertResult);
-
-                return Request.CreateErrorResponse(revertResult.Result == HttpStatusCode.OK ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError, e);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
-        }
-        private async Task<HttpStatusCode> RevertFailedSubmisionChanges(IEnumerable<Tuple<SubmissionModel, string, string>> backUpInformation, 
-            IEnumerable<Tuple<SubmissionModel, string>> newlyAddedInformation)
-        {
-            foreach (var x in newlyAddedInformation)
-            {
-                var result = await _unitOfWork.SubmissionRepository.Delete(x.Item1.Id);
-                if (!result)
-                {
-                    return HttpStatusCode.InternalServerError;
-                }
-
-                File.Delete(x.Item2);
-            }
-
-            foreach (var y in backUpInformation)
-            {
-                var result = await _unitOfWork.SubmissionRepository.Update(y.Item1);
-                if (result == null)
-                {
-                    return HttpStatusCode.InternalServerError;
-                }
-
-                File.Move(y.Item2, y.Item3);
-            }
-
-            return HttpStatusCode.OK;
         }
         private class FileModelExtension : FileModel
         {

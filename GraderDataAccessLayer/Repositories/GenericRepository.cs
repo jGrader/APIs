@@ -73,6 +73,7 @@
                 DbSet.AddOrUpdate(entity);
                 await Context.SaveChangesAsync();
 
+                // The new entry is recorded in the database; load virtual properties before returning
                 var virtualProperties = entity.GetType().GetProperties().Where(p => p.GetGetMethod().IsVirtual);
                 foreach (var property in virtualProperties)
                 {
@@ -85,6 +86,7 @@
                         Context.Entry(entity).Reference(property.Name).Load();
                     }
                 }
+
                 return entity;
             }
             catch (DbException e)
