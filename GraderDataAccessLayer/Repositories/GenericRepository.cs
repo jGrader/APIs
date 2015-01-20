@@ -1,5 +1,7 @@
 ﻿namespace GraderDataAccessLayer.Repositories
 {
+    using System.Collections;
+    using System.Collections.ObjectModel;
     using System.Data.Common;
     using System.Data.Entity.Migrations;
     using System.Linq;
@@ -48,10 +50,10 @@
 
             try
             {
-                var properties = entity.GetType().GetProperties().Where(p => !p.GetGetMethod().IsVirtual);
+                var nonVirtualProperties = entity.GetType().GetProperties().Where(p => !p.GetGetMethod().IsVirtual);
 
                 var tmp = dbSet.AsEnumerable();
-                foreach (var prop in properties)
+                foreach (var prop in nonVirtualProperties)
                 {
                     if (prop.Name == "Id")
                     {
@@ -69,6 +71,19 @@
 
                 dbSet.AddOrUpdate(entity);
                 await context.SaveChangesAsync();
+
+                var virtualProperties = entity.GetType().GetProperties().Where(p => p.GetGetMethod().IsVirtual);
+                foreach (var property in virtualProperties)
+                {
+                    if (property.PropertyType.Name == "ICollection`1")
+                    {
+                        context.Entry(entity).Collection(property.Name).Load();
+                    }
+                    else
+                    {
+                        context.Entry(entity).Reference(property.Name).Load();
+                    }
+                }
                 return entity;
             }
             catch (DbException)
