@@ -46,7 +46,6 @@
     <Compile Include="GeneralExtensionMethods.cs" />
     <Compile Include="JsonSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestForUniqueness.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
