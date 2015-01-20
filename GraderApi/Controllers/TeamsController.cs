@@ -6,7 +6,6 @@
     using GraderDataAccessLayer.Models;
     using Resources;
     using Services;
-    using System.Data.Entity;
     using System.Linq;
     using System;
     using System.Net;
@@ -88,7 +87,6 @@
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
-
 
         // POST: api/Courses/{courseId}/Teams/Add
         [HttpPost]

@@ -5,6 +5,7 @@
     using System;
     using System.Collections.Generic;
     using System.Data.Entity;
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -89,6 +90,7 @@
                     var deletedMembers = oldTeam.TeamMembers.Where(tm => !team.TeamMembers.Contains(tm)).ToList();
                     var addedMembers = team.TeamMembers.Where(tm => !oldTeam.TeamMembers.Contains(tm)).ToList();
 
+                    var filesToDelete = new List<string>();
                     foreach (var tm in deletedMembers)
                     {
                         // Delete all submission, extensions, excuses of this team for the deleted team members
@@ -96,6 +98,7 @@
                         var submissions = Context.Submission.Where(e => e.File.EntityId == team.EntityId && e.UserId == tm1.Id);
                         foreach (var s in submissions)
                         {
+                            filesToDelete.Add(s.FilePath);
                             Context.Entry(s).State = EntityState.Deleted;
                         }
 
@@ -112,17 +115,18 @@
                         }
                     }
 
-                    var constantMember = oldTeam.TeamMembers.FirstOrDefault(tm => !deletedMembers.Contains(tm));
+                    var constantMember = oldTeam.TeamMembers.First(tm => !deletedMembers.Contains(tm));
                     var teamSubmissions = Context.Submission.Where(e => e.File.EntityId == team.EntityId && e.UserId == constantMember.Id);
                     var teamExtensions = Context.Extension.Where(e => e.EntityId == team.EntityId && e.UserId == constantMember.Id);
                     var teamExcuses = Context.Excuse.Where(e => e.EntityId == team.EntityId && e.UserId == constantMember.Id);
+                    var filesToAdd = new List<string>();
                     foreach (var tm in addedMembers)
                     {
                         // Add all submissions, extensions, excuses of the team to the new team members
                         var tm1 = tm;
                         foreach (var s in teamSubmissions)
                         {
-                            // TODO: Copy the files also and change the FilePath
+                            filesToAdd.Add(s.FilePath);
                             var newSubmission = new SubmissionModel { FileId = s.FileId, FilePath = s.FilePath, TimeStamp = s.TimeStamp, UserId = tm1.Id };
                             Context.Entry(newSubmission).State = EntityState.Added;
                         }
@@ -140,6 +144,23 @@
 
                     await Context.SaveChangesAsync();
                     dbContextTransaction.Commit();
+
+                    // Now manipulate the files for the submissions
+                    foreach (var path in filesToDelete.Where(File.Exists))
+                    {
+                        // Delete the files of the removed users
+                        File.Delete(path);
+                    }
+                    foreach (var tm in addedMembers)
+                    {
+                        // Add the files to the users added to the team
+                        foreach (var path in filesToAdd.Where(File.Exists))
+                        {
+                            var newPath = path.Replace(constantMember.UserName, tm.UserName);
+                            File.Copy(path, newPath, true);
+                        }
+                    }
+
                     return team;
                 }
                 catch (Exception e)
@@ -162,14 +183,15 @@
             {
                 try
                 {
+                    var filesToDelete = new List<string>();
                     foreach (var tm in team.TeamMembers)
                     {
                         // Delete all submissions, extensions, excuses this team had
                         var tm1 = tm;
-                        // TODO: Also delete the files themselves
                         var submissions = Context.Submission.Where(s => s.File.EntityId == team.EntityId && s.UserId == tm1.Id);
                         foreach (var s in submissions)
                         {
+                            filesToDelete.Add(s.FilePath);
                             Context.Entry(s).State = EntityState.Deleted;
                         }
 
@@ -188,6 +210,13 @@
 
                     await Context.SaveChangesAsync();
                     dbContextTransaction.Commit();
+
+                    // Now delete the files
+                    foreach (var path in filesToDelete.Where(File.Exists))
+                    {
+                        File.Delete(path);
+                    }
+
                     return true;
                 }
                 catch (Exception e)
