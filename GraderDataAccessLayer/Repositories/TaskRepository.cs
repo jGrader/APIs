@@ -18,28 +18,28 @@ namespace GraderDataAccessLayer.Repositories
 
         public async Task<TaskModel> Get(int id)
         {
-            var searchResult = await dbSet.FirstOrDefaultAsync(t => t.Id == id);
+            var searchResult = await DbSet.FirstOrDefaultAsync(t => t.Id == id);
             return searchResult;
         }
 
         public async Task<IEnumerable<TaskModel>> GetByName(string name)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(w => w.Name == name));
+            var searchResult = await Task.Run(() => DbSet.Where(w => w.Name == name));
             return searchResult;
         }
         public async Task<IEnumerable<TaskModel>> GetByCourseId(int courseId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(w => w.CourseId == courseId));
+            var searchResult = await Task.Run(() => DbSet.Where(w => w.CourseId == courseId));
             return searchResult;
         }
         public async Task<IEnumerable<TaskModel>> GetByGradeComponentId(int gradeComponentId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(w => w.GradeComponentId == gradeComponentId));
+            var searchResult = await Task.Run(() => DbSet.Where(w => w.GradeComponentId == gradeComponentId));
             return searchResult;
         }
         public async Task<IEnumerable<TaskModel>> GetByCourseIdAndGradeComponentId(int courseId, int gradeComponentId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(w => w.CourseId == courseId && w.GradeComponentId == gradeComponentId));
+            var searchResult = await Task.Run(() => DbSet.Where(w => w.CourseId == courseId && w.GradeComponentId == gradeComponentId));
             return searchResult;
         }
 
@@ -56,12 +56,12 @@ namespace GraderDataAccessLayer.Repositories
                 return;
             }
 
-            if (context == null)
+            if (Context == null)
             {
                 return;
             }
-            context.Dispose();
-            context = null;
+            Context.Dispose();
+            Context = null;
         }
     }
 }

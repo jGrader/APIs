@@ -7,7 +7,6 @@
     using Resources;
     using Services;
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Net;
@@ -87,10 +86,6 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.NoTeamFound);
                 }
 
-                // This excuse can only be added directly by someone with permission
-                // So they obviously want it to be granted
-                excuse.IsGranted = true;
-                var addedExcuses = new List<ExcuseModel>();
                 foreach (var tm in firstOrDefaultTeam.TeamMembers)
                 {
                     var tm1 = tm;
@@ -98,29 +93,25 @@
                     var firstOrDefaultEnrollment = enrollments.FirstOrDefault();
                     if (firstOrDefaultEnrollment == null)
                     {
-                        // This user is not enrolled in this course
-                        // Something is fishy; revert and exit
-                        var deleteResult = await DeleteAddedExcuses(addedExcuses);
-                        return Request.CreateResponse(deleteResult == HttpStatusCode.OK ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
+                        // This user is not enrolled in this course; revert and exit
+                        return Request.CreateResponse(HttpStatusCode.BadRequest);
                     }
-
-                    excuse.UserId = tm.Id;
-                    var result = await _unitOfWork.ExcuseRepository.Add(excuse);
-                    if (result == null)
-                    {
-                        var deleteResult = await DeleteAddedExcuses(addedExcuses);
-                        return Request.CreateResponse(deleteResult == HttpStatusCode.OK ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
-                    }
-                    addedExcuses.Add(result);
                 }
 
-                return Request.CreateResponse(HttpStatusCode.OK);
+                // This excuse can only be added directly by someone with permission
+                // So they obviously want it to be granted
+                excuse.IsGranted = true;
+
+                var result = await _unitOfWork.ExcuseRepository.AddToTeam(excuse, firstOrDefaultTeam.TeamMembers);
+                return result != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
             catch (Exception e)
             {
                 _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
-            }
+            } 
         }
 
         // PUT: api/Courses/{courseId}/Excuses/{excuseId}
@@ -147,46 +138,10 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.NoTeamFound);
                 }
 
-                var backUpValues = new List<ExcuseModel>();
-                var addedExcuses = new List<ExcuseModel>();
-                foreach (var tm in firstOrDefaultTeam.TeamMembers)
-                {
-                    var tm1 = tm;
-                    var oldExcuse = await _unitOfWork.ExcuseRepository.GetByExpression(g => g.EntityId == excuse.EntityId && g.UserId == tm1.Id);
-                    var firstOrDefaultOldGrade = oldExcuse.FirstOrDefault();
-                    if (firstOrDefaultOldGrade != null)
-                    {
-                        backUpValues.Add(firstOrDefaultOldGrade);
-
-                        excuse.UserId = tm.Id;
-                        var result = await _unitOfWork.ExcuseRepository.Update(excuse);
-
-                        if (result == null)
-                        {
-                            var revertResult1 = await UndoChangedExcuses(backUpValues);
-                            var revertResult2 = await DeleteAddedExcuses(addedExcuses);
-                            return Request.CreateResponse(revertResult1 == HttpStatusCode.OK && revertResult2 == HttpStatusCode.OK
-                                ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
-                        }
-                    }
-                    else
-                    {
-                        excuse.UserId = tm.Id;
-                        var result = await _unitOfWork.ExcuseRepository.Add(excuse);
-
-                        if (result == null)
-                        {
-                            var revertResult1 = await UndoChangedExcuses(backUpValues);
-                            var revertResult2 = await DeleteAddedExcuses(addedExcuses);
-                            return Request.CreateResponse(revertResult1 == HttpStatusCode.OK && revertResult2 == HttpStatusCode.OK
-                                ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
-                        }
-
-                        addedExcuses.Add(result);
-                    }
-                }
-
-                return Request.CreateResponse(HttpStatusCode.OK);
+                var result = await _unitOfWork.ExcuseRepository.UpdateForTeam(excuse, firstOrDefaultTeam.TeamMembers);
+                return result != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
             catch (Exception e)
             {
@@ -219,38 +174,18 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.NoTeamFound);
                 }
 
-                var deletedExcuses = new List<ExcuseModel>();
-                foreach (var tm in firstOrDefaultTeam.TeamMembers)
-                {
-                    var tm1 = tm;
-                    var oldExcuse = await _unitOfWork.ExcuseRepository.GetByExpression(g => g.EntityId == existingExcuse.EntityId && g.UserId == tm1.Id);
-                    var firstOrDefaultOldExcuse = oldExcuse.FirstOrDefault();
-                    if (firstOrDefaultOldExcuse != null)
-                    {
-                        var result = await _unitOfWork.GradeRepository.Delete(firstOrDefaultOldExcuse.Id);
-                        if (result == false)
-                        {
-                            var undoResult = await AddDeletedExcuses(deletedExcuses);
-                            return Request.CreateResponse(undoResult == HttpStatusCode.OK
-                                ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
-                        }
-
-                        deletedExcuses.Add(firstOrDefaultOldExcuse);
-                    }
-                }
-
-                return Request.CreateResponse(HttpStatusCode.OK);
+                var result = await _unitOfWork.ExcuseRepository.DeleteForTeam(existingExcuse, firstOrDefaultTeam.TeamMembers);
+                return result
+                    ? Request.CreateResponse(HttpStatusCode.OK)
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
             catch (Exception e)
             {
                 _logger.Log(e);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
-            }
+            } 
         }
 
-
-
-        #region Helpers
         private async Task<TeamModel> GetCorrectTeamModel(bool wholeTeam, ExcuseModel excuse)
         {
             var firstOrDefaultTeam = new TeamModel
@@ -268,51 +203,5 @@
 
             return firstOrDefaultTeam;
         }
-
-        private async Task<HttpStatusCode> DeleteAddedExcuses(IEnumerable<ExcuseModel> addedExcuses)
-        {
-            foreach (var excuse in addedExcuses)
-            {
-                var result = await _unitOfWork.ExcuseRepository.Delete(excuse);
-
-                if (result == false)
-                {
-                    return HttpStatusCode.InternalServerError;
-                }
-            }
-
-            return HttpStatusCode.OK;
-        }
-
-        private async Task<HttpStatusCode> UndoChangedExcuses(IEnumerable<ExcuseModel> backUpValues)
-        {
-            foreach (var excuse in backUpValues)
-            {
-                var result = await _unitOfWork.ExcuseRepository.Update(excuse);
-
-                if (result == null)
-                {
-                    return HttpStatusCode.InternalServerError;
-                }
-            }
-
-            return HttpStatusCode.OK;
-        }
-
-        private async Task<HttpStatusCode> AddDeletedExcuses(IEnumerable<ExcuseModel> deletedExcuses)
-        {
-            foreach (var excuse in deletedExcuses)
-            {
-                var result = await _unitOfWork.ExcuseRepository.Add(excuse);
-
-                if (result == null)
-                {
-                    return HttpStatusCode.InternalServerError;
-                }
-            }
-
-            return HttpStatusCode.OK;
-        }
-        #endregion
     }
 }

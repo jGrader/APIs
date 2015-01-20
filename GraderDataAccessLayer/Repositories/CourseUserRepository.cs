@@ -17,17 +17,17 @@
 
         public async Task<IEnumerable<CourseUserModel>> GetByCourseId(int courseId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(w => w.CourseId == courseId));
+            var searchResult = await Task.Run(() => DbSet.Where(w => w.CourseId == courseId));
             return searchResult;
         }
         public async Task<IEnumerable<CourseUserModel>> GetByUserId(int userId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(w => w.UserId == userId));
+            var searchResult = await Task.Run(() => DbSet.Where(w => w.UserId == userId));
             return searchResult;
         }
         public async Task<IEnumerable<CourseUserModel>> GetByPermissions(int permissions)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(w => w.Permissions == permissions));
+            var searchResult = await Task.Run(() => DbSet.Where(w => w.Permissions == permissions));
             return searchResult;
         }
 
@@ -43,12 +43,12 @@
                 return;
             }
 
-            if (context == null)
+            if (Context == null)
             {
                 return;
             }
-            context.Dispose();
-            context = null;
+            Context.Dispose();
+            Context = null;
         }  
     }
 }

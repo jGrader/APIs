@@ -1,41 +1,44 @@
 ﻿namespace GraderDataAccessLayer.Repositories
 {
-    using System.Data.Common;
-    using System.Data.Entity.Migrations;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Interfaces;
+    using Services;
     using System;
     using System.Collections.Generic;
+    using System.Data.Common;
     using System.Data.Entity;
+    using System.Data.Entity.Migrations;
+    using System.Linq;
     using System.Linq.Expressions;
-
+    using System.Threading.Tasks;
+  
     public abstract class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
-        protected DbContext context;
-        protected readonly DbSet<TEntity> dbSet;
+        protected DatabaseContext Context;
+        protected readonly DbSet<TEntity> DbSet;
+        protected readonly Logger Logger;
 
-        protected GenericRepository(DbContext context)
+        protected GenericRepository(DatabaseContext context)
         {
-            this.context = context;
-            dbSet = this.context.Set<TEntity>();
+            this.Context = context;
+            this.DbSet = this.Context.Set<TEntity>();
+            this.Logger = new Logger();
         }
 
         public async virtual Task<IEnumerable<TEntity>> GetAll()
         {
-            var result = await Task.Run(() => dbSet.AsEnumerable());
+            var result = await Task.Run(() => DbSet.AsEnumerable());
             return result;
         }
 
         public async virtual Task<IEnumerable<TEntity>> GetByExpression(Expression<Func<TEntity, bool>> exp)
         {
-            var result = await Task.Run(() => dbSet.Where(exp).AsEnumerable());
+            var result = await Task.Run(() => DbSet.Where(exp).AsEnumerable());
             return result;
         }
 
         public async virtual Task<TEntity> Get(object id)
         {
-            var result = await Task.Run(() => dbSet.Find(id));
+            var result = await Task.Run(() => DbSet.Find(id));
             return result;
         }
 
@@ -50,7 +53,7 @@
             {
                 var properties = entity.GetType().GetProperties().Where(p => !p.GetGetMethod().IsVirtual);
 
-                var tmp = dbSet.AsEnumerable();
+                var tmp = DbSet.AsEnumerable();
                 foreach (var prop in properties)
                 {
                     if (prop.Name == "Id")
@@ -67,8 +70,8 @@
                     return enumerable.FirstOrDefault();
                 }
 
-                dbSet.AddOrUpdate(entity);
-                await context.SaveChangesAsync();
+                DbSet.AddOrUpdate(entity);
+                await Context.SaveChangesAsync();
                 return entity;
             }
             catch (DbException)
@@ -86,9 +89,9 @@
             }
             try
             {
-                dbSet.Attach(entity);
-                context.Entry(entity).State = EntityState.Modified;
-                await context.SaveChangesAsync();
+                DbSet.Attach(entity);
+                Context.Entry(entity).State = EntityState.Modified;
+                await Context.SaveChangesAsync();
                 return entity;
             }
             catch (DbException)
@@ -102,7 +105,7 @@
         {
             try
             {
-                var entity = dbSet.Find(id);
+                var entity = DbSet.Find(id);
                 return await Delete(entity);
             }
             catch (Exception)
@@ -119,8 +122,8 @@
             }
             try
             {
-                dbSet.Remove(entity);
-                await context.SaveChangesAsync();
+                DbSet.Remove(entity);
+                await Context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)

@@ -15,13 +15,13 @@
 
         public async Task<IEnumerable<SubmissionModel>> GetByCourseId(int courseId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(s => s.File.Entity.Task.CourseId == courseId));
+            var searchResult = await Task.Run(() => DbSet.Where(s => s.File.Entity.Task.CourseId == courseId));
             return searchResult;
         }
 
         public async Task<IEnumerable<SubmissionModel>> GetByUserId(int userId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(s => s.File.Entity.Task.CourseId == userId));
+            var searchResult = await Task.Run(() => DbSet.Where(s => s.File.Entity.Task.CourseId == userId));
             return searchResult;
         }
         
@@ -37,13 +37,13 @@
                 return;
             }
 
-            if (context == null)
+            if (Context == null)
             {
                 return;
             }
 
-            context.Dispose();
-            context = null;
+            Context.Dispose();
+            Context = null;
         }    
     }
 }

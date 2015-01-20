@@ -17,18 +17,18 @@
 
         public async Task<UserModel> GetByUsername(string username)
         {
-            var searchResult = await dbSet.FirstOrDefaultAsync(u => u.UserName == username);
+            var searchResult = await DbSet.FirstOrDefaultAsync(u => u.UserName == username);
             return searchResult;
         }
 
         public async Task<IEnumerable<UserModel>> GetAllByGraduationYear(string year)
         {
-            return await Task.Run(() => dbSet.Where(w => w.GraduationYear == year));
+            return await Task.Run(() => DbSet.Where(w => w.GraduationYear == year));
         }
 
         public async Task<string> GetEmail(int id)
         {
-            var searchResult = await dbSet.FirstOrDefaultAsync(w => w.Id == id);
+            var searchResult = await DbSet.FirstOrDefaultAsync(w => w.Id == id);
             return searchResult == null ? string.Empty : searchResult.Email;
         }
 
@@ -45,13 +45,13 @@
                 return;
             }
 
-            if (context == null)
+            if (Context == null)
             {
                 return;
             }
 
-            context.Dispose();
-            context = null;
+            Context.Dispose();
+            Context = null;
         }      
     }
 }

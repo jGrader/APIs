@@ -23,13 +23,13 @@
                 return;
             }
 
-            if (context == null)
+            if (Context == null)
             {
                 return;
             }
 
-            context.Dispose();
-            context = null;
+            Context.Dispose();
+            Context = null;
         }
     }
 }

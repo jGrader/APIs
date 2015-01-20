@@ -17,32 +17,32 @@
 
         public async Task<IEnumerable<EntityModel>> GetByTask(int taskId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(e => e.TaskId == taskId));
+            var searchResult = await Task.Run(() => DbSet.Where(e => e.TaskId == taskId));
             return searchResult;
         }
         public async Task<IEnumerable<EntityModel>> GetByName(string name)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(e => e.Name == name));
+            var searchResult = await Task.Run(() => DbSet.Where(e => e.Name == name));
             return searchResult;
         }
         public async Task<IEnumerable<EntityModel>> GetByCourseId(int courseId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(e => e.Task.CourseId == courseId));
+            var searchResult = await Task.Run(() => DbSet.Where(e => e.Task.CourseId == courseId));
             return searchResult;
         }
         public async Task<IEnumerable<EntityModel>> GetByOpenDate(DateTime openTime)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(e => e.OpenTime == openTime));
+            var searchResult = await Task.Run(() => DbSet.Where(e => e.OpenTime == openTime));
             return searchResult;
         }
         public async Task<IEnumerable<EntityModel>> GetByCloseDate(DateTime closeTime)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(e => e.CloseTime == closeTime));
+            var searchResult = await Task.Run(() => DbSet.Where(e => e.CloseTime == closeTime));
             return searchResult;
         }
         public async Task<IEnumerable<EntityModel>> GetActiveBetween(DateTime time1, DateTime time2)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(e => e.OpenTime > time1 && e.CloseTime < time2));
+            var searchResult = await Task.Run(() => DbSet.Where(e => e.OpenTime > time1 && e.CloseTime < time2));
             return searchResult;
         }
 
@@ -58,13 +58,13 @@
                 return;
             }
 
-            if (context == null)
+            if (Context == null)
             {
                 return;
             }
 
-            context.Dispose();
-            context = null;
+            Context.Dispose();
+            Context = null;
         }
     }
 }

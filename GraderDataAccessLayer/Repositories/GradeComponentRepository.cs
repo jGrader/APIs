@@ -3,7 +3,6 @@ namespace GraderDataAccessLayer.Repositories
 {
     using Interfaces;
     using Models;
-
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -18,7 +17,7 @@ namespace GraderDataAccessLayer.Repositories
 
         public async Task<IEnumerable<GradeComponentModel>> GetByCourseId(int courseId)
         {
-            var searchResult = await Task.Run( () => dbSet.Where(w => w.CourseId == courseId));
+            var searchResult = await Task.Run( () => DbSet.Where(w => w.CourseId == courseId));
             return searchResult;
         }
 
@@ -29,13 +28,13 @@ namespace GraderDataAccessLayer.Repositories
                 return;
             }
 
-            if (context == null)
+            if (Context == null)
             {
                 return;
             }
 
-            context.Dispose();
-            context = null;
+            Context.Dispose();
+            Context = null;
         }
         public void Dispose()
         {

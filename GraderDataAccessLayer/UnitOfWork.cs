@@ -5,7 +5,7 @@
 
     public class UnitOfWork : IDisposable
     {
-        private DatabaseContext _context;
+        public DatabaseContext Context;
         private AdminRepository _adminRepository;
         private CourseRepository _courseRepository;
         private CourseUserRepository _courseUserRepository;
@@ -23,14 +23,14 @@
 
         public UnitOfWork()
         {
-            _context = new DatabaseContext();
+            Context = new DatabaseContext();
         }
 
         public AdminRepository AdminRepository
         {
             get
             {
-                _adminRepository = _adminRepository ?? new AdminRepository(_context);
+                _adminRepository = _adminRepository ?? new AdminRepository(Context);
 
                 return _adminRepository;
             }
@@ -40,7 +40,7 @@
         {
             get
             {
-                _courseRepository = _courseRepository ?? new CourseRepository(_context);
+                _courseRepository = _courseRepository ?? new CourseRepository(Context);
 
                 return _courseRepository;
             }
@@ -50,7 +50,7 @@
         {
             get
             {
-                _courseUserRepository = _courseUserRepository ?? new CourseUserRepository(_context);
+                _courseUserRepository = _courseUserRepository ?? new CourseUserRepository(Context);
 
                 return _courseUserRepository;
             }
@@ -60,7 +60,7 @@
         {
             get
             {
-                _entityRepository = _entityRepository ?? new EntityRepository(_context);
+                _entityRepository = _entityRepository ?? new EntityRepository(Context);
                 return _entityRepository;
             }
         }
@@ -69,7 +69,7 @@
         {
             get
             {
-                _excuseRepository = _excuseRepository ?? new ExcuseRepository(_context);
+                _excuseRepository = _excuseRepository ?? new ExcuseRepository(Context);
                 return _excuseRepository;
             }
         }
@@ -78,7 +78,7 @@
         {
             get
             {
-                _extensionRepository = _extensionRepository ?? new ExtensionRepository(_context);
+                _extensionRepository = _extensionRepository ?? new ExtensionRepository(Context);
                 return _extensionRepository;
             }
         }
@@ -87,7 +87,7 @@
         {
             get
             {
-                _fileRepository = _fileRepository ?? new FileRepository(_context);
+                _fileRepository = _fileRepository ?? new FileRepository(Context);
                 return _fileRepository;
             }
         }
@@ -96,7 +96,7 @@
         {
             get
             {
-                _gradeComponentRepository = _gradeComponentRepository ?? new GradeComponentRepository(_context);
+                _gradeComponentRepository = _gradeComponentRepository ?? new GradeComponentRepository(Context);
                 return _gradeComponentRepository;
             }
         }
@@ -105,7 +105,7 @@
         {
             get
             {
-                _gradeRepository = _gradeRepository ?? new GradeRepository(_context);
+                _gradeRepository = _gradeRepository ?? new GradeRepository(Context);
                 return _gradeRepository;
             }
         }
@@ -114,7 +114,7 @@
         {
             get
             {
-                _sessionIdRepository = _sessionIdRepository ?? new SessionIdRepository(_context);
+                _sessionIdRepository = _sessionIdRepository ?? new SessionIdRepository(Context);
                 return _sessionIdRepository;
             }
         }
@@ -123,7 +123,7 @@
         {
             get
             {
-                _submissionRepository = _submissionRepository ?? new SubmissionRepository(_context);
+                _submissionRepository = _submissionRepository ?? new SubmissionRepository(Context);
                 return _submissionRepository;
             }
         }
@@ -132,7 +132,7 @@
         {
             get
             {
-                _taskRepository = _taskRepository ?? new TaskRepository(_context);
+                _taskRepository = _taskRepository ?? new TaskRepository(Context);
                 return _taskRepository;
             }
         }
@@ -141,7 +141,7 @@
         {
             get
             {
-                _teamRepository = _teamRepository ?? new TeamRepository(_context);
+                _teamRepository = _teamRepository ?? new TeamRepository(Context);
                 return _teamRepository;
             }
         }
@@ -150,7 +150,7 @@
         {
             get
             {
-                _userRepository = _userRepository ?? new UserRepository(_context);
+                _userRepository = _userRepository ?? new UserRepository(Context);
                 return _userRepository;
             }
         }
@@ -183,13 +183,13 @@
             DisposeTeamRepository();
             DisposeUserRepository();
 
-            if (_context == null)
+            if (Context == null)
             {
                 return;
             }
 
-            _context.Dispose();
-            _context = null;
+            Context.Dispose();
+            Context = null;
         }
 
         private void DisposeUserRepository()

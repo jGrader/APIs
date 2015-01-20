@@ -64,6 +64,7 @@
     <Compile Include="Interfaces\IExtensionRepository.cs" />
     <Compile Include="Interfaces\IFileRepository.cs" />
     <Compile Include="Interfaces\IGenericRepository.cs" />
+    <Compile Include="Interfaces\IGenericTeamActionsRepository.cs" />
     <Compile Include="Interfaces\IGradeRepository.cs" />
     <Compile Include="Interfaces\IMessageRepository.cs" />
     <Compile Include="Interfaces\ISessionIdRepository.cs" />
@@ -129,6 +130,12 @@
     <EmbeddedResource Include="Migrations\201501190925442_AddedMessages.resx">
       <DependentUpon>201501190925442_AddedMessages.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Services.cs\Services.csproj">
+      <Project>{eb402009-5a3b-418a-b52b-ef579349fd56}</Project>
+      <Name>Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

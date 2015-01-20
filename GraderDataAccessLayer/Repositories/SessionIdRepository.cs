@@ -1,6 +1,5 @@
 ﻿namespace GraderDataAccessLayer.Repositories
 {
-    using System.Linq;
     using Interfaces;
     using Models;
     using System;
@@ -17,12 +16,12 @@
 
         public async Task<SessionIdModel> GetByUserId(int userId)
         {
-            var searchResult = await dbSet.FirstOrDefaultAsync(s => s.UserId == userId);
+            var searchResult = await DbSet.FirstOrDefaultAsync(s => s.UserId == userId);
             return searchResult;
         }
         public async Task<SessionIdModel> GetBySesionId(Guid sessionId)
         {
-            var searchResult = await dbSet.FirstOrDefaultAsync(s => s.SessionId == sessionId);
+            var searchResult = await DbSet.FirstOrDefaultAsync(s => s.SessionId == sessionId);
             return searchResult;
         }
 
@@ -31,11 +30,11 @@
             try
             {
                 var newSession = new SessionIdModel(userId);
-                dbSet.Add(newSession);
-                await context.SaveChangesAsync();
+                DbSet.Add(newSession);
+                await Context.SaveChangesAsync();
 
                 //Load virtual properties and return object
-                context.Entry(newSession).Reference(c => c.User).Load();
+                Context.Entry(newSession).Reference(c => c.User).Load();
                 return newSession;
             }
             catch (DbException)
@@ -73,7 +72,7 @@
         {
             try
             {
-                var model = await dbSet.FirstOrDefaultAsync(s => s.UserId == userId);
+                var model = await DbSet.FirstOrDefaultAsync(s => s.UserId == userId);
                 return await Delete(model);
             }
             catch (Exception e)
@@ -94,13 +93,13 @@
                 return;
             }
 
-            if (context == null)
+            if (Context == null)
             {
                 return;
             }
 
-            context.Dispose();
-            context = null;
+            Context.Dispose();
+            Context = null;
         }      
     }
 }

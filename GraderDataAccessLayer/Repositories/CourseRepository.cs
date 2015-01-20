@@ -15,42 +15,42 @@
 
         public async Task<IEnumerable<CourseModel>> GetByName(string name)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(c => c.Name == name));
+            var searchResult = await Task.Run(() => DbSet.Where(c => c.Name == name));
             return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByShortName(string shortName)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(c => c.ShortName == shortName));
+            var searchResult = await Task.Run(() => DbSet.Where(c => c.ShortName == shortName));
             return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByCourseNumber(string courseNumber)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(c => c.CourseNumber == courseNumber));
+            var searchResult = await Task.Run(() => DbSet.Where(c => c.CourseNumber == courseNumber));
             return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetBySemester(int semester)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(c => c.Semester == semester));
+            var searchResult = await Task.Run(() => DbSet.Where(c => c.Semester == semester));
             return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByYear(int year)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(c => c.Year == year));
+            var searchResult = await Task.Run(() => DbSet.Where(c => c.Year == year));
             return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByStartDate(DateTime startDate)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(c => c.StartDate == startDate));
+            var searchResult = await Task.Run(() => DbSet.Where(c => c.StartDate == startDate));
             return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByEndDate(DateTime endDate)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(c => c.EndDate == endDate));
+            var searchResult = await Task.Run(() => DbSet.Where(c => c.EndDate == endDate));
             return searchResult;
         }
         public async Task<IEnumerable<CourseModel>> GetByOwnerId(int ownerId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(c => c.OwnerId == ownerId));
+            var searchResult = await Task.Run(() => DbSet.Where(c => c.OwnerId == ownerId));
             return searchResult;
         }
 
@@ -66,12 +66,12 @@
                 return;
             }
 
-            if (context == null)
+            if (Context == null)
             {
                 return;
             }
-            context.Dispose();
-            context = null;
+            Context.Dispose();
+            Context = null;
         }
     }
 }

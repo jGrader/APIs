@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public interface IExcuseRepository : IGenericRepository<ExcuseModel>, IDisposable
+    public interface IExcuseRepository : IGenericTeamActionsRepository<ExcuseModel>, IDisposable
     {
         Task<IEnumerable<ExcuseModel>> GetByEntity(int entityId);
         Task<IEnumerable<ExcuseModel>> GetByUser(int userId);

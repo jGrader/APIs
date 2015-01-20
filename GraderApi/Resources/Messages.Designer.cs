@@ -268,6 +268,15 @@ namespace GraderApi.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user {0} is already a member of other team for this entity!.
+        /// </summary>
+        internal static string TeamMemberAlreadyInTeam {
+            get {
+                return ResourceManager.GetString("TeamMemberAlreadyInTeam", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An unexpected error turned up. Please try again!.
         /// </summary>
         internal static string UnexpectedError {

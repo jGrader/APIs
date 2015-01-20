@@ -13,7 +13,7 @@
 
         public async Task<AdminModel> GetByUserId(int userId)
         {
-            var searchResult = await dbSet.FirstOrDefaultAsync(a => a.UserId == userId);
+            var searchResult = await DbSet.FirstOrDefaultAsync(a => a.UserId == userId);
             return searchResult;
         }
        
@@ -29,13 +29,13 @@
                 return;
             }
 
-            if (context == null)
+            if (Context == null)
             {
                 return;
             }
 
-            context.Dispose();
-            context = null;
+            Context.Dispose();
+            Context = null;
         }
     }
 }

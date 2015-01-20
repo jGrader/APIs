@@ -15,12 +15,12 @@
 
         public async Task<IEnumerable<FileModel>> GetByCourseId(int courseId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(f => f.Entity.Task.CourseId == courseId));
+            var searchResult = await Task.Run(() => DbSet.Where(f => f.Entity.Task.CourseId == courseId));
             return searchResult;
         }
         public async Task<IEnumerable<FileModel>> GetByEntityId(int entityId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(f => f.EntityId == entityId));
+            var searchResult = await Task.Run(() => DbSet.Where(f => f.EntityId == entityId));
             return searchResult;
         }  
 
@@ -36,13 +36,13 @@
                 return;
             }
 
-            if (context == null)
+            if (Context == null)
             {
                 return;
             }
 
-            context.Dispose();
-            context = null;
+            Context.Dispose();
+            Context = null;
         }  
     }
 }

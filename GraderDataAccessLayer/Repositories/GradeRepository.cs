@@ -15,19 +15,19 @@
 
         public async Task<IEnumerable<GradeModel>> GetByUserId(int userId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(g => g.UserId == userId));
+            var searchResult = await Task.Run(() => DbSet.Where(g => g.UserId == userId));
             return searchResult;
         }
 
         public async Task<IEnumerable<GradeModel>> GetByGraderId(int graderId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(g => g.GraderId == graderId));
+            var searchResult = await Task.Run(() => DbSet.Where(g => g.GraderId == graderId));
             return searchResult;
         }
 
         public async Task<IEnumerable<GradeModel>> GetByEntityId(int entityId)
         {
-            var searchResult = await Task.Run(() => dbSet.Where(g => g.EntityId == entityId));
+            var searchResult = await Task.Run(() => DbSet.Where(g => g.EntityId == entityId));
             return searchResult;
         }
 
@@ -43,13 +43,13 @@
                 return;
             }
 
-            if (context == null)
+            if (Context == null)
             {
                 return;
             }
 
-            context.Dispose();
-            context = null;
+            Context.Dispose();
+            Context = null;
         }  
     }
 }

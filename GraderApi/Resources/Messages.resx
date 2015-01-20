@@ -195,4 +195,7 @@
   <data name="NoTeamFound" xml:space="preserve">
     <value>The user is not part of any team!</value>
   </data>
+  <data name="TeamMemberAlreadyInTeam" xml:space="preserve">
+    <value>The user {0} is already a member of other team for this entity!</value>
+  </data>
 </root>
