@@ -89,7 +89,7 @@
 
                         existingExcuse.IsGranted = excuse.IsGranted;
                         Context.Entry(existingExcuse).State = EntityState.Modified;
-                        returnValues.Add(excuse);
+                        returnValues.Add(existingExcuse);
                     }
 
                     await Context.SaveChangesAsync();

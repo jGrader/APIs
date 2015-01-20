@@ -98,7 +98,6 @@
         public async Task<HttpResponseMessage> Add(int courseId, bool wholeTeam, [FromBody] GradeModel grade)
         {
             grade.Entity = await _unitOfWork.EntityRepository.Get(grade.EntityId);
-            grade.Entity.Task = await _unitOfWork.TaskRepository.Get(grade.Entity.TaskId);
             if (courseId != grade.Entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -112,23 +111,10 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.NoTeamFound);
                 }
 
-                var addedGrades = new List<GradeModel>();
-                foreach (var teamMember in firstOrDefaultTeam.TeamMembers)
-                {
-                    grade.UserId = teamMember.Id;
-                    var result = await _unitOfWork.GradeRepository.Add(grade);
-
-                    if (result == null)
-                    {
-                        var revertResult = await DeleteAddedGrades(addedGrades);
-                        return Request.CreateResponse(revertResult == HttpStatusCode.OK ? 
-                            HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
-                    }
-
-                    addedGrades.Add(result);
-                }
-
-                return Request.CreateResponse(HttpStatusCode.OK);
+                var result = await _unitOfWork.GradeRepository.AddToTeam(grade, firstOrDefaultTeam.TeamMembers);
+                return result != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
             catch (Exception e)
             {
@@ -149,7 +135,6 @@
             }
 
             grade.Entity = await _unitOfWork.EntityRepository.Get(grade.EntityId);
-            grade.Entity.Task = await _unitOfWork.TaskRepository.Get(grade.Entity.TaskId);
             if (courseId != grade.Entity.Task.CourseId)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.InvalidCourse);
@@ -163,46 +148,10 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.NoTeamFound);
                 }
 
-                var backUpValues = new List<GradeModel>();
-                var addedGrades = new List<GradeModel>();
-                foreach (var tm in firstOrDefaultTeam.TeamMembers)
-                {
-                    var tm1 = tm;
-                    var oldGrade = await _unitOfWork.GradeRepository.GetByExpression(g => g.EntityId == grade.EntityId && g.UserId == tm1.Id);
-                    var firstOrDefaultOldGrade = oldGrade.FirstOrDefault();
-                    if (firstOrDefaultOldGrade != null)
-                    {
-                        backUpValues.Add(firstOrDefaultOldGrade);
-
-                        grade.UserId = tm.Id;
-                        var result = await _unitOfWork.GradeRepository.Update(grade);
-
-                        if (result == null)
-                        {
-                            var revertResult1 = await UndoChangedGrades(backUpValues);
-                            var revertResult2 = await DeleteAddedGrades(addedGrades);
-                            return Request.CreateResponse(revertResult1 == HttpStatusCode.OK && revertResult2 == HttpStatusCode.OK
-                                ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
-                        }
-                    }
-                    else
-                    {
-                        grade.UserId = tm.Id;
-                        var result = await _unitOfWork.GradeRepository.Add(grade);
-
-                        if (result == null)
-                        {
-                            var revertResult1 = await UndoChangedGrades(backUpValues);
-                            var revertResult2 = await DeleteAddedGrades(addedGrades);
-                            return Request.CreateResponse(revertResult1 == HttpStatusCode.OK && revertResult2 == HttpStatusCode.OK
-                                ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
-                        }
-
-                        addedGrades.Add(result);
-                    }
-                }
-
-                return Request.CreateResponse(HttpStatusCode.OK);
+                var result = await _unitOfWork.GradeRepository.UpdateForTeam(grade, firstOrDefaultTeam.TeamMembers);
+                return result != null
+                    ? Request.CreateResponse(HttpStatusCode.OK, result.ToJson())
+                    : Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
             catch (Exception e)
             {
@@ -235,27 +184,8 @@
                     return Request.CreateResponse(HttpStatusCode.BadRequest, Messages.NoTeamFound);
                 }
 
-                var deletedGrades = new List<GradeModel>();
-                foreach (var tm in firstOrDefaultTeam.TeamMembers)
-                {
-                    var tm1 = tm;
-                    var oldGrade = await _unitOfWork.GradeRepository.GetByExpression(g => g.EntityId == existingGrade.EntityId && g.UserId == tm1.Id);
-                    var firstOrDefaultOldGrade = oldGrade.FirstOrDefault();
-                    if (firstOrDefaultOldGrade != null)
-                    {
-                        var result = await _unitOfWork.GradeRepository.Delete(firstOrDefaultOldGrade.Id);
-                        if (result == false)
-                        {
-                            var undoResult = await AddDeletedGrades(deletedGrades);
-                            return Request.CreateResponse(undoResult == HttpStatusCode.OK 
-                                ? HttpStatusCode.NotModified : HttpStatusCode.InternalServerError);
-                        }
-
-                        deletedGrades.Add(firstOrDefaultOldGrade);
-                    }
-                }
-
-                return Request.CreateResponse(HttpStatusCode.OK);
+                var result = await _unitOfWork.GradeRepository.DeleteForTeam(existingGrade, firstOrDefaultTeam.TeamMembers);
+                return Request.CreateResponse(result ? HttpStatusCode.OK : HttpStatusCode.InternalServerError);
             }
             catch (Exception e)
             {
@@ -264,8 +194,6 @@
             }
         }
 
-
-        #region Helpers
         private async Task<TeamModel> GetCorrectTeamModel(bool wholeTeam, GradeModel grade)
         {
             var firstOrDefaultTeam = new TeamModel
@@ -283,51 +211,5 @@
 
             return firstOrDefaultTeam;
         }
-
-        private async Task<HttpStatusCode> DeleteAddedGrades(IEnumerable<GradeModel> addedGrades)
-        {
-            foreach (var grade in addedGrades)
-            {
-                var result = await _unitOfWork.GradeRepository.Delete(grade);
-
-                if (result == false)
-                {
-                    return HttpStatusCode.InternalServerError;
-                }
-            }
-
-            return HttpStatusCode.OK;
-        }
-
-        private async Task<HttpStatusCode> UndoChangedGrades(IEnumerable<GradeModel> backUpValues)
-        {
-            foreach (var grade in backUpValues)
-            {
-                var result = await _unitOfWork.GradeRepository.Update(grade);
-
-                if (result == null)
-                {
-                    return HttpStatusCode.InternalServerError;
-                }
-            }
-
-            return HttpStatusCode.OK;
-        }
-
-        private async Task<HttpStatusCode> AddDeletedGrades(IEnumerable<GradeModel> deletedGrades)
-        {
-            foreach (var grade in deletedGrades)
-            {
-                var result = await _unitOfWork.GradeRepository.Add(grade);
-
-                if (result == null)
-                {
-                    return HttpStatusCode.InternalServerError;
-                }
-            }
-
-            return HttpStatusCode.OK;
-        }
-        #endregion
     }
 }

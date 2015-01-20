@@ -91,7 +91,7 @@
                         existingExtension.IsGranted = extension.IsGranted;
                         existingExtension.NewDeadline = extension.NewDeadline;
                         Context.Entry(existingExtension).State = EntityState.Modified;
-                        returnValues.Add(extension);
+                        returnValues.Add(existingExtension);
                     }
 
                     await Context.SaveChangesAsync();

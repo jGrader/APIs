@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public interface IGradeRepository : IGenericRepository<GradeModel>, IDisposable
+    public interface IGradeRepository : IGenericTeamActionsRepository<GradeModel>, IDisposable
     {
         Task<IEnumerable<GradeModel>> GetByUserId(int userId);
         Task<IEnumerable<GradeModel>> GetByGraderId(int graderId);
