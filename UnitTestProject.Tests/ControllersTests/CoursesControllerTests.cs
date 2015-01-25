@@ -1,5 +1,6 @@
 ﻿using GraderApi.Controllers;
 using GraderApi.Filters;
+using GraderApi.Resources;
 using GraderDataAccessLayer;
 using GraderDataAccessLayer.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,6 +16,9 @@ using System.Web.Http;
 
 namespace UnitTestProject.Tests.ControllersTests
 {
+    using System.Configuration;
+    using GraderApi.Resources;
+
     [TestClass]
     public class CoursesControllerTests
     {
@@ -41,7 +45,7 @@ namespace UnitTestProject.Tests.ControllersTests
         [TestInitialize]
         public void Initialize()
         {
-           _uow = new UnitOfWork();
+            _uow = new UnitOfWork(ConfigurationManager.ConnectionStrings[DatabaseConnections.MySQLTest].ConnectionString);
             _cc = new CoursesController(_uow);
 
             _cc.Configuration = new HttpConfiguration();

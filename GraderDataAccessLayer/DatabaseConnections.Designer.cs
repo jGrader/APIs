@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace GraderApi.Resources {
+namespace GraderDataAccessLayer.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace GraderApi.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GraderApi.Resources.DatabaseConnections", typeof(DatabaseConnections).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GraderDataAccessLayer.DatabaseConnections", typeof(DatabaseConnections).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

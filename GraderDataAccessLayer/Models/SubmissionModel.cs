@@ -19,16 +19,16 @@
         [DataType(DataType.DateTime)]
         public DateTime TimeStamp { get; set; }
 
-        //Navigation property
         [Required]
         public int UserId { get; set; }
+
+        [Required]
+        public int FileId { get; set; }
+
+        //Navigation property
         
         [ForeignKey("UserId")]
         public virtual UserModel User { get; set; }
-
-        //Navigation property
-        [Required]
-        public int FileId { get; set; }
         
         [ForeignKey("FileId")]
         public virtual FileModel File { get; set; }

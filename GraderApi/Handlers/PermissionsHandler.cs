@@ -1,13 +1,14 @@
 ﻿namespace GraderApi.Handlers
 {
-    using System.Configuration;
     using Extensions;
     using Grader.ExtensionMethods;
     using GraderDataAccessLayer;
+    using GraderDataAccessLayer.Resources;
     using Resources;
     using Services;
     using System;
     using System.Collections.Generic;
+    using System.Configuration;
     using System.Linq;
     using System.Net;
     using System.Net.Http;

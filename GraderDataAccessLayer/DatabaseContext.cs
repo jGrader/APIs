@@ -14,6 +14,7 @@
         public DatabaseContext(string connectionString)
             : base(connectionString)
         {
+            this.Configuration.LazyLoadingEnabled = true;
         }
 
         public DbSet<CourseModel> Course { get; set; }

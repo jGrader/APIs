@@ -38,5 +38,13 @@
         public virtual TaskModel Task { get; set; }
 
         public virtual ICollection<FileModel> Files { get; set; }
+
+        public virtual ICollection<TeamModel> Teams { get; set; }
+
+        public virtual ICollection<ExcuseModel> Excuses { get; set; }
+
+        public virtual ICollection<ExtensionModel> Extensions { get; set; }
+
+        public virtual ICollection<GradeModel> Grades { get; set; } 
     }
 }

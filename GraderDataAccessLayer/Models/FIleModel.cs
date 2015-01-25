@@ -1,5 +1,7 @@
 ﻿namespace GraderDataAccessLayer.Models
 {
+    using System.Collections;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -22,5 +24,7 @@
         
         [ForeignKey("EntityId")]
         public virtual EntityModel Entity { get; set; }
+
+        public virtual ICollection<SubmissionModel> Submissions { get; set; }
     }
 }

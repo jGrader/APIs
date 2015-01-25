@@ -15,6 +15,7 @@
         private FileRepository _fileRepository;
         private GradeComponentRepository _gradeComponentRepository;
         private GradeRepository _gradeRepository;
+        private MessageRepository _messageRepository;
         private SessionIdRepository _sessionIdRepository;
         private SubmissionRepository _submissionRepository;
         private TaskRepository _taskRepository;
@@ -110,6 +111,15 @@
             }
         }
 
+        public MessageRepository MessageRepository
+        {
+            get
+            {
+                _messageRepository = _messageRepository ?? new MessageRepository(_context);
+                return _messageRepository;
+            }
+        }
+
         public SessionIdRepository SessionIdRepository
         {
             get
@@ -177,6 +187,7 @@
             DisposeFileRepository();
             DisposeGradeComponentRepository();
             DisposeGradeRepository();
+            DisposeMessageRepository();
             DisposeSessionIdRepository();
             DisposeSubmissionRepository();
             DisposeTaskRepository();
@@ -245,6 +256,17 @@
 
             _sessionIdRepository.Dispose();
             _sessionIdRepository = null;
+        }
+
+        private void DisposeMessageRepository()
+        {
+            if (_messageRepository == null)
+            {
+                return;
+            }
+
+            _messageRepository.Dispose();
+            _messageRepository = null;
         }
 
         private void DisposeGradeRepository()

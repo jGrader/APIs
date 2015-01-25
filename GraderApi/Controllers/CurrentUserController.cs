@@ -79,10 +79,10 @@
         {
             try
             {
-                var entities = from e in (await _unitOfWork.EntityRepository.GetByCourseId(courseId)) select e.Id;
-                var grades = (await _unitOfWork.GradeRepository.GetByUserId(_user.Id)).Where(g => entities.Contains(g.EntityId));
-
-                return Request.CreateResponse(HttpStatusCode.OK, grades.ToJson());
+                /*var entities = from e in (await _unitOfWork.EntityRepository.GetByCourseId(courseId)) select e.Id;
+                var grades = (await _unitOfWork.GradeRepository.GetByUserId(_user.Id)).Where(g => entities.Contains(g.EntityId));*/
+                var tmp = _user.Grades;
+                return Request.CreateResponse(HttpStatusCode.OK, tmp.ToJson());
             }
             catch (Exception e)
             {

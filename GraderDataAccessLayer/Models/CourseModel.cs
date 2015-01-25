@@ -51,5 +51,9 @@
         public virtual UserModel Owner { get; set; }
 
         public virtual ICollection<GradeComponentModel> GradeComponents { get; set; }
+
+        public virtual ICollection<CourseUserModel> CourseUsers { get; set; }
+
+        public virtual ICollection<TaskModel> Tasks { get; set; } 
     }
 }

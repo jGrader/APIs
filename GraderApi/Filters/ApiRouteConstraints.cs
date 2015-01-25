@@ -1,11 +1,11 @@
 ﻿namespace GraderApi.Filters
 {
-    using System.Configuration;
     using GraderDataAccessLayer;
-    using Resources;
+    using GraderDataAccessLayer.Resources;
     using Services;
     using System;
     using System.Collections.Generic;
+    using System.Configuration;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http.Routing;

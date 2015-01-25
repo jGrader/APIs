@@ -39,6 +39,18 @@
         public string GraduationYear { get; set; }
 
         //Navigation properties
-        public virtual ICollection<TeamModel> Teams { get; set; } 
+        public virtual ICollection<TeamModel> Teams { get; set; }
+
+        public virtual ICollection<SubmissionModel> Submissions { get; set; }
+
+        public virtual ICollection<CourseModel> OwnedCourses { get; set; }
+
+        public virtual ICollection<CourseUserModel> Courses { get; set; }
+
+        public virtual ICollection<ExcuseModel> Excuses { get; set; }
+        
+        public virtual ICollection<ExtensionModel> Extensions { get; set; }
+
+        public virtual ICollection<GradeModel> Grades { get; set; }
     }
 }

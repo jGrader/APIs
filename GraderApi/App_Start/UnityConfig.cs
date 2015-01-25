@@ -2,6 +2,7 @@ namespace GraderApi
 {
     using System.Configuration;
     using GraderDataAccessLayer;
+    using GraderDataAccessLayer.Resources;
     using Microsoft.Practices.Unity;
     using Resources;
     using Services;

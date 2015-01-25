@@ -56,7 +56,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseConnections.Designer.cs">
+      <DependentUpon>DatabaseConnections.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="DatabaseContext.cs" />
+    <Compile Include="DatabaseContextFactory.cs" />
     <Compile Include="Interfaces\IAdminRepository.cs" />
     <Compile Include="Interfaces\ICourseUserRepository.cs" />
     <Compile Include="Interfaces\IEntityRepository.cs" />
@@ -79,6 +85,10 @@
     <Compile Include="Migrations\201501190925442_AddedMessages.cs" />
     <Compile Include="Migrations\201501190925442_AddedMessages.Designer.cs">
       <DependentUpon>201501190925442_AddedMessages.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201501250807432_BeforeFirstRelease.cs" />
+    <Compile Include="Migrations\201501250807432_BeforeFirstRelease.Designer.cs">
+      <DependentUpon>201501250807432_BeforeFirstRelease.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdminModel.cs" />
@@ -124,11 +134,19 @@
     <Compile Include="Repositories\CourseRepository.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="DatabaseConnections.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>DatabaseConnections.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>GraderDataAccessLayer.Resources</CustomToolNamespace>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201501172201390_Initial.resx">
       <DependentUpon>201501172201390_Initial.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201501190925442_AddedMessages.resx">
       <DependentUpon>201501190925442_AddedMessages.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201501250807432_BeforeFirstRelease.resx">
+      <DependentUpon>201501250807432_BeforeFirstRelease.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

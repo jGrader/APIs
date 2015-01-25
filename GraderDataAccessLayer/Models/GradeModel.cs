@@ -19,7 +19,7 @@
         public int BonusGrade { get; set; }
 
         [Required]
-        [DataType(DataType.DateTime)]
+        [DataType(DataType.Time)]
         public DateTime TimeStamp { get; set; }
 
         //Navigation properties
