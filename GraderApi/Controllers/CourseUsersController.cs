@@ -138,7 +138,7 @@
                     }
                     else
                     {
-                        finalGrade += (sum / entitiesByGradeComponent.Count());
+                        finalGrade += (int)((gradeComponent.Percentage / 100.0) * (sum /(double) entitiesByGradeComponent.Count()));
                     }
                 }
 

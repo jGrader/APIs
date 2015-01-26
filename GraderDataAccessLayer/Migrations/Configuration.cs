@@ -9,7 +9,7 @@ namespace GraderDataAccessLayer.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
         }
 
         protected override void Seed(DatabaseContext context)
@@ -47,7 +47,7 @@ namespace GraderDataAccessLayer.Migrations
                 new CourseModel { Name = "General Procrastination", CourseNumber = "52001", StartDate = new DateTime(2014, 10, 22), EndDate = new DateTime(2014, 11, 23), Semester = 1, ShortName = "GenPro", Year = 2014, OwnerId = 1, ExtensionLimit = 2, ExcuseLimit = 1 },
                 new CourseModel { Name = "General Useless Studies", CourseNumber = "71501", StartDate = new DateTime(2014, 1, 2), EndDate = new DateTime(2015, 5, 23), Semester = 2, ShortName = "GenULS", Year = 2014, OwnerId = 2, ExtensionLimit = 3, ExcuseLimit = 0 }
             };
-            courses.ForEach(c => context.Course.AddOrUpdate(p => new {p.Name, p.Semester, p.StartDate, p.EndDate},c));
+            courses.ForEach(c => context.Course.AddOrUpdate(p => new { p.Name, p.Semester, p.StartDate, p.EndDate }, c));
             context.SaveChanges();
 
             var courseUsers = new List<CourseUserModel>
@@ -56,7 +56,7 @@ namespace GraderDataAccessLayer.Migrations
                 new CourseUserModel {ExcuseNumber = 0, ExtensionNumber = 0, UserId = 2, CourseId = 1, Permissions = 700}
             };
 
-            courseUsers.ForEach(cu => context.CourseUser.AddOrUpdate(p => new {p.UserId, p.CourseId}, cu));
+            courseUsers.ForEach(cu => context.CourseUser.AddOrUpdate(p => new { p.UserId, p.CourseId }, cu));
             context.SaveChanges();
 
             var gradeComponents = new List<GradeComponentModel>
@@ -68,7 +68,7 @@ namespace GraderDataAccessLayer.Migrations
                 new GradeComponentModel { CourseId = 1, Name = "Monthly quizzes", Percentage = 30 },
                 new GradeComponentModel { CourseId = 1, Name = "Final exam", Percentage = 70 }
             };
-            gradeComponents.ForEach(g => context.GradeComponent.AddOrUpdate(p=> new {p.CourseId, p.Name}, g));
+            gradeComponents.ForEach(g => context.GradeComponent.AddOrUpdate(p => new { p.CourseId, p.Name }, g));
             context.SaveChanges();
 
             var tasks = new List<TaskModel>
@@ -76,7 +76,7 @@ namespace GraderDataAccessLayer.Migrations
                 new TaskModel { CourseId = 2, GradeComponentId = 1, Name = "Assignment 1" },
                 new TaskModel { CourseId = 1, GradeComponentId = 5, Name = "Week 1 problems" }
             };
-            tasks.ForEach(t => context.Task.AddOrUpdate(p => new { p.CourseId, p.GradeComponentId}, t));
+            tasks.ForEach(t => context.Task.AddOrUpdate(p => new { p.CourseId, p.GradeComponentId }, t));
             context.SaveChanges();
 
             var entities = new List<EntityModel>
@@ -87,7 +87,7 @@ namespace GraderDataAccessLayer.Migrations
                 new EntityModel { Name = "Test 1", Points = 15, BonusPoints = 0, OpenTime = new DateTime(2015, 1, 10), CloseTime = new DateTime(2015, 1, 17), TaskId = 2 },
                 new EntityModel { Name = "Test 2", Points = 25, BonusPoints = 0, OpenTime = new DateTime(2015, 1, 10), CloseTime = new DateTime(2015, 1, 17), TaskId = 2 },
             };
-            entities.ForEach(e => context.Entity.AddOrUpdate(p => new { p.Name}, e));
+            entities.ForEach(e => context.Entity.AddOrUpdate(p => new { p.Name }, e));
             context.SaveChanges();
 
             var files = new List<FileModel>
@@ -99,7 +99,7 @@ namespace GraderDataAccessLayer.Migrations
                 new FileModel { EntityId = 4, FileName = "file4", Extension = ".pdf" },
                 new FileModel { EntityId = 5, FileName = "file5", Extension = ".bmp" }
             };
-            files.ForEach(f => context.File.AddOrUpdate(p => new { p.FileName, p.EntityId, p.Extension}, f));
+            files.ForEach(f => context.File.AddOrUpdate(p => new { p.FileName, p.EntityId, p.Extension }, f));
             context.SaveChanges();
 
             // Create Teams

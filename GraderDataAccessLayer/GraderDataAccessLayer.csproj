@@ -86,10 +86,6 @@
     <Compile Include="Migrations\201501190925442_AddedMessages.Designer.cs">
       <DependentUpon>201501190925442_AddedMessages.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201501250807432_BeforeFirstRelease.cs" />
-    <Compile Include="Migrations\201501250807432_BeforeFirstRelease.Designer.cs">
-      <DependentUpon>201501250807432_BeforeFirstRelease.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdminModel.cs" />
     <Compile Include="Models\CourseModel.cs" />
@@ -144,9 +140,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201501190925442_AddedMessages.resx">
       <DependentUpon>201501190925442_AddedMessages.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201501250807432_BeforeFirstRelease.resx">
-      <DependentUpon>201501250807432_BeforeFirstRelease.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

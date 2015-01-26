@@ -33,9 +33,11 @@
         public int EntityId { get; set; }
 
         [ForeignKey("UserId")]
+        [InverseProperty("Grades")]
         public virtual UserModel User { get; set; }
 
         [ForeignKey("GraderId")]
+        [InverseProperty("GradesAsGrader")]
         public virtual UserModel Grader { get; set; }
 
         [ForeignKey("EntityId")]
