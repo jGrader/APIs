@@ -109,9 +109,6 @@ namespace GraderApi.Handlers
 
                 try
                 {
-                    //CreateVPNConnection("JacobsVPN", "212.201.44.246", "ahegyes", "~Mg7XqzA$");
-                    //DialVPNConnection("JacobsVPN");
-
                     // Check with the LDAP server that the user's credentials are valid
                     if (!Membership.ValidateUser(credentials.Username, credentials.Password))
                     {
@@ -257,47 +254,6 @@ namespace GraderApi.Handlers
             {
                 HttpContext.Current.User = principal;
             }
-        }
-
-        public static void CreateVPNConnection(string connectionName, string serverAddress, string username, string password)
-        {
-            // create vpn connection
-            RasDevice device = RasDevice.GetDeviceByName("(PPTP)", RasDeviceType.Vpn, false);
-            if (device == null) throw new Exception("Cannot get RasDevice");
-            RasEntry entry = RasEntry.CreateVpnEntry(connectionName, serverAddress, RasVpnStrategy.Default, device);
-
-            // set vpn connection options
-            entry.Options.RemoteDefaultGateway = false;
-            entry.Options.IPv6RemoteDefaultGateway = false;
-            entry.Options.ReconnectIfDropped = true;
-            entry.Options.ShowDialingProgress = false;
-            entry.Options.RequireMSChap2 = true;
-            entry.Options.PreviewUserPassword = false;
-
-            // add connection
-            RasPhoneBook phoneBook = new RasPhoneBook();
-            phoneBook.Open();
-            if (phoneBook.Entries.Contains(connectionName))
-            {// already exists
-                // check if connected
-                RasConnection rasConnection = RasConnection.GetActiveConnectionByName(connectionName, phoneBook.Path);
-                if (rasConnection != null)
-                    rasConnection.HangUp();
-                phoneBook.Entries.Remove(connectionName);
-            }
-            phoneBook.Entries.Add(entry);
-
-            // set credentials
-            entry.UpdateCredentials(new System.Net.NetworkCredential(username, password), true);
-        }
-        public static void DialVPNConnection(string connectionName)
-        {
-            // dial
-            RasDialer dialer = new RasDialer();
-            dialer.AllowUseStoredCredentials = true;
-            dialer.EntryName = connectionName;
-            dialer.PhoneBookPath = RasPhoneBook.GetPhoneBookPath(RasPhoneBookType.AllUsers);
-            dialer.Dial();
         }
 
         private class Credentials
