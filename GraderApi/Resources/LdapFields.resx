@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AttributeMapUsernameField" xml:space="preserve">
-    <value>LDAPAttributeMapUsername</value>
+    <value>sAMAccountName</value>
   </data>
   <data name="CampusNet" xml:space="preserve">
     <value>cn</value>
@@ -152,5 +152,11 @@
   </data>
   <data name="UserQuery" xml:space="preserve">
     <value>(&amp;(objectClass=user)({0}={1}))</value>
+  </data>
+  <data name="Container" xml:space="preserve">
+    <value>LDAPContainer</value>
+  </data>
+  <data name="Domain" xml:space="preserve">
+    <value>LDAPDomain</value>
   </data>
 </root>

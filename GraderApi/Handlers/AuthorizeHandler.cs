@@ -26,8 +26,12 @@ namespace GraderApi.Handlers
 
     public class AuthorizeHandler : DelegatingHandler
     {
-        private readonly UnitOfWork _unitOfWork;
         private readonly Logger _logger;
+        private readonly UnitOfWork _unitOfWork;
+
+        private static readonly string LdapDomain = WebConfigurationManager.AppSettings[LdapFields.Domain];
+        private static readonly string LdapContainer = WebConfigurationManager.AppSettings[LdapFields.Container];
+        private static readonly string LdapConnectionString = WebConfigurationManager.AppSettings[LdapFields.ConnectionStringField];       
 
         public AuthorizeHandler()
         {
@@ -109,104 +113,99 @@ namespace GraderApi.Handlers
 
                 try
                 {
-                    // Check with the LDAP server that the user's credentials are valid
-                    if (!Membership.ValidateUser(credentials.Username, credentials.Password))
+                    using (var context = new System.DirectoryServices.AccountManagement.PrincipalContext(System.DirectoryServices.AccountManagement.ContextType.Domain, LdapDomain, LdapContainer))
                     {
-                        //If we reach this point, the user's credentials were invalid. Let him know about that!
-                        return await CreateTask(request, HttpStatusCode.BadRequest, Messages.InvalidCredentials);
-                    }
-
-                    try
-                    {
-                        // Credentials check out; get his data from the server
-                        var serverUser = ActiveDirectoryRoleProvider.GetUserEntry(credentials.Username);
-                        if (serverUser == null)
+                        if (context.ValidateCredentials(credentials.Username, credentials.Password))
                         {
-                            // For some reason, no data was retreived for the user; why?!
-                            return await CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
-                        }
-
-                        int userId;
-                        // Now check if they are logging in for the first time or not
-                        var foundUser = await _unitOfWork.UserRepository.GetByUsername(credentials.Username);
-                        if (foundUser != null)
-                        {
-                            // If we reached this point, it's not the first time -- make sure the info is updated and move on
-                            foundUser.Email = serverUser.Properties[LdapFields.Email].Value.ToString();
-                            foundUser.GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString();
-
-                            var result = await _unitOfWork.UserRepository.Update(foundUser);
-                            if (result == null)
+                            // Credentials check out; get his data from the server
+                            var root = new DirectoryEntry(LdapConnectionString, credentials.Username + "@jacobs.jacobs-university.de", credentials.Password);
+                            var searcher = new DirectorySearcher(root, string.Format(CultureInfo.InvariantCulture, LdapFields.UserQuery, LdapFields.AttributeMapUsernameField, credentials.Username));
+                            
+                            var searchResult = searcher.FindOne();
+                            DirectoryEntry serverUser = null;
+                            if (searchResult != null && !string.IsNullOrEmpty(searchResult.Path))
                             {
+                                serverUser = searchResult.GetDirectoryEntry();
+                            }
+                                
+                            if (serverUser == null)
+                            {
+                                // For some reason, no data was retreived for the user; why?!
                                 return await CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
                             }
 
-                            userId = foundUser.Id;
-                        }
-                        else
-                        {
-                            // If we reached this point, it is the first time that the user logs in on this website;
-                            // create a password-less local account 
-                            var user = new UserModel
+                            int userId;
+                            // Now check if they are logging in for the first time or not
+                            var foundUser = await _unitOfWork.UserRepository.GetByUsername(credentials.Username);
+                            if (foundUser != null)
                             {
-                                UserName = credentials.Username,
-                                Name = serverUser.Properties[LdapFields.Name].Value.ToString(),
-                                Surname = serverUser.Properties[LdapFields.Surname].Value.ToString(),
-                                Email = serverUser.Properties[LdapFields.Email].Value.ToString(),
-                                GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString()
-                            };
+                                // If we reached this point, it's not the first time -- make sure the info is updated and move on
+                                foundUser.Email = serverUser.Properties[LdapFields.Email].Value.ToString();
+                                foundUser.GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString();
 
-                            var result = await _unitOfWork.UserRepository.Add(user);
-                            if (result == null)
+                                var result = await _unitOfWork.UserRepository.Update(foundUser);
+                                if (result == null)
+                                {
+                                    return await CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
+                                }
+
+                                userId = foundUser.Id;
+                            }
+                            else
                             {
-                                // We failed to add the new user to the database
+                                // If we reached this point, it is the first time that the user logs in on this website;
+                                // create a password-less local account 
+                                var user = new UserModel
+                                {
+                                    UserName = credentials.Username,
+                                    Name = serverUser.Properties[LdapFields.Name].Value.ToString(),
+                                    Surname = serverUser.Properties[LdapFields.Surname].Value.ToString(),
+                                    Email = serverUser.Properties[LdapFields.Email].Value.ToString(),
+                                    GraduationYear = serverUser.Properties[LdapFields.Description].Value.ToString()
+                                };
+
+                                var result = await _unitOfWork.UserRepository.Add(user);
+                                if (result == null)
+                                {
+                                    // We failed to add the new user to the database
+                                    return await CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
+                                }
+
+                                userId = result.Id;
+                            }
+
+                            if (userId == 0)
+                            {
+                                //If the userId is 0, the variable is uninitialized; something still went wrong; but what?
                                 return await CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
                             }
 
-                            userId = result.Id;
+                            //At this point, the user certainly has a local account and his credentials check out
+                            var newSessionModel = await _unitOfWork.SessionIdRepository.Add(userId);
+                            if (newSessionModel.SessionId == Guid.Empty)
+                            {
+                                // failed to register a new active session
+                                return await CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
+                            }
+
+                            var userDb = await _unitOfWork.UserRepository.Get(userId);
+                            if (userDb == null)
+                            {
+                                // The local database didn't find this user; why?!
+                                return await CreateTask(request, HttpStatusCode.BadRequest, Messages.UserNotFound);
+                            }
+
+                            // Set the user as the current UserPrincipal
+                            UpdatePrincipal(userDb);
+
+                            //Everythin is fine; Hallelujah! Send the client the active sessionId so that it can use it in future requests
+                            return await CreateTask(request, HttpStatusCode.OK, newSessionModel.SessionId);
                         }
-
-                        if (userId == 0)
-                        {
-                            //If the userId is 0, the variable is uninitialized; something still went wrong; but what?
-                            return await CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
-                        }
-
-                        //At this point, the user certainly has a local account and his credentials check out
-                        var newSessionModel = await _unitOfWork.SessionIdRepository.Add(userId);
-                        if (newSessionModel.SessionId == Guid.Empty)
-                        {
-                            // failed to register a new active session
-                            return await CreateTask(request, HttpStatusCode.InternalServerError, Messages.InternalDatabaseError);
-                        }
-
-                        var userDb = await _unitOfWork.UserRepository.Get(userId);
-                        if (userDb == null)
-                        {
-                            // The local database didn't find this user; why?!
-                            return await CreateTask(request, HttpStatusCode.BadRequest, Messages.UserNotFound);
-                        }
-
-                        // Set the user as the current UserPrincipal
-                        UpdatePrincipal(userDb);
-
-                        //Everythin is fine; Hallelujah! Send the client the active sessionId so that it can use it in future requests
-                        return await CreateTask(request, HttpStatusCode.OK, newSessionModel.SessionId);
-                    }
-                    catch (Exception e)
-                    {
-                        // Unexpected error
-                        _logger.Log(e);
-
-                        var tsk = Task.Run(() => CreateTask(request, HttpStatusCode.InternalServerError, Messages.UnexpectedError), cancellationToken);
-                        Task.WaitAll(tsk);
-
-                        return tsk.Result;
                     }
                 }
                 catch (Exception e)
                 {
-                    if (e.GetType() == typeof (ConfigurationErrorsException))
+                    if (e.GetType() == typeof(ConfigurationErrorsException))
                     {
                         // VPN connection is not set up
                         var tsk = Task.Run(() => CreateTask(request, HttpStatusCode.ServiceUnavailable, Messages.CannotConnectToLdap), cancellationToken);
@@ -271,86 +270,6 @@ namespace GraderApi.Handlers
             }
 
             return new Credentials { Username = credentials[0], Password = credentials[1] };
-        }
-
-        private static class ActiveDirectoryRoleProvider
-        {
-            private static readonly string ConnectionStringName = WebConfigurationManager.AppSettings[LdapFields.ConnectionStringField];
-            private static readonly string ConnectionUsername = WebConfigurationManager.AppSettings[LdapFields.UsernameField];
-            private static readonly string ConnectionPassword = WebConfigurationManager.AppSettings[LdapFields.PasswordField];
-            private static readonly string AttributeMapUsername = WebConfigurationManager.AppSettings[LdapFields.AttributeMapUsernameField];
-
-            public static DirectoryEntry GetUserEntry(string username)
-            {
-                var root = new DirectoryEntry(WebConfigurationManager.ConnectionStrings[ConnectionStringName].ConnectionString, ConnectionUsername, ConnectionPassword);
-                var searcher = new DirectorySearcher(root, string.Format(CultureInfo.InvariantCulture, LdapFields.UserQuery, AttributeMapUsername, username));
-
-                var result = searcher.FindOne();
-
-                if (result != null && !string.IsNullOrEmpty(result.Path))
-                    return result.GetDirectoryEntry();
-
-                return null;
-            }
-
-            private static IEnumerable<string> GetRolesForUser(string username)
-            {
-                // var allRoles = new List<string>();
-
-                var root = new DirectoryEntry(WebConfigurationManager.ConnectionStrings[ConnectionStringName].ConnectionString, ConnectionUsername, ConnectionPassword);
-
-                var searcher = new DirectorySearcher(root, string.Format(CultureInfo.InvariantCulture, LdapFields.UserQuery, AttributeMapUsername, username));
-                searcher.PropertiesToLoad.Add(LdapFields.Member); searcher.PropertiesToLoad.Add(LdapFields.EmployeeType);
-
-                var result = searcher.FindOne();
-
-                if (result != null && !string.IsNullOrEmpty(result.Path))
-                {
-                    var user = result.GetDirectoryEntry();
-
-                    yield return user.Properties[LdapFields.EmployeeType].Value.ToString(); //This will return either 'Student', 'Professor', 'Technician' etc.
-                    var groups = user.Properties[LdapFields.Member]; //This will return everything else, like mailing lists etc.
-
-                    foreach (string path in groups)
-                    {
-                        var parts = path.Split(',');
-
-                        if (parts.Length <= 0)
-                        {
-                            continue;
-                        }
-
-                        foreach (var part in parts)
-                        {
-                            var p = part.Split('=');
-
-                            if (p.Length == 0)
-                            {
-                                continue;
-                            }
-
-                            if (p[0].Equals(LdapFields.CampusNet, StringComparison.OrdinalIgnoreCase))
-                            {
-                                yield return p[1];
-                            }
-                        }
-                    }
-                }
-            }
-            public static bool IsUserInRole(string username, string roleName)
-            {
-                IEnumerable<string> roles = GetRolesForUser(username);
-
-                foreach (var role in roles)
-                {
-                    if (role.Equals(roleName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
         }
         #endregion
     }
